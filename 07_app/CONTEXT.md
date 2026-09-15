@@ -1,4 +1,3 @@
 # Workspace: application
-Status: active
-Default example write boundary for product code.
-Replace this text and the roadmap boundary during intake.
+Status: inactive
+Wall2Wall es una biblioteca, sin aplicación o servicio en el alcance inicial.

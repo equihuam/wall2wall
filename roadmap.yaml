@@ -1,42 +1,638 @@
 schema: frutlups.roadmap/2
-project: replace-with-project-slug
+project: wall2wall
 brief: 00_brief/
+runtime:
+  python: '3.11'
 verification:
-  full: [python, scripts/hermetic_verification.py]
+  full:
+  - python
+  - scripts/hermetic_verification.py
   focused_default: []
-allowed_prefixes: [07_app/]
+  timeout_seconds: 1200
+  observation: process
+allowed_prefixes:
+- 08_pkg/
+- 01_data/
+- 03_experiments/
+- 04_delivery/
+- 06_infra/
 forbidden:
-  - 00_brief/
-  - 05_governance/
-  - prompts/
-  - questions/answered/
-  - roadmap.yaml
-  - frutlups.toml
-  - AGENTS.md
-  - CLAUDE.md
+- 00_brief/
+- 05_governance/
+- prompts/
+- questions/answered/
+- roadmap.yaml
+- frutlups.toml
+- AGENTS.md
+- CLAUDE.md
+- scripts/
+- tests/
+- pyproject.toml
 review:
-  ordinary: [reviewer]
-  high: [claude_reviewer]
-  release: [reviewer, claude_reviewer]
+  ordinary:
+  - reviewer
+  high:
+  - reviewer
+  release:
+  - reviewer
 milestones:
-  - id: M001
-    title: First project milestone
-    status: active
-    risk: ordinary
-    holistic_review: true
-    slices:
-      - id: M001-S01
-        title: Replace this example with the first bounded slice
-        objective: >
-          Deliver one reviewable project change inside the declared write
-          boundary.
-        acceptance:
-          - Replace this example with observable acceptance criteria.
-        non_goals:
-          - Work outside the first slice.
-        read_first:
-          - 00_brief/CONTEXT.md
-        focused: []
-        kind: code
-ruled_out: []
-not_yet_specified: []
+- id: M001
+  title: Linux/WSL2, Micromamba y cualificación Python 3.11
+  status: active
+  risk: ordinary
+  holistic_review: true
+  slices:
+  - id: M001-S01
+    title: Prueba exacta Linux, Micromamba y Snakemake
+    objective: Cualificar plataforma Linux/WSL2, entorno fijo 3.11, plantilla y DAG mínimo.
+    acceptance:
+    - 'V1/V7/D012: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar
+      distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.'
+    - Arquitecto cualifica Git/ledger/lock/verificador en Linux antes de baseline. Probar GeoTIFF,
+      CRS, RF y DAG de dos procesos con artefactos persistidos y segunda ejecución sin trabajo.
+    - Crear 08_pkg/tests/run_checks.py con Pytest; full descubre suites y falla ante cero pruebas,
+      skips requeridos o dependencia ausente; sólo usar procesos Linux del entorno fijo.
+    - Sin entornos por regla ni uso de Python/Conda Windows. WSL/Micromamba ausentes bloquean ejecución,
+      no esta planificación; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.
+    non_goals:
+    - API final, workflow completo o experimentos científicos.
+    - Modificar sistema, entorno base o herramientas de plantilla desde el asiento coder.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 06_infra/
+    - 08_pkg/tests/
+    - 08_pkg/workflow/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M002
+  title: Paquete, simulaciones y datos alineados
+  status: planned
+  risk: ordinary
+  holistic_review: true
+  slices:
+  - id: M002-S01
+    title: Paquete instalable mínimo
+    objective: Crear distribución aislada de las herramientas de plantilla.
+    acceptance:
+    - Wheel declara compatibilidad mínima Python 3.11 e importa fuera del checkout en réplica Micromamba
+      del lock; requisitos resueltos soportan 3.11.
+    - Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar
+      wall2wall. Documentar Micromamba y exigir pruebas de paquete en V1.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Implementar algoritmos futuros.
+    - Publicar o elegir licencia sin propietario.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M002-S02
+    title: Generador y contrato de datos
+    objective: Crear fixtures con verdad conocida y metadatos explícitos.
+    acceptance:
+    - 'V2: generador por semilla produce seis campos, verdad oculta y puntos; incluye señal/no señal,
+      agrupación y cambio de dominio sin filtrar verdad a predictores.'
+    - Fixtures analíticas cubren mallas, máscaras, escalas, bordes e IDs; esquemas describen unidad/soporte/período
+      y no incluyen datos reales.
+    - Salidas regenerables en scratch; checksum lógico reproducible con mismas versiones y semilla.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Experimentos reales ni afirmar habilidad ecológica.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/tests/
+    - 08_pkg/examples/
+    - 01_data/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M002-S03
+    title: Armonización de predictores
+    objective: Implementar malla explícita y alineación por capa.
+    acceptance:
+    - 'Contrato Entradas y armonización de architecture.md: validar CRS/bandas/nombres/afín, reutilizar
+      malla igual y armonizar sólo explícitamente.'
+    - V2 demuestra reproyección/remuestreo continuo y máscaras, escala/offset una vez y rechazo de
+      falta de cobertura/CRS o entradas contradictorias.
+    - Intersección válida por banda, cero válido conservado; archivos originales intactos y sin cubo
+      completo en RAM.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Descargas/EE, categorías predictoras, creación de índices.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M002-S04
+    title: Muestreo puntual y exclusiones
+    objective: Convertir observaciones y rásteres en tabla trazable.
+    acceptance:
+    - 'V2: sample_points transforma CRS y extrae píxel contenedor con bordes definidos; conserva IDs/orden
+      y reporta cada exclusión.'
+    - Rechazar IDs duplicados, respuesta no finita/inválida y tabla efectiva vacía; separar coordenadas/IDs/objetivo
+      del esquema predictor.
+    - Preservar site_id, celda, unidad/soporte/período; misma política de validez que armonización
+      e inferencia.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Agregación zonal, imputación y codificación categórica.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M003
+  title: Particiones espaciales reproducibles
+  status: planned
+  risk: high
+  holistic_review: true
+  slices:
+  - id: M003-S01
+    title: Bloques y grupos indivisibles
+    objective: Construir folds auditables según el escenario espacial.
+    acceptance:
+    - 'V3: tamaño/origen/CRS métrico/semilla explícitos; cada ID tiene una prueba externa y no se
+      filtra a entrenamiento.'
+    - Celda y sitio indivisibles, incluyendo sitios que cruzan bloques mediante unión; error si faltan
+      grupos/folds no vacíos.
+    - Exportar asignaciones, tamaños, distribución de respuesta y distancia mínima; repetir semilla
+      reproduce índices.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Tamaño universal o selección de tamaño por error observado.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M003-S02
+    title: Buffer y folds aportados
+    objective: Verificar distancias y particiones externas.
+    acceptance:
+    - 'V3: buffer excluye sólo entrenamiento y prueba distancia mínima >= radio; fallo claro si deja
+      entrenamiento insuficiente.'
+    - Folds externos validados por índices, grupos, solapamiento y cobertura; no fallback aleatorio.
+      Las comparaciones aleatorias se etiquetan diagnósticas.
+    - CSV de folds incluye exclusiones por buffer; documentar cómo el escenario de despliegue guía
+      tamaño/distancia.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Autocorrelación automática, CV temporal avanzada.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M004
+  title: Regresión, evaluación y motores opcionales
+  status: planned
+  risk: high
+  holistic_review: true
+  slices:
+  - id: M004-S01
+    title: Random Forest y evaluación fija
+    objective: Implementar evaluación espacial OOF y ajuste final separados.
+    acceptance:
+    - 'V4: clonar RF/dummy por fold, preservar estimador original, exportar OOF sin fuga y ajustar
+      modelo final como operación separada.'
+    - Métricas RMSE/MAE/sesgo/R² exactas sobre ejemplos manuales; por fold y agrupadas diferenciadas;
+      R² indefinido null con razón.
+    - 'Fixture de señal fija, semilla 17: RMSE OOF RF <= 0.9 veces dummy; protocolo congelado antes
+      del resultado. Variante sin señal admite desempeño pobre correctamente reportado.'
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Tuning o inferencia causal.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M004-S02
+    title: Selección espacial anidada y diagnóstico
+    objective: Añadir búsqueda opt-in y permutación fuera de entrenamiento.
+    acceptance:
+    - 'V4: folds internos espaciales sólo dentro de entrenamiento externo; prueba espía demuestra
+      que selección/preprocesamiento no ve IDs externos.'
+    - Configurar candidatos/semilla y contar ajustes antes de lanzar; selección final distinguida
+      de OOF. Elegir familia también dentro de CV interna.
+    - Permutación opt-in en folds externos con repeticiones limitadas; exportar dispersión y límites
+      por correlación; sin reselección usando ese OOF.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Optuna/AutoML y búsqueda sin límite.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M004-S03
+    title: LightGBM y XGBoost opcionales
+    objective: Soportar ambos motores con el mismo contrato de evaluación.
+    acceptance:
+    - Extras separados e imports perezosos; core funciona sin ellos y elección sin extra produce error
+      accionable.
+    - Perfil extras instala y prueba ambos en entorno exacto; clone/fit/predict, CV espacial, semillas
+      e hilos satisfacen V4 con datos pequeños.
+    - Desactivar/rechazar early stopping y eval_set/callbacks incompatibles con CV; n_estimators explícito.
+      Actualizar full con perfil extras obligatorio para aceptar esta tarea.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - GPU, formatos nativos adicionales ni afirmar equivalencia numérica entre motores.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    allowed_prefixes:
+    - 08_pkg/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M005
+  title: Mapas y expediente auditable
+  status: planned
+  risk: high
+  holistic_review: true
+  slices:
+  - id: M005-S01
+    title: Persistencia y manifiestos
+    objective: Conservar el estimador y evidencia necesaria para auditarlo.
+    acceptance:
+    - 'Expediente auditable: esquema, Micromamba/lock, Snakemake/flujo, código/configuración, parámetros,
+      variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.'
+    - 'V5: entrenar/guardar/salir y cargar confiablemente en otro proceso conserva predicción; rechazar
+      corrupción, incompatibilidad y carga sin trusted=True.'
+    - Rutas portables; nuevos resultados con nueva identidad; no incluir rutas de máquina ni datos
+      privados en evidencia versionada.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Carga segura de modelos no confiables ni compatibilidad entre versiones.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M005-S02
+    title: Inferencia GeoTIFF por ventanas
+    objective: Producir mapas completos sobre celdas válidas con RAM acotada.
+    acceptance:
+    - 'V5: predictor y lote acotados, malla/orden/esquema iguales; GeoTIFF float32 tiled comprimido,
+      nodata/CRS/transform/dimensiones correctos.'
+    - Equivalencia con referencia en memoria a tolerancia 1e-5, ventanas no divisoras y bloques inválidos;
+      nuevo ráster compatible permitido.
+    - Prevenir sobreescritura accidental; ante fallo no dejar mapa final parcial ni dañar destino
+      previo; completar manifiesto tras cierre.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - COG obligatorio, predicción distribuida y entrenamiento fuera de memoria.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M005-S03
+    title: Calidad y prueba de escala
+    objective: Entregar máscaras y medir comportamiento con un ráster mayor.
+    acceptance:
+    - 'V5: máscara válida y número de predictores fuera de min/max de entrenamiento, con cero rango
+      e inválidos definidos; alerta no presentada como AOA/incertidumbre.'
+    - Caso 2048x2048x8 por ventanas registra tiempo/memoria/buffers/caché y cumple R3; instrumentación
+      rechaza lectura del cubo entero.
+    - Documentar límites de memoria de puntos/modelo y de min/max; reporte de escala reproducible
+      sin binarios grandes versionados.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Intervalos calibrados, AOA multivariante, clipping silencioso.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/src/wall2wall/
+    - 08_pkg/tests/
+    - 08_pkg/examples/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M006
+  title: Producción Snakemake, reproducibilidad y entrega v0.1
+  status: planned
+  risk: release
+  holistic_review: true
+  slices:
+  - id: M006-S01
+    title: Workflow Snakemake y Pytest por etapas
+    objective: Unir la API en un DAG de artefactos persistidos dentro del Micromamba fijo.
+    acceptance:
+    - 'orchestration.md/V7: preflight, alinear, muestrear, folds, evaluar, ajustar final, predecir
+      y auditar con inputs/outputs/parámetros/código/lock declarados.'
+    - Targets production y validated; Pytest por módulo/regla con recibos ligados a código/pruebas/entorno.
+      Smoke Pytest invoca production sin recursión.
+    - Todas las reglas usan el mismo Python Micromamba 3.11; scripts finos llaman API sin duplicación.
+      Identidades SHA detectan cambios incluso sin mtime; respetar recursos R3 y no crear entornos
+      por regla.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - DAG por píxel, ejecución distribuida o gestores propios.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/workflow/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    - 08_pkg/examples/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M006-S02
+    title: Reproducción limpia, invalidación y reanudación
+    objective: Demostrar el camino de producción y pruebas sin depender de una sesión viva.
+    acceptance:
+    - 'V1/V5/V7: wheel fuera del checkout y Micromamba del lock, procesos separados y DAG completo;
+      API y workflow producen mismos folds/mapas/métricas dentro de tolerancia 1e-5.'
+    - Pytest demuestra no-op, cambio de entrada con mtime conservado, parámetro/código/entorno, intermedio
+      eliminado/corrupto y fallo/reinicio. Sólo descendientes afectados; compresión no reentrena.
+    - Recrear réplica Micromamba exacta y ejecutar en scratch nuevo; core/extras probados, manifiesto
+      completo y artefactos anteriores intactos. Full exige suites/smoke offline sin invocar validated
+      recursivamente.
+    - Protocolo sintético previo V2/R4 y recursos R3; no confundir repetición determinista con intentos
+      científicos. Respetar R1–R6.
+    non_goals:
+    - Piloto real o garantía de igualdad binaria entre plataformas.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/tests/
+    - 08_pkg/workflow/
+    - 08_pkg/examples/
+    - 08_pkg/docs/
+    - 03_experiments/
+    - 06_infra/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M006-S03
+    title: Documentación y paquete entregable
+    objective: Preparar v0.1 local con instrucciones reproducibles y límites claros.
+    acceptance:
+    - 'Quickstart reproducible: Micromamba fijo 3.11, API y Snakemake validated, Pytest por etapa,
+      dry-run, reanudación y lectura de artefactos; entradas exportadas de geecomposer.'
+    - Wheel/sdist y distribución local del workflow incluyen archivos necesarios; documentar recreación
+      Micromamba desde lock y versiones exactas, sin prefijos privados.
+    - Linux x86-64 obligatorio; documentar WSL2 y Linux nativo con Bash/Micromamba. Ejecutar smoke
+      en la plataforma elegida y distinguir alternativa no verificada; no soporte operativo Windows
+      nativo.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Publicar en PyPI/GitHub ni exigir notebook o UI.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 08_pkg/
+    - 06_infra/
+    focused: []
+    kind: code
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M007
+  title: Piloto real y evaluación de utilidad
+  status: planned
+  risk: high
+  holistic_review: true
+  slices:
+  - id: M007-S01
+    title: Admisión del caso real
+    objective: Fijar datos, permisos y protocolo antes de entrenar.
+    acceptance:
+    - 'V6: propietario aporta metadatos/permiso/variable/soporte/fechas/malla/sitios y criterio de
+      utilidad; no leer datos privados sin esa admisión.'
+    - Arquitecto registra en decisiones y roadmap el presupuesto real, particiones y criterio antes
+      de resultados; si faltan, conservar planificación y registrar pregunta precisa.
+    - Protocolo distingue evaluación del software, calidad del ajuste y validez de las inferencias;
+      referencias saneadas sin coordenadas privadas.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Ejecutar piloto antes de admisión o inventar umbral de utilidad.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 01_data/
+    - 03_experiments/
+    - 04_delivery/
+    focused: []
+    kind: docs
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+  - id: M007-S02
+    title: Piloto e informe reproducible
+    objective: Aplicar paquete al caso admitido y evaluar sus límites.
+    acceptance:
+    - 'V6/V7: con M007-S01 admitida, ejecutar protocolo mediante Snakemake validated y Micromamba
+      fijo; conservar manifiesto/lock y datos privados fuera de Git.'
+    - Informe entrega métricas espaciales/OOF/exclusiones/validez/extrapolación, soporte y sesgo de
+      muestra; desempeño pobre válido no se declara éxito predictivo.
+    - Reproducir camino documentado; defectos de código originan tareas correctivas acotadas con nuevo
+      alcance/revisión, no cambios escondidos en esta tarea.
+    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    non_goals:
+    - Publicación, nuevos datos o experimentos no admitidos.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/architecture.md
+    - 00_brief/validation.md
+    - 08_pkg/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    allowed_prefixes:
+    - 03_experiments/
+    - 04_delivery/
+    - 08_pkg/examples/
+    - 08_pkg/docs/
+    focused: []
+    kind: docs
+    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
+      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+ruled_out:
+- id: R1
+  text: 'Sesión inicial: sólo planificación; cero prompts (incluido preview), asientos, experimentos
+    de producto, baseline aceptada, commits, publicación o servicios de pago. Antes de emitir M001-S01
+    el arquitecto prepara/cualifica en scratch entorno exacto y verificador y añade lecturas de implementación
+    precisas; preview sólo al reanudar.'
+- id: R2
+  text: 'Límites de cada futura ronda manual: 60 minutos, 20000 tokens si el proveedor permite medirlos,
+    máximo 2 rondas correctivas por tarea. Sin métricas de tokens registrar unknown, nunca cero ni
+    cumplimiento probado. Cero llamadas facturables externas, nube o GPU. Al agotar un límite, conservar
+    evidencia y volver al arquitecto; no reintentar silenciosamente. No es autorización para lanzar
+    asientos en esta sesión.'
+- id: R3
+  text: 'Verificación de producto por invocación: 1200 segundos, 1 proceso de ajuste concurrente,
+    n_jobs=1 en pruebas, caché GDAL <=128 MiB, buffers de inferencia <=128 MiB; objetivo RSS <=1 GiB
+    en caso sintético, registrar si no puede medirse. Scratch generado <=512 MiB por suite y <=1 GiB
+    en escala; ficheros versionados de ejemplo <=1 MiB cada uno; mapas/modelos generados fuera de
+    Git. Snakemake --cores 1 en pruebas y retries=0; caches/.snakemake fuera del producto. Réplica
+    Micromamba de instalación: hasta 6 GiB adicionales de disco y 1200 s, separada de datos sintéticos;
+    fallo conserva evidencia y no reemplaza entorno fijo.'
+- id: R4
+  text: 'Selección sintética acotada: hasta 5 folds externos, 3 internos y 6 candidatos totales incluyendo
+    familias; máximo 128 ajustes por evaluación completa (incluye refits y dummy). Semillas 17,29,43:
+    hasta 3 evaluaciones científicas, una por semilla, y 1 canary técnico por nuevo límite de entorno;
+    0 reemplazos automáticos. Fallo común de infraestructura detiene los intentos no iniciados; conservar
+    los iniciados. Cada nuevo lote requiere protocolo del arquitecto antes de resultados. Pruebas
+    deterministas del verificador no son nuevos intentos científicos; siguen sujetas a R3.'
+- id: R5
+  text: 'Fuera de v0.1: adquisición/compuestos EE, clasificación/multisalida, agregación zonal, categorías
+    predictoras, imputación, AutoML, early stopping, incertidumbre calibrada/AOA formal, kriging,
+    GPU, Dask, servicios y GUI. No añadir dependencia fuera de D004/D010/D011/D012 (workflow: Snakemake;
+    dev: pytest/build/setuptools/wheel; herramientas raíz: PyYAML) sin decisión del arquitecto. D012:
+    operación sólo Linux (WSL2 o nativo), Micromamba fijo; sin ejecutables Python/Git Windows ni conda
+    deployment por regla.'
+- id: R6
+  text: 'Piloto real sin admisión de ejecución hasta M007-S01: requiere datos/metadatos/permiso del
+    propietario y protocolo previo. No existe presupuesto real implícito por completar simulaciones.
+    Licencia, nombre público y publicación requieren decisión humana; sin push ni instalación global.'
+not_yet_specified:
+- id: N1
+  text: 'Antes de M001-S01: seleccionar WSL2/Linux nativo, identificar Micromamba/prefijo Linux 3.11
+    y resolver lock linux-64. Cualificar herramientas de plantilla POSIX y DAG. Preview sólo al reanudar;
+    no baseline aceptada.'
+- id: N2
+  text: 'Antes del piloto: objetivo/unidad/soporte, fechas, AOI/malla, CRS, sitios, representatividad,
+    permisos/licencia, metadatos de predictores, recursos y criterio de utilidad aportados por el
+    propietario.'
+- id: N3
+  text: 'Antes de publicación: licencia del paquete, disponibilidad de nombre de distribución y plataformas/versiones
+    demostradas. Publicación externa es una acción humana posterior.'
+- id: N4
+  text: 'Pendientes de ejecución: distribución WSL2 o equipo Linux x86-64, Micromamba instalado, prefijo
+    fijo y checkout en filesystem Linux. No se han instalado componentes ni transferido archivos.
+    Preservar cambios locales e historial al preparar el traslado.'

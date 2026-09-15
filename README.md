@@ -1,72 +1,77 @@
-# Agentic Project Template v4
+# Wall2Wall
 
-A compact, artifact-first harness for manual software-development loops. This
-manual release uses `/2` and prepares shared contracts for a future compatible runner.
-Manual operation needs only Python 3.11+, PyYAML and Git. No frutlups installation
-is needed. frutlups 0.3.2 does not support `/2`; autonomous compatibility and the
-paired live canary remain pending. See `docs/upgrading.md` before upgrading an
-existing project or enabling a runner.
+Biblioteca ligera de Python para ajustar regresiones con observaciones puntuales y
+producir mapas continuos a partir de predictores ráster ya disponibles.
 
-## Start a project
+**Estado: diseño y roadmap inicial. El paquete todavía no está implementado.**
 
-Create a project archive from the template repository so template qualification
-tests are excluded:
+Base de compatibilidad: **Python 3.11**, con un **entorno Micromamba fijo** del proyecto.
+La operación completa será en **Linux x86-64**, dentro de **WSL2** o en un equipo
+Linux nativo. Snakemake orquestará producción y Pytest usando ese mismo entorno.
+No se exige Snakemake para importar la biblioteca.
 
-```powershell
-git archive --format=zip --output ..\my-project.zip HEAD
-Expand-Archive ..\my-project.zip ..\my-project
+Caso ilustrativo: altura de árboles medida en campo, explicada por compuestos
+Sentinel-1/Sentinel-2, elevación y variables bioclimáticas. Random Forest es el
+modelo de referencia; LightGBM y XGBoost serán extras opcionales.
+
+## Flujo previsto
+
+```mermaid
+flowchart LR
+  A[Tablas de puntos y rásteres] --> B[Armonizar malla]
+  B --> C[Extraer predictores]
+  C --> D[Crear folds espaciales]
+  D --> E[Evaluar y ajustar]
+  E --> F[Predecir por ventanas]
+  F --> G[GeoTIFF y expediente auditable]
 ```
 
-Then edit `00_brief/`, replace the example `roadmap.yaml`, choose active
-workspace statuses, record decisions, and set a real project-owned
-`verification.full` command. The provided hermetic entry point fails closed
-until its `COMMANDS` list is customized with argv lists or safe per-directory
-argv/cwd mappings. Commands run from the project while temporary output is
-directed through the external `VERIFICATION_SCRATCH`. From the extracted project
-directory, initialize Git (configure your Git name/email if needed) and run:
+Cada etapa tendrá una función Python y resultados inspeccionables. El mapa cubrirá
+las celdas válidas; la evaluación espacial conservará predicciones fuera de muestra,
+exclusiones y parámetros. Las alertas de extrapolación no son intervalos calibrados.
 
-```powershell
+## Documentación para empezar
+
+- [Definición del proyecto](00_brief/intake.md)
+- [Diseño y API prevista](00_brief/architecture.md)
+- [Contrato de validación](00_brief/validation.md)
+- [Linux, Micromamba y Snakemake](00_brief/orchestration.md)
+- [Investigación y fuentes](00_brief/research.md)
+- [Decisiones aceptadas](00_brief/decisions.md)
+- [Roadmap legible generado](docs/roadmap.md)
+- [Plan y fronteras autoritativos](roadmap.yaml)
+
+La implementación vivirá en `08_pkg/`. Los `pyproject.toml` y `tests/` raíz siguen
+perteneciendo a la plantilla; instalar la raíz no instala Wall2Wall.
+
+## Frontera actual
+
+La sesión inicial sólo prepara especificación, decisiones, estados y plan completo.
+No se han emitido prompts ni aceptado una baseline de producto. La primera tarea
+prevista es una prueba desechable del entorno exacto; los demás hitos están
+planificados. El piloto real requiere metadatos, permisos y protocolo posteriores.
+
+El verificador raíz apunta a `08_pkg/tests/run_checks.py`, salida futura de la
+primera tarea. Su ausencia produce fallo explícito hasta preparar las pruebas;
+`roadmap: ok` únicamente comprueba la estructura del plan.
+
+## Operación de la plantilla
+
+El arquitecto delimita tareas; el programador implementa; el revisor comprueba la
+aceptación usando evidencia. El ledger conserva la historia. No reescribirla.
+Procedimiento: [docs/operating.md](docs/operating.md). Entorno:
+[ENVIRONMENT.md](ENVIRONMENT.md). Compatibilidad:
+[docs/upgrading.md](docs/upgrading.md).
+
+Desde Bash en Linux/WSL2, con el entorno Micromamba Python 3.11 del proyecto
+activado y PyYAML disponible:
+
+```bash
 python scripts/roadmap.py check
-git init
-git add --all
-git commit -m "Initialize project"
 python scripts/roadmap.py render
+python scripts/ledger.py status
 ```
 
-## Manual slice loop
-
-```powershell
-python scripts/prompt.py M001-S01
-python scripts/ledger.py coded M001-S01
-python scripts/verify.py M001-S01
-python scripts/prompt.py M001-S01 --review
-python scripts/ledger.py record <review-report>
-python scripts/ledger.py accept M001-S01
-```
-
-The architect hands the generated coding/review prompts to the chosen agents.
-Optional `coded --notes <path>` binds saved notes. Add `--commit` to the original
-accept command when a commit is authorized; acceptance otherwise changes only
-the ledger. **Before the next slice, inspect and commit the accepted product and
-loop evidence yourself when using ledger-only acceptance.** New slices require a
-clean starting tree; `--allow-dirty` is deliberate architect attribution.
-If a requested commit is interrupted, `ledger.py recover` diagnoses the
-pending intent and `recover --execute` performs only its missing Git work.
-`prompt.py M001-S01 --preview` renders the actual prompt without writes.
-Explicit blockers and recorded resolutions are exceptional boundaries, not extra
-steps for every edit. See `docs/operating.md` for their commands and holistic review.
-
-## Sources of truth
-
-- plan and boundaries: `roadmap.yaml`
-- decisions: `00_brief/decisions.md`
-- loop history: `05_governance/ledger.jsonl`
-- blockers: `questions/open/`
-
-`python scripts/ledger.py status` prints the current state and next step;
-`index` renders the historical table. Do not maintain duplicate state files.
-
-Local venvs, caches, credentials, run output, `project.local.toml` and
-`frutlups.local.toml` are ignored. Keep machine paths and secrets out of tracked
-evidence. `docs/project_checks.md` covers runtime selection, required test
-discovery, fresh-process user paths and optional raw-evidence/research guidance.
+Estos comandos validan/muestran el plan; no entrenan modelos ni generan prompts.
+La operación es manual, sin runner autónomo activado. La publicación es una
+acción humana independiente del desarrollo y la aceptación local.

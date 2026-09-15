@@ -12,8 +12,8 @@ import _workspace
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Replace this with the project's real argv lists or {"argv": [...], "cwd": "subdir"}.
-COMMANDS: list[object] = []
+# Product test launcher is delivered by M001-S01; until then verification fails closed.
+COMMANDS: list[object] = [["python", "08_pkg/tests/run_checks.py"]]
 
 
 def _command(value, project_root):
