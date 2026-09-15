@@ -1,0 +1,23 @@
+import os
+from pathlib import Path
+import sys
+
+shell.executable(os.environ["WALL2WALL_BASH"])
+PYTHON = Path(sys.executable).as_posix()
+
+rule all:
+    input: "resultado final.json"
+
+rule raster:
+    input: "entrada.json"
+    output: "mapa pequeño.tif"
+    script: "raster.py"
+
+rule summarize:
+    input: "mapa pequeño.tif"
+    output: "resultado final.json"
+    params:
+        python=PYTHON,
+        worker=str(Path(workflow.basedir, "summarize.py").as_posix()),
+    shell:
+        "{params.python:q} {params.worker:q} {input:q} {output:q}"

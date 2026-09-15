@@ -60,6 +60,8 @@ conjunta. Se conserva la API ligera y se añade el workflow como capa de ejecuci
 
 ## Actualización: Micromamba y Linux
 
+Antecedente D012; la exclusividad Linux queda sustituida por D013 más abajo.
+
 Consulta: 2026-09-15. D012 sustituye la elección previa de gestor/plataforma.
 
 - [Micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)
@@ -78,3 +80,33 @@ Consulta: 2026-09-15. D012 sustituye la elección previa de gestor/plataforma.
 La instalación Conda Windows mencionada anteriormente no demuestra disponibilidad
 de Micromamba/Linux. M001 comprobará la plataforma concreta; no hay cualificación
 Linux derivada de los checks editoriales realizados en Windows.
+
+## Actualización D013 WSL recomendado y Windows alternativo
+
+Consulta: 2026-09-15. Distinguimos mecanismos disponibles de compatibilidad del
+workflow completo, que aún debe probarse con versiones exactas y Python 3.11.
+
+| Fuente primaria | Observación | Consecuencia para Wall2Wall |
+| --- | --- | --- |
+| [Snakemake 9.27.0 shell.py](https://raw.githubusercontent.com/snakemake/snakemake/v9.27.0/src/snakemake/shell.py) | Contiene ramas Windows para shell explícito, quoting y Bash; rechaza el launcher WSL como shell de un proceso Windows. | Windows es objetivo posible; comprobar dependencias y ejecución real. Configurar Bash explícito, sin puente WSL. |
+| [Instalación Snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html) | La guía Windows orienta a WSL. | WSL2 sigue siendo la referencia recomendada; disponer de Bash no prueba soporte integral. |
+| [Git for Windows](https://gitforwindows.org/) | Incluye Git Bash. | Primera variante Windows si ya existe; registrar versión e identidad externa al lock Conda. |
+| [Rutas MSYS2](https://www.msys2.org/docs/filesystem-paths/) | Convierte argumentos y variables al invocar binarios Windows, con exclusiones selectivas. | Probar espacios/Unicode/argumentos y aplicar conversiones sólo en fronteras; no desactivar globalmente toda conversión. |
+| [Entorno MSYS2](https://www.msys2.org/wiki/MSYS2-introduction/) | Advierte sobre PATH que mezcla otras instalaciones/runtimes. | Un proveedor Bash y utilidades por run; Python científico permanece nativo Conda. |
+| [Instalador MSYS2](https://www.msys2.org/docs/installer/) | msys2-base nombra variantes de distribución de MSYS2. | No tratarlo como una biblioteca Python. |
+| [m2-base en conda-forge](https://anaconda.org/conda-forge/m2-base) y [metadatos de build](https://anaconda.org/conda-forge/m2-base/files/modal/info/6812476149d760ac14ec8150) | El metapaquete m2-base depende de Bash y otras herramientas/runtime MSYS2. | Resolver plataforma/build/transitivas antes de proponer instalación; no fijar nombre o compatibilidad por analogía. |
+
+Recomendación de diseño: WSL2/Micromamba para menor fricción POSIX. Windows/Conda
+con Git Bash primero, MSYS2 como alternativa justificada y cualificada. Ninguna
+capa Bash cambia las reglas Windows de archivos abiertos, procesos o locks; la API
+debe usar Python portable y las pruebas V8 deben comprobar esos límites. M008 aísla
+esa cualificación para que los problemas Windows no frenen la entrega WSL.
+
+## Comprobación D014 — 2026-09-16
+
+[PyPI Snakemake 9.27.0](https://pypi.org/project/snakemake/9.27.0/) declara Python
+>=3.11. Se instaló esa versión sobre Conda Windows/Python 3.11 y se probó con Git
+Bash explícito. Los resultados concretos y límites están en 06_infra/WINDOWS.md;
+no extrapolar esta prueba a todos los plugins ni al workflow de producción futuro.
+La guía upstream sigue recomendando WSL; la ruta nativa queda limitada al perfil
+local, CPU, entorno único y scheduler greedy comprobado.

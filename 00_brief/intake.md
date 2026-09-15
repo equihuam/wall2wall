@@ -48,14 +48,15 @@ La calidad predictiva se medirá; no se promete un umbral universal.
 
 ## Entorno y comprobación
 
-- Base de compatibilidad obligatoria: CPython 3.11, CPU. Entorno fijo gestionado
-  por Micromamba dentro de Linux, exclusivo del proyecto. D012 sustituye la
-  elección de Conda; instalación/prefijo de Micromamba aún por identificar.
-  No usar Python/Conda de Windows ni venv como sustitutos del entorno Linux.
-- Operación íntegra en Linux x86-64 (linux-64): WSL2 local o equipo Linux nativo.
-  Desarrollo, Git, herramientas de plantilla, builds, Pytest y Snakemake corren
-  dentro de Linux. Windows sólo puede alojar el editor/terminal. M001 cualifica
-  plataforma y herramientas; esta sesión no instala ni migra el repositorio.
+- Base de compatibilidad: CPython 3.11, CPU. D013 permite dos perfiles exclusivos
+  por ejecución: WSL2/Linux x86-64 con Micromamba (recomendado) y Windows x64 con
+  Conda y Bash seleccionado (alternativa por cualificar). Un entorno fijo por perfil.
+- En WSL todo proceso corre en Linux. En Windows, Python/GDAL/sklearn/Snakemake
+  son nativos del entorno Conda; Bash viene de Git for Windows o MSYS2, nunca de
+  WSL. No mezclar prefijos, DLL, PATH ni metadatos de ejecución entre perfiles.
+  M001 cualifica el perfil base; M008 cualifica Windows de manera independiente.
+  D014 amplía la preparación a instalación aislada y canary Windows; no migra el
+  repositorio ni acepta la integración del producto. Guía: 06_infra/WINDOWS.md.
 - Núcleo previsto: NumPy, pandas, Rasterio, scikit-learn y joblib para persistencia.
   Reutilizar las transformaciones CRS de Rasterio. Sin GeoPandas, Dask, xarray,
   Optuna, SHAP ni Earth Engine obligatorios.

@@ -15,10 +15,10 @@ Holistic review: true
 Cualificar plataforma Linux/WSL2, entorno fijo 3.11, plantilla y DAG mínimo.
 
 Acceptance:
-- V1/V7/D012: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.
+- V1/V7/D013: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.
 - Arquitecto cualifica Git/ledger/lock/verificador en Linux antes de baseline. Probar GeoTIFF, CRS, RF y DAG de dos procesos con artefactos persistidos y segunda ejecución sin trabajo.
 - Crear 08_pkg/tests/run_checks.py con Pytest; full descubre suites y falla ante cero pruebas, skips requeridos o dependencia ausente; sólo usar procesos Linux del entorno fijo.
-- Sin entornos por regla ni uso de Python/Conda Windows. WSL/Micromamba ausentes bloquean ejecución, no esta planificación; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.
+- Perfil base WSL/Linux: sin entornos por regla ni ejecutables Windows. Windows se cualifica por separado en M008; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.
 
 Non-goals:
 - API final, workflow completo o experimentos científicos.
@@ -36,7 +36,7 @@ Crear distribución aislada de las herramientas de plantilla.
 
 Acceptance:
 - Wheel declara compatibilidad mínima Python 3.11 e importa fuera del checkout en réplica Micromamba del lock; requisitos resueltos soportan 3.11.
-- Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar wall2wall. Documentar Micromamba y exigir pruebas de paquete en V1.
+- Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar wall2wall. Documentar gestor/lock por perfil y exigir pruebas V1.
 - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
 
 Non-goals:
@@ -170,7 +170,7 @@ Holistic review: true
 Conservar el estimador y evidencia necesaria para auditarlo.
 
 Acceptance:
-- Expediente auditable: esquema, Micromamba/lock, Snakemake/flujo, código/configuración, parámetros, variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.
+- Expediente auditable: esquema, perfil/gestor/Bash/lock, Snakemake/flujo, código/configuración, parámetros, variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.
 - V5: entrenar/guardar/salir y cargar confiablemente en otro proceso conserva predicción; rechazar corrupción, incompatibilidad y carga sin trusted=True.
 - Rutas portables; nuevos resultados con nueva identidad; no incluir rutas de máquina ni datos privados en evidencia versionada.
 - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
@@ -212,12 +212,12 @@ Holistic review: true
 
 ### M006-S01 — Workflow Snakemake y Pytest por etapas
 
-Unir la API en un DAG de artefactos persistidos dentro del Micromamba fijo.
+Unir API en un DAG común de artefactos persistidos con entorno fijo por perfil.
 
 Acceptance:
 - orchestration.md/V7: preflight, alinear, muestrear, folds, evaluar, ajustar final, predecir y auditar con inputs/outputs/parámetros/código/lock declarados.
 - Targets production y validated; Pytest por módulo/regla con recibos ligados a código/pruebas/entorno. Smoke Pytest invoca production sin recursión.
-- Todas las reglas usan el mismo Python Micromamba 3.11; scripts finos llaman API sin duplicación. Identidades SHA detectan cambios incluso sin mtime; respetar recursos R3 y no crear entornos por regla.
+- Mismo Python 3.11 del perfil en todas las reglas; scripts llaman API sin duplicación ni operaciones POSIX innecesarias. Hashes detectan cambios sin mtime; límites R3, sin entornos por regla.
 - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
 
 Non-goals:
@@ -241,9 +241,9 @@ Non-goals:
 Preparar v0.1 local con instrucciones reproducibles y límites claros.
 
 Acceptance:
-- Quickstart reproducible: Micromamba fijo 3.11, API y Snakemake validated, Pytest por etapa, dry-run, reanudación y lectura de artefactos; entradas exportadas de geecomposer.
-- Wheel/sdist y distribución local del workflow incluyen archivos necesarios; documentar recreación Micromamba desde lock y versiones exactas, sin prefijos privados.
-- Linux x86-64 obligatorio; documentar WSL2 y Linux nativo con Bash/Micromamba. Ejecutar smoke en la plataforma elegida y distinguir alternativa no verificada; no soporte operativo Windows nativo.
+- Quickstart: perfil WSL/Micromamba base y Windows/Conda alternativo, Python 3.11, API, Snakemake validated, Pytest, dry-run, reanudación y auditoría.
+- Wheel/sdist y workflow con archivos necesarios; describir declaraciones environment-linux.yml/environment-windows.yml y locks linux-64/win-64 según perfil, sin rutas locales.
+- M006 demuestra WSL/Linux. Documentar Windows como alternativa no verificada hasta M008, con proveedor Bash y límites POSIX; no exigir Windows para aceptar entrega WSL.
 - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
 
 Non-goals:
@@ -280,3 +280,35 @@ Acceptance:
 
 Non-goals:
 - Publicación, nuevos datos o experimentos no admitidos.
+
+## M008 — Compatibilidad Windows opcional con Conda y Bash
+
+Status: active
+Risk: high
+Holistic review: true
+
+### M008-S01 — Entorno Windows y canary de frontera POSIX
+
+Cualificar Windows/Conda 3.11 y un proveedor Bash sin cambiar el comportamiento científico.
+
+Acceptance:
+- V1/V8/D013: resolver environment-windows.yml/lock win-64, Snakemake y proveedor Bash; Python/GDAL nativos Conda. Elegir Git Bash o MSYS2 explícito y registrar versión/identidad externa.
+- Canary real: dos reglas/procesos, rutas con espacios/Unicode, argv sin conversión indebida, códigos de error, LF/CRLF, temporales, Git/lock y archivos abiertos. Full Pytest descubre requisitos sin skips.
+- No mezclar runtimes/PATH ni usar Bash WSL desde Windows. Si se prueba otro proveedor consume su canary; reportar fallo/no verificado sin bloquear WSL. Sin cambios de algoritmo para obtener pase.
+- Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en esta revisión.
+
+Non-goals:
+- Emulación POSIX general, toolchain C/C++ o instalaciones globales.
+
+### M008-S02 — Workflow Windows y comparación con WSL
+
+Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar soporte.
+
+Acceptance:
+- Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en Windows con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.
+- Mismos fixtures/código/configuración que WSL: IDs/folds/máscaras/CRS iguales; predicciones/métricas dentro de 1e-5. Reportar plataforma, versiones y proveedor Bash; investigar discrepancia sin relajar umbral silenciosamente.
+- Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash sin prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la API ni compartir entornos/.snakemake.
+- Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en esta revisión.
+
+Non-goals:
+- Cualificar todas las versiones de Windows/Snakemake o exigir Windows para cerrar entrega WSL.

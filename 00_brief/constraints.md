@@ -14,9 +14,9 @@ Decisiones aceptadas: `decisions.md`. Límites ejecutables: `roadmap.yaml`.
 | Sin datos privados versionados | AGENTS.md | Ejemplos sintéticos; rutas portables; artefactos reales fuera de Git. |
 | Verificación aislada | Inicialización | Temporales fuera del árbol, descubrimiento comprobado y prueba del wheel. |
 | Historial preservado | AGENTS.md | No reescribir decisiones anteriores, ledger ni revisiones. |
-| Micromamba fijo y Python 3.11 | Propietario, D012 | Entorno exclusivo identificado; no usar venv/base ni actualizarlo durante una ejecución. |
+| Entorno fijo y Python 3.11 | Propietario, D013 | Micromamba en WSL/Linux, Conda en Windows; no usar base ni actualizar durante ejecución. |
 | Producción y Pytest por etapas | Propietario, D011 | Snakemake llama a la API; probar dependencias, reanudación, invalidación y reproducción completa. |
-| Operación Linux completa | Propietario, D012 | WSL2 o Linux nativo; Bash, Git y Python Linux. No procesos de producto Windows ni mezcla de prefijos. |
+| Perfiles separados | Propietario, D013 | WSL recomendado; Windows seleccionable tras cualificación. No mezclar prefijos, runtimes, Bash ni estados de ejecución. |
 
 ## Límites científicos
 

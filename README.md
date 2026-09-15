@@ -5,9 +5,10 @@ producir mapas continuos a partir de predictores ráster ya disponibles.
 
 **Estado: diseño y roadmap inicial. El paquete todavía no está implementado.**
 
-Base de compatibilidad: **Python 3.11**, con un **entorno Micromamba fijo** del proyecto.
-La operación completa será en **Linux x86-64**, dentro de **WSL2** o en un equipo
-Linux nativo. Snakemake orquestará producción y Pytest usando ese mismo entorno.
+Base de compatibilidad: **Python 3.11**, con un **entorno fijo por perfil**.
+**WSL2/Linux con Micromamba es la opción recomendada**. Se prepara también
+**Windows nativo con Conda y Git Bash o MSYS2**, sujeto a cualificación independiente.
+Snakemake orquestará producción y Pytest usando el entorno del perfil elegido.
 No se exige Snakemake para importar la biblioteca.
 
 Caso ilustrativo: altura de árboles medida en campo, explicada por compuestos
@@ -35,7 +36,9 @@ exclusiones y parámetros. Las alertas de extrapolación no son intervalos calib
 - [Definición del proyecto](00_brief/intake.md)
 - [Diseño y API prevista](00_brief/architecture.md)
 - [Contrato de validación](00_brief/validation.md)
-- [Linux, Micromamba y Snakemake](00_brief/orchestration.md)
+- [Orquestación y entornos separados](00_brief/orchestration.md)
+- [Opciones WSL y Windows y prevención de conflictos POSIX](ENVIRONMENT.md)
+- [Instalación y operación práctica en Windows](06_infra/WINDOWS.md)
 - [Investigación y fuentes](00_brief/research.md)
 - [Decisiones aceptadas](00_brief/decisions.md)
 - [Roadmap legible generado](docs/roadmap.md)
@@ -46,7 +49,9 @@ perteneciendo a la plantilla; instalar la raíz no instala Wall2Wall.
 
 ## Frontera actual
 
-La sesión inicial sólo prepara especificación, decisiones, estados y plan completo.
+La sesión inicial preparó especificación, decisiones, estados y plan completo.
+La ampliación D014 prepara además un entorno Windows aislado y su prueba técnica
+en 06_infra/, independiente de la implementación científica.
 No se han emitido prompts ni aceptado una baseline de producto. La primera tarea
 prevista es una prueba desechable del entorno exacto; los demás hitos están
 planificados. El piloto real requiere metadatos, permisos y protocolo posteriores.

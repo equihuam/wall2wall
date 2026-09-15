@@ -1,86 +1,131 @@
-# Entorno Linux de Wall2Wall
+# Perfiles de ejecución de Wall2Wall
 
-Autoridad: D012 en 00_brief/decisions.md. Base: **Python 3.11**, **Linux x86-64**
-(linux-64), con un **entorno fijo gestionado por Micromamba**.
+Autoridad: D013/D014 en 00_brief/decisions.md. Python 3.11 y CPU en ambos perfiles.
+La opción recomendada es WSL2. Windows nativo es una alternativa que debe superar
+su propia cualificación; instalar Bash no demuestra que todo Snakemake funcione.
+La preparación Windows autorizada por D014 instala un entorno aislado. La guía
+operativa y sus resultados están en [06_infra/WINDOWS.md](06_infra/WINDOWS.md).
+El paquete y su workflow de producción siguen pendientes de implementación.
 
-Dos destinos admitidos: WSL2 local o equipo Linux nativo. Desarrollo, Git, scripts
-manuales de plantilla, builds, Pytest y producción Snakemake corren en Linux. El
-editor puede estar en Windows; sus terminales/procesos de trabajo deben estar en
-Linux. La revisión actual modifica documentos y plan; no instala ni migra nada.
+## Opciones
 
-## Preparación y traslado
+| Perfil | Python y paquetes científicos | Shell para reglas que lo necesiten | Estado |
+| --- | --- | --- | --- |
+| WSL2 o Linux x86-64 | Entorno fijo Micromamba, linux-64 | Bash Linux | Base recomendada; cualificación M001 pendiente. |
+| Windows x64 con Git Bash | Entorno fijo Conda, win-64 | Bash de Git for Windows explícito | Instalación y canary técnico comprobados; integración M008 pendiente. |
+| Windows x64 con MSYS2 | Entorno fijo Conda, win-64 | Un runtime MSYS2 explícito | Variante Windows alternativa; cualificación independiente. |
 
-1. Elegir distribución WSL2 o equipo Linux y comprobar arquitectura, Micromamba,
-   Git y espacio. No presumir que la instalación Conda Windows sirva en Linux.
-2. Preparar checkout y temporales activos en el filesystem Linux, preferentemente
-   fuera de unidades Windows montadas. Identificar origen/destino y preservar HEAD,
-   índice, cambios sin commit y archivos nuevos. Comparar manifiestos del contenido
-   transferido; no usar una exportación de HEAD que omita cambios pendientes.
-   No mover/borrar el origen ni copiar entornos, caches o configuración local Windows.
-3. Definir el entorno exclusivo del proyecto; nombre sugerido wall2wall. Guardar
-   prefijo y MAMBA_ROOT_PREFIX sólo en configuración local/shell. No escribir rutas
-   resueltas en archivos versionados ni modificar perfiles globales automáticamente.
-4. Preparar 06_infra/environment.yml con Python 3.11, canales explícitos, prioridad
-   estricta y paquetes D004/D011/D012. Mantener resolución exacta linux-64 con
-   versiones/builds/hashes y hashes de paquetes pip/wheel propios si los hay.
-   Micromamba usa paquetes del ecosistema Conda; no requiere instalar conda para
-   este diseño. El YAML portable no sustituye la resolución exacta.
-5. Crear o preparar el entorno una vez, antes de verificar. Comprobar sys.platform
-   linux, Python 3.11, prefijo, librerías nativas, Pytest y Snakemake. Actualizaciones
-   del entorno requieren nueva identidad y cualificación, nunca durante un run.
-6. Crear project.local.toml ignorado con el intérprete Linux correcto cuando sea
-   necesario. No reutilizar el archivo local de Windows. Cualificar herramientas de
-   plantilla POSIX (Git/lock/ledger/verificador) y el canary de M001 antes de baseline.
+Las dos variantes Windows son un único modo de plataforma con proveedor Bash
+seleccionable; no se combinan sus runtimes. Usar Git Bash primero si ya está
+instalado y cubre las pocas reglas de shell; optar por MSYS2 si existe una necesidad
+concreta de utilidades adicionales o de fijarlas junto al entorno.
 
-environment.yml y lock son entregables futuros de M001; no se han generado aún.
-Esta guía sustituye para el proyecto los ejemplos Windows/venv de la documentación
-original de la plantilla. No modifica sus contratos ni convierte su cualificación
-Windows en evidencia Linux. Otras arquitecturas requieren resolución y prueba propias.
+MSYS2 no es simplemente una biblioteca Python. Sus archivos de distribución se
+llaman msys2-base; en los canales consultados el metapaquete se llama m2-base y Bash
+m2-bash. Antes de instalar, comprobar canal, versión, plataforma, dependencias y
+mantenimiento. No recomendar conda install msys2-base como un nombre ya verificado.
+La resolución exacta determinará si se usa m2-base o sólo componentes requeridos.
+No añadir compiladores/toolchains completos sin necesidad.
 
-## Comandos desde Bash, dentro de Linux
+## Entorno y selección
 
-Ejemplos con el nombre sugerido, una vez preparado el entorno:
+Declaraciones previstas en 06_infra/environment-linux.yml y
+06_infra/environment-windows.yml, más locks exactos linux-64 y win-64. Compartir
+requisitos lógicos y configuración científica; resolver builds/hashes por sistema.
+Fijar Python 3.11, dependencias core/extras, Pytest, Snakemake y auxiliares requeridos.
+En Windows registrar también versión/distribución del Bash externo y su identidad;
+un lock Conda no fija una instalación Git for Windows externa.
+
+Nombre sugerido del entorno dedicado: wall2wall. El perfil y proveedor de shell se
+seleccionan explícitamente antes del preflight, sin fallback según el primer bash
+que aparezca en PATH. Intérprete en project.local.toml ignorado, conforme a su esquema
+actual. Bash mediante variable local WALL2WALL_BASH o configuración local del workflow;
+su ruta resuelta no se versiona. No insertar claves no soportadas en project.local.toml.
+
+Cada proceso comprueba sys.platform (linux o win32), Python 3.11, prefijo, versiones
+y ejecutables. No compartir entornos, DLL, caches de paquetes, .snakemake ni recibos
+entre perfiles. Snakemake se ejecuta desde el entorno fijo; no usar conda: por regla
+ni --sdm conda. El gestor prepara dependencias antes del run y no se modifica durante
+verificación. Cambiar versión, plataforma o proveedor Bash exige recualificación.
+
+Comandos orientativos una vez creado el entorno:
+
+WSL2, desde Bash Linux:
 
 ```bash
-micromamba run -n wall2wall python --version
 micromamba run -n wall2wall python scripts/roadmap.py check
-micromamba run -n wall2wall python scripts/roadmap.py render
 micromamba run -n wall2wall python scripts/ledger.py check
-```
-
-También se puede activar el entorno en Bash. No iniciar Python/Git .exe de Windows.
-No se necesita activar un entorno base. El binario de Micromamba debe ser Linux.
-
-El comando completo previsto es:
-
-```bash
 micromamba run -n wall2wall python scripts/hermetic_verification.py
 ```
 
-Llama al futuro 08_pkg/tests/run_checks.py, que ejecutará Pytest y el smoke del
-workflow. Su implementación y cualificación están pendientes. Las pruebas raíz
-son de la plantilla, no del producto; el arquitecto las usa para cualificar POSIX.
+Windows, desde PowerShell y la raíz del repositorio, después de la instalación
+descrita en la guía Windows (el lanzador selecciona el prefijo fijo):
 
-Snakemake se lanzará mediante micromamba run en el mismo entorno, con Snakefile,
-configuración, directorio de trabajo y recursos explícitos. La línea exacta de
-producción se fijará cuando exista 08_pkg/workflow/. Targets: production genera
-mapas y validated añade recibos Pytest. La integración Pytest llama a production
-para evitar recursión. No usar conda: por regla ni --sdm conda; los scripts heredan
-el entorno fijo, sin necesitar el gestor conda de Snakemake.
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('scripts/roadmap.py', 'check')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/ledger.py', 'check')
+```
 
-## Reproducción y evidencia
+El full de producto aún requiere el futuro 08_pkg/tests/run_checks.py; comprobar
+la instalación con el canary Windows no sustituye esa aceptación.
 
-La réplica temporal de instalación se reconstruye con Micromamba desde el lock
-linux-64, sin modificar el entorno fijo. Registrar distribución/kernel/arquitectura,
-Micromamba, Python, GDAL/librerías, código/flujo, parámetros, semillas e identidades.
-Comparar datos científicos con tolerancias declaradas. WSL2 y Linux nativo comparten
-el diseño, pero cada plataforma anunciada como verificada requiere evidencia propia.
+PowerShell sólo lanza el proceso Windows. La elección de Bash para las reglas es
+explícita e independiente del terminal. Las futuras instrucciones Snakemake fijarán
+Snakefile, configuración, perfil, directorio de trabajo y recursos. No hay un
+workflow de producto ejecutable todavía; el lanzador de pruebas está pendiente.
 
-Temporales, .snakemake, caches, mapas y modelos permanecen en scratch Linux externo
-al producto o almacenamiento local ignorado. No copiar estados de ejecución activos
-entre equipos: transferir entradas/configuración/lock y reconstruir/verificar outputs.
-Conservar resultados y procedencia anteriores. No instalar dependencias durante
-verificación ni descargar datos como efecto secundario.
+## Prevención de conflictos POSIX
 
-Snakemake orquesta producción científica y sus pruebas. El ciclo manual de
-arquitecto/programador/revisor conserva la autoridad del roadmap y ledger.
+1. Priorizar reglas script de Python y subprocess con lista argv y shell=False.
+   Usar pathlib/shutil/tempfile para archivos. Esto reduce quoting, sed/awk/rm y
+   otros supuestos POSIX; no elimina las dependencias internas de Snakemake.
+2. Si hace falta shell, el workflow configura shell.executable con el Bash verificado
+   de ese perfil. En Windows rechazar el launcher de WSL como Bash del proceso
+   Windows. Probar -euo pipefail y códigos de salida; no ocultar errores con || true.
+3. Python, Rasterio/GDAL, NumPy y sklearn Windows deben provenir del entorno Conda
+   nativo. No sustituirlos por Python de MSYS2 ni combinar DLL de sus toolchains.
+   Mantener un PATH local al proceso, verificando Python/Git/Bash/utilidades. No mezclar
+   Git Bash y otro MSYS2/Cygwin en ese PATH. Si se selecciona MSYS2, cualificar también
+   qué Git nativo se invoca sin introducir otro runtime MSYS por accidente.
+4. Los archivos de configuración contienen rutas relativas portables. Python usa
+   rutas nativas; convertir sólo al cruzar una frontera Bash/ejecutable nativo.
+   Usar cygpath cuando sea necesario. MSYS puede convertir argumentos y variables
+   automáticamente: probar espacios, acentos, barras, listas de rutas y argumentos
+   que se parezcan a rutas. Aplicar MSYS2_ARG_CONV_EXCL/MSYS2_ENV_CONV_EXCL sólo a
+   argumentos/variables que lo requieran, por proceso; no exportar exclusiones * globales.
+5. Citar cada argumento cuando se use shell (incluido el formateo :q de Snakemake).
+   Preferir JSON/archivos para listas extensas. No construir comandos concatenando
+   nombres de archivo y no asumir expansión de glob idéntica entre shells.
+6. Mantener LF para Snakefile, .smk y .sh; comprobar LF/CRLF al materializar Git.
+   No cambiar globalmente core.autocrlf ni atributos de evidencia histórica. Rechazar
+   colisiones sólo por mayúsculas, nombres Windows reservados y rutas fuera del área
+   admitida. Probar nombres largos sin reconfigurar el sistema como solución automática.
+7. No exigir symlinks, chmod, FIFO o fork como parte de la API. Preferir archivos
+   normales, procesos separados y cierre explícito de lectores antes de renombrar.
+   Probar archivo abierto, reemplazo atómico, lock y fallo/interrupción en Windows;
+   Bash no transforma esas reglas del kernel en semántica Linux.
+8. No compartir un checkout activo con dos procesos de distintos perfiles. En WSL
+   preferir filesystem Linux; en Windows filesystem local Windows. Mismo código e
+   inputs identificados, workdirs y estados separados. Los resultados numéricos se
+   comparan con tolerancias y plataforma registrada, no como igualdad binaria universal.
+
+## Preparación y puertas de aceptación
+
+M001 cualifica WSL/Linux y las herramientas de plantilla en POSIX. M008, opcional
+e independiente, cualifica Windows, su versión exacta de Snakemake y el proveedor
+Bash seleccionado. Un fallo Windows no cancela el desarrollo/entrega WSL. Antes de
+usar o anunciar Windows, deben pasar canary, Pytest y workflow completo; no basta
+snakemake --version ni un dry-run.
+
+Probar rutas con espacios/Unicode, argumentos sin modificación, minidag de dos
+procesos, salida no cero, temporales, locks y renombrado; después no-op, invalidación,
+reanudación y equivalencia de resultados entre perfiles. Validar cada proveedor
+Bash que se anuncie como soportado. Limitar la búsqueda de soluciones: fallo
+conservado, causa documentada y retorno al arquitecto según presupuestos del roadmap.
+
+La réplica de instalación usa el mismo gestor y lock del perfil. No se copia un
+entorno Linux a Windows. El cambio de checkout debe preservar HEAD, índice, cambios
+sin commit y archivos nuevos; no exportar sólo HEAD si omite trabajo pendiente.
+Este documento sustituye las indicaciones de exclusividad Linux de la revisión
+anterior sin reescribir decisiones históricas. Publicación y cambios del host siguen
+siendo acciones independientes de la instalación aislada admitida por D014.

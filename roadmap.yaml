@@ -46,14 +46,14 @@ milestones:
     title: Prueba exacta Linux, Micromamba y Snakemake
     objective: Cualificar plataforma Linux/WSL2, entorno fijo 3.11, plantilla y DAG mínimo.
     acceptance:
-    - 'V1/V7/D012: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar
+    - 'V1/V7/D013: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar
       distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.'
     - Arquitecto cualifica Git/ledger/lock/verificador en Linux antes de baseline. Probar GeoTIFF,
       CRS, RF y DAG de dos procesos con artefactos persistidos y segunda ejecución sin trabajo.
     - Crear 08_pkg/tests/run_checks.py con Pytest; full descubre suites y falla ante cero pruebas,
       skips requeridos o dependencia ausente; sólo usar procesos Linux del entorno fijo.
-    - Sin entornos por regla ni uso de Python/Conda Windows. WSL/Micromamba ausentes bloquean ejecución,
-      no esta planificación; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.
+    - 'Perfil base WSL/Linux: sin entornos por regla ni ejecutables Windows. Windows se cualifica
+      por separado en M008; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.'
     non_goals:
     - API final, workflow completo o experimentos científicos.
     - Modificar sistema, entorno base o herramientas de plantilla desde el asiento coder.
@@ -85,7 +85,7 @@ milestones:
     - Wheel declara compatibilidad mínima Python 3.11 e importa fuera del checkout en réplica Micromamba
       del lock; requisitos resueltos soportan 3.11.
     - Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar
-      wall2wall. Documentar Micromamba y exigir pruebas de paquete en V1.
+      wall2wall. Documentar gestor/lock por perfil y exigir pruebas V1.
     - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
     non_goals:
     - Implementar algoritmos futuros.
@@ -341,8 +341,8 @@ milestones:
     title: Persistencia y manifiestos
     objective: Conservar el estimador y evidencia necesaria para auditarlo.
     acceptance:
-    - 'Expediente auditable: esquema, Micromamba/lock, Snakemake/flujo, código/configuración, parámetros,
-      variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.'
+    - 'Expediente auditable: esquema, perfil/gestor/Bash/lock, Snakemake/flujo, código/configuración,
+      parámetros, variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.'
     - 'V5: entrenar/guardar/salir y cargar confiablemente en otro proceso conserva predicción; rechazar
       corrupción, incompatibilidad y carga sin trusted=True.'
     - Rutas portables; nuevos resultados con nueva identidad; no incluir rutas de máquina ni datos
@@ -430,15 +430,14 @@ milestones:
   slices:
   - id: M006-S01
     title: Workflow Snakemake y Pytest por etapas
-    objective: Unir la API en un DAG de artefactos persistidos dentro del Micromamba fijo.
+    objective: Unir API en un DAG común de artefactos persistidos con entorno fijo por perfil.
     acceptance:
     - 'orchestration.md/V7: preflight, alinear, muestrear, folds, evaluar, ajustar final, predecir
       y auditar con inputs/outputs/parámetros/código/lock declarados.'
     - Targets production y validated; Pytest por módulo/regla con recibos ligados a código/pruebas/entorno.
       Smoke Pytest invoca production sin recursión.
-    - Todas las reglas usan el mismo Python Micromamba 3.11; scripts finos llaman API sin duplicación.
-      Identidades SHA detectan cambios incluso sin mtime; respetar recursos R3 y no crear entornos
-      por regla.
+    - Mismo Python 3.11 del perfil en todas las reglas; scripts llaman API sin duplicación ni operaciones
+      POSIX innecesarias. Hashes detectan cambios sin mtime; límites R3, sin entornos por regla.
     - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
     non_goals:
     - DAG por píxel, ejecución distribuida o gestores propios.
@@ -495,13 +494,12 @@ milestones:
     title: Documentación y paquete entregable
     objective: Preparar v0.1 local con instrucciones reproducibles y límites claros.
     acceptance:
-    - 'Quickstart reproducible: Micromamba fijo 3.11, API y Snakemake validated, Pytest por etapa,
-      dry-run, reanudación y lectura de artefactos; entradas exportadas de geecomposer.'
-    - Wheel/sdist y distribución local del workflow incluyen archivos necesarios; documentar recreación
-      Micromamba desde lock y versiones exactas, sin prefijos privados.
-    - Linux x86-64 obligatorio; documentar WSL2 y Linux nativo con Bash/Micromamba. Ejecutar smoke
-      en la plataforma elegida y distinguir alternativa no verificada; no soporte operativo Windows
-      nativo.
+    - 'Quickstart: perfil WSL/Micromamba base y Windows/Conda alternativo, Python 3.11, API, Snakemake
+      validated, Pytest, dry-run, reanudación y auditoría.'
+    - Wheel/sdist y workflow con archivos necesarios; describir declaraciones environment-linux.yml/environment-windows.yml
+      y locks linux-64/win-64 según perfil, sin rutas locales.
+    - M006 demuestra WSL/Linux. Documentar Windows como alternativa no verificada hasta M008, con
+      proveedor Bash y límites POSIX; no exigir Windows para aceptar entrega WSL.
     - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
     non_goals:
     - Publicar en PyPI/GitHub ni exigir notebook o UI.
@@ -582,12 +580,90 @@ milestones:
     kind: docs
     notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
       existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+- id: M008
+  title: Compatibilidad Windows opcional con Conda y Bash
+  status: active
+  risk: high
+  holistic_review: true
+  slices:
+  - id: M008-S01
+    title: Entorno Windows y canary de frontera POSIX
+    objective: Cualificar Windows/Conda 3.11 y un proveedor Bash sin cambiar el comportamiento científico.
+    acceptance:
+    - 'V1/V8/D013: resolver environment-windows.yml/lock win-64, Snakemake y proveedor Bash; Python/GDAL
+      nativos Conda. Elegir Git Bash o MSYS2 explícito y registrar versión/identidad externa.'
+    - 'Canary real: dos reglas/procesos, rutas con espacios/Unicode, argv sin conversión indebida,
+      códigos de error, LF/CRLF, temporales, Git/lock y archivos abiertos. Full Pytest descubre requisitos
+      sin skips.'
+    - No mezclar runtimes/PATH ni usar Bash WSL desde Windows. Si se prueba otro proveedor consume
+      su canary; reportar fallo/no verificado sin bloquear WSL. Sin cambios de algoritmo para obtener
+      pase.
+    - Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en
+      esta revisión.
+    non_goals:
+    - Emulación POSIX general, toolchain C/C++ o instalaciones globales.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    - 00_brief/validation.md
+    - ENVIRONMENT.md
+    - 06_infra/CONTEXT.md
+    - 08_pkg/CONTEXT.md
+    allowed_prefixes:
+    - 06_infra/
+    - 08_pkg/workflow/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    focused: []
+    kind: code
+    notes: 'D014 admite preparación arquitectónica del entorno y canary Git Bash: un lote técnico,
+      hasta dos correcciones conservadas, 1200 s por instalación/suite, 6 GiB entorno/cache y
+      512 MiB scratch. Sin prompts ni aceptación automática. M001 no depende de este hito;
+      completar puertas de plantilla/producto antes de aceptación manual.'
+  - id: M008-S02
+    title: Workflow Windows y comparación con WSL
+    objective: Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar
+      soporte.
+    acceptance:
+    - 'Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en Windows
+      con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.'
+    - 'Mismos fixtures/código/configuración que WSL: IDs/folds/máscaras/CRS iguales; predicciones/métricas
+      dentro de 1e-5. Reportar plataforma, versiones y proveedor Bash; investigar discrepancia sin
+      relajar umbral silenciosamente.'
+    - Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash sin
+      prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la API ni
+      compartir entornos/.snakemake.
+    - Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en
+      esta revisión.
+    non_goals:
+    - Cualificar todas las versiones de Windows/Snakemake o exigir Windows para cerrar entrega WSL.
+    read_first:
+    - 00_brief/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
+    - 00_brief/validation.md
+    - ENVIRONMENT.md
+    - 06_infra/CONTEXT.md
+    - 08_pkg/CONTEXT.md
+    allowed_prefixes:
+    - 08_pkg/workflow/
+    - 08_pkg/tests/
+    - 08_pkg/docs/
+    - 08_pkg/examples/
+    - 06_infra/
+    focused: []
+    kind: code
+    notes: Rama de trabajo opcional e independiente del perfil WSL. Activar sólo al preparar Windows;
+      antes de emitir añadir lecturas concretas de código y comandos enfocados. M001 no depende de
+      este hito.
 ruled_out:
 - id: R1
   text: 'Sesión inicial: sólo planificación; cero prompts (incluido preview), asientos, experimentos
     de producto, baseline aceptada, commits, publicación o servicios de pago. Antes de emitir M001-S01
     el arquitecto prepara/cualifica en scratch entorno exacto y verificador y añade lecturas de implementación
-    precisas; preview sólo al reanudar.'
+    precisas; preview sólo al reanudar. D014 admite ahora instalación Windows aislada y canary
+    arquitectónico M008-S01; no admite API, prompts ni baseline.'
 - id: R2
   text: 'Límites de cada futura ronda manual: 60 minutos, 20000 tokens si el proveedor permite medirlos,
     máximo 2 rondas correctivas por tarea. Sin métricas de tokens registrar unknown, nunca cero ni
@@ -600,30 +676,34 @@ ruled_out:
     en caso sintético, registrar si no puede medirse. Scratch generado <=512 MiB por suite y <=1 GiB
     en escala; ficheros versionados de ejemplo <=1 MiB cada uno; mapas/modelos generados fuera de
     Git. Snakemake --cores 1 en pruebas y retries=0; caches/.snakemake fuera del producto. Réplica
-    Micromamba de instalación: hasta 6 GiB adicionales de disco y 1200 s, separada de datos sintéticos;
-    fallo conserva evidencia y no reemplaza entorno fijo.'
+    del gestor del perfil para instalación: hasta 6 GiB adicionales de disco y 1200 s, separada de
+    datos sintéticos; fallo conserva evidencia y no reemplaza entorno fijo.'
 - id: R4
   text: 'Selección sintética acotada: hasta 5 folds externos, 3 internos y 6 candidatos totales incluyendo
     familias; máximo 128 ajustes por evaluación completa (incluye refits y dummy). Semillas 17,29,43:
     hasta 3 evaluaciones científicas, una por semilla, y 1 canary técnico por nuevo límite de entorno;
     0 reemplazos automáticos. Fallo común de infraestructura detiene los intentos no iniciados; conservar
     los iniciados. Cada nuevo lote requiere protocolo del arquitecto antes de resultados. Pruebas
-    deterministas del verificador no son nuevos intentos científicos; siguen sujetas a R3.'
+    deterministas del verificador no son nuevos intentos científicos; siguen sujetas a R3. Cualificación
+    Windows M008: máximo dos canaries iniciales, uno por proveedor Git Bash/MSYS2, registrados antes
+    de ejecutar; no reemplazos ni intentos extra silenciosos. Excepción D014: lote Git Bash con
+    hasta dos correcciones técnicas explícitas, preservando fallos, sin evaluación científica.'
 - id: R5
   text: 'Fuera de v0.1: adquisición/compuestos EE, clasificación/multisalida, agregación zonal, categorías
     predictoras, imputación, AutoML, early stopping, incertidumbre calibrada/AOA formal, kriging,
-    GPU, Dask, servicios y GUI. No añadir dependencia fuera de D004/D010/D011/D012 (workflow: Snakemake;
-    dev: pytest/build/setuptools/wheel; herramientas raíz: PyYAML) sin decisión del arquitecto. D012:
-    operación sólo Linux (WSL2 o nativo), Micromamba fijo; sin ejecutables Python/Git Windows ni conda
-    deployment por regla.'
+    GPU, Dask, servicios y GUI. No añadir dependencia fuera de D004/D010/D011/D012/D013 (workflow:
+    Snakemake; dev: pytest/build/setuptools/wheel; herramientas raíz: PyYAML) sin decisión del arquitecto.
+    D013: WSL recomendado; Windows sólo tras M008. Un entorno/Bash por perfil, sin mezcla de runtimes
+    ni conda deployment por regla. Componentes MSYS2 opcionales sólo para el perfil Windows, con resolución/justificación
+    en M008.'
 - id: R6
   text: 'Piloto real sin admisión de ejecución hasta M007-S01: requiere datos/metadatos/permiso del
     propietario y protocolo previo. No existe presupuesto real implícito por completar simulaciones.
     Licencia, nombre público y publicación requieren decisión humana; sin push ni instalación global.'
 not_yet_specified:
 - id: N1
-  text: 'Antes de M001-S01: seleccionar WSL2/Linux nativo, identificar Micromamba/prefijo Linux 3.11
-    y resolver lock linux-64. Cualificar herramientas de plantilla POSIX y DAG. Preview sólo al reanudar;
+  text: 'Antes de M001-S01: preparar perfil base WSL/Linux, Micromamba/prefijo 3.11 y lock linux-64;
+    cualificar plantilla POSIX y DAG. Windows tiene admisión propia M008. Preview sólo al reanudar;
     no baseline aceptada.'
 - id: N2
   text: 'Antes del piloto: objetivo/unidad/soporte, fechas, AOI/malla, CRS, sitios, representatividad,
@@ -633,6 +713,7 @@ not_yet_specified:
   text: 'Antes de publicación: licencia del paquete, disponibilidad de nombre de distribución y plataformas/versiones
     demostradas. Publicación externa es una acción humana posterior.'
 - id: N4
-  text: 'Pendientes de ejecución: distribución WSL2 o equipo Linux x86-64, Micromamba instalado, prefijo
-    fijo y checkout en filesystem Linux. No se han instalado componentes ni transferido archivos.
-    Preservar cambios locales e historial al preparar el traslado.'
+  text: 'D014: preparación Windows Conda/Python 3.11 con Git Bash comprobada mediante instalación,
+    recreación desde locks y canary; evidencia y guía en 06_infra/WINDOWS.md. Esto no acepta M008.
+    MSYS2 queda como alternativa sin cualificar. Integración de producto M008-S02 y
+    cualificación base WSL M001 permanecen independientes de este canary.'

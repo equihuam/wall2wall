@@ -1,11 +1,11 @@
 # Contrato de validación
 
-Decisiones D005–D012. Las puertas obligatorias de cada entrega se declaran en el
+Decisiones D005–D013. Las puertas obligatorias de cada entrega se declaran en el
 roadmap; este documento define cómo observarlas. No es un informe de pruebas pasadas.
 
 ## V1 — Herramientas, descubrimiento y paquete
 
-Prueba desechable con CPython 3.11 en el entorno Micromamba fijo y versiones/builds exactos
+Prueba desechable con CPython 3.11 en el entorno fijo del perfil y versiones/builds exactos
 resueltos por el arquitecto. Verificar también Snakemake y Pytest en ese intérprete.
 En scratch externo: escribir/leer un GeoTIFF, reproyectar, extraer puntos, ajustar
 Random Forest pequeño y predecir otra ventana. Registrar versiones y GDAL.
@@ -14,7 +14,7 @@ pruebas obligatorias. Dependencia requerida ausente produce fallo, no skip.
 Los extras ausentes se permiten sólo en perfil core; el perfil extras los exige.
 
 El wheel se construye y se importa fuera del checkout. Para comprobar instalación
-limpia se usa una réplica temporal Micromamba de la especificación fija, sin modificar
+limpia se usa una réplica temporal del gestor/lock del perfil, sin modificar
 el entorno de producción ni usar venv. Es una fixture de instalación, no otro entorno
 por etapa. Las pruebas raíz de plantilla no sustituyen las de `08_pkg`.
 El verificador usa VERIFICATION_SCRATCH, no escribe cachés/builds en producto ni
@@ -109,10 +109,13 @@ declarar el modelo útil para ese caso. Publicar exige decisión humana independ
 ## V7 — Snakemake, Pytest y reproducción
 
 Contrato en orchestration.md. En M001, canary mínimo de dos reglas/procesos con
-Pytest: intérprete Micromamba 3.11 correcto, artefacto persistido, segunda ejecución sin
+Pytest: intérprete del entorno 3.11 correcto, artefacto persistido, segunda ejecución sin
 trabajo. Probar Linux real (WSL2 o nativo), sys.platform linux y Python 3.11 del prefijo
 fijo. Cualificar también bloqueo Git, ledger y verificador de plantilla en POSIX;
 la evidencia Windows no basta. Una dependencia incompatible es bloqueo, no skip.
+
+Windows se cualifica por separado en M008: sys.platform win32, Python nativo Conda
+3.11 y proveedor Bash fijado; no se reutiliza evidencia POSIX como pase Windows.
 
 En integración: Pytest por módulos, contratos de reglas y smoke del DAG de producción
 en scratch. Probar ejecución limpia, no-op sin cambios, cambio de dato conservando
@@ -129,3 +132,23 @@ identidad binaria entre plataformas o bibliotecas nativas distintas.
 La suite Pytest de integración invoca el target de producción, nunca el target que
 vuelve a invocar esa misma suite. Cada grupo requerido falla ante cero pruebas/skips;
 guardar recibos JUnit ligados al código/pruebas/configuración/entorno actuales.
+
+## V8 — Portabilidad Windows y fronteras POSIX
+
+Probar las medidas de ENVIRONMENT.md con Pytest en el perfil seleccionado. El canary
+Windows debe ejecutar jobs reales y verificar que Python procede del prefijo Conda,
+Bash del proveedor elegido y que no aparece Python WSL/MSYS2 en los procesos.
+Argumentos con espacios, acentos, barras y prefijos parecidos a rutas llegan intactos;
+verificar conversión MSYS y sus excepciones selectivas. No validar sólo un dry-run.
+
+Comprobar materialización Git de LF/CRLF, colisiones de nombres/case, paths largos,
+reemplazo de archivos con handles cerrados, temporales externos, locks y propagación
+de salida no cero. Interrupción controlada sólo de procesos hijos propiedad de la
+prueba; sin matar procesos del host. Reinicio respeta resultados completos y rechaza
+estado parcial. El código común no requiere symlinks, chmod, fork ni FIFO.
+
+Mismos fixtures, código y configuración científica en WSL y Windows: iguales IDs,
+folds, máscaras/CRS y resultados dentro de tolerancia 1e-5, con locks y bibliotecas
+nativas propios de cada perfil. No compartir .snakemake, modelos binarios o recibos
+entre plataformas para simular reproducción. Si sólo se prueba un proveedor Bash,
+el otro queda explícitamente sin verificar. Fallos Windows no se silencian con skips.

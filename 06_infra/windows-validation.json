@@ -1,0 +1,64 @@
+{
+  "python": "3.11.16",
+  "platform": "win32",
+  "gdal": "3.12.3",
+  "packages": {
+    "snakemake": "9.27.0",
+    "pytest": "9.1.1",
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "rasterio": "1.4.4",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0",
+    "packaging": "25.0"
+  },
+  "date": "2026-09-16",
+  "scope": "Windows installation canary; no product acceptance",
+  "conda": "26.1.1",
+  "git": "2.55.0.windows.5",
+  "bash": "5.3.15(2)-release",
+  "initial_suite": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 152.883,
+    "junit": "local_state/windows-setup/smoke-initial.xml"
+  },
+  "sha256": {
+    "06_infra/conda-win-64.lock.txt": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19",
+    "06_infra/pip-win-64.lock.txt": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc",
+    "06_infra/windows.ps1": "f729589b011b269d6d482947bd5702df1eb44df2ab3663d0d8cdc12724c510e3",
+    "06_infra/windows_smoke/Snakefile": "08792f42b40e46b8e072e8be7b5d060b89f48200bee313546b558e27e992c4f7",
+    "06_infra/windows_smoke/raster.py": "d807d09525899e34cf2445c46d79ef935e2052c236e7ff1c2f17e763062d856d",
+    "06_infra/windows_smoke/summarize.py": "7168fc6c10c83dc98a6577efd00a40113d75123a9dcab16337f029bde5ac98f4",
+    "06_infra/windows_smoke/test_windows.py": "4720059c058ae3c3f7068b0834daabb974b9e16c216df00d61090148783e55ec"
+  },
+  "git_distribution_sha256": {
+    "bin/bash.exe": "0010d7d71a94b0441028eea42381589483836d2c097f24940d282f5c4eba7919",
+    "usr/bin/bash.exe": "5490d0da5e7cf9d92068cc48fcc590f2bcf8564add8ff91c3b5fe541eb2d72e3",
+    "usr/bin/msys-2.0.dll": "e55be2d89f2756f540a8f2acf18cd14bf275d1187a32d5189946ee5c896bcf03"
+  },
+  "limits": {
+    "rss_measurement": "unknown",
+    "token_measurement": "unknown",
+    "conda_installed_MiB_from_metadata": 1230.2,
+    "scientific_evaluations": 0,
+    "canary_corrections": 0
+  },
+  "clean_recreation": {
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 101.829,
+    "junit": "local_state/windows-setup/smoke-replay.xml",
+    "conda_exact_artifacts_matched": 103,
+    "pip_exact_downloads_matched": 49,
+    "pip_check": "passed",
+    "scientific_evaluations": 0
+  },
+  "tested_lock_sha256_before_lf_normalization": {
+    "06_infra/conda-win-64.lock.txt": "257757a22a6597ba980c211486cf713977867f13267f7affc3f8c623b39b4564",
+    "06_infra/pip-win-64.lock.txt": "1f1960d2c89720561b0f99a419bc09294dd70d99182e93e6b0930caf12509d8d"
+  },
+  "lock_normalization": "Only CRLF to LF changed before commit, following .gitattributes; package URLs, versions and artifact hashes are unchanged. Original tested lock hashes are retained."
+}

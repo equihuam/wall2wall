@@ -150,3 +150,49 @@ rewrite history when a decision changes.
   de ejecución Windows nativa. Conserva Python 3.11, entorno fijo, API y Pytest/DAG.
   Esta revisión sólo reorganiza el diseño: no instala WSL/Micromamba, transfiere
   archivos, modifica host ni emite prompts.
+
+## D013 — WSL recomendado y Windows nativo seleccionable
+
+- Status: accepted
+- Date: 2026-09-15
+- Decision: Mantener WSL2/Linux x86-64 con Micromamba como perfil recomendado y
+  añadir Windows x64 con Conda fijo como alternativa explícita. Ambos usan Python
+  3.11, la misma API/DAG y locks separados linux-64/win-64. Un run pertenece a un
+  solo perfil y no comparte prefijos, bibliotecas nativas ni metadatos activos.
+- Authority: Instrucción explícita del propietario de conservar ambas opciones.
+- Reason: WSL reduce las diferencias POSIX; Windows es viable como objetivo a
+  cualificar, sin inferir soporte integral por disponer de Bash. En Windows se
+  selecciona exactamente un proveedor: Git Bash primero, MSYS2 como alternativa.
+  Se fijan versiones y rutas locales, evitando mezcla de runtimes y ajustes globales.
+- Decision details: Preferir scripts Python y argv sin shell para operaciones del
+  producto. Cualificar quoting, conversión de rutas MSYS, locks, LF/CRLF, archivos
+  abiertos, interrupción y reanudación. La capa MSYS2 es una herramienta externa;
+  no sustituye Python/GDAL/NumPy nativos de Conda Windows. m2-base es un candidato
+  a resolver y comprobar, no un paquete que se dé por instalado o compatible.
+- Supersedes: D012 en exclusividad Linux y prohibición de ejecutables Windows.
+  Conserva aislamiento, Python 3.11, entorno fijo y cualificación independiente.
+  Windows permanece sin verificar hasta sus puertas M008; no bloquea entrega WSL.
+  Esta revisión no instala, migra, genera prompts ni publica cambios.
+
+## D014 — Instalación y comprobación concreta de Windows
+
+- Status: accepted
+- Date: 2026-09-16
+- Authority: Petición explícita del propietario de resolver la instalación y operación Windows.
+- Decision: Preparar un prefijo Conda exclusivo del proyecto en local_state/, Python
+  3.11 nativo y Git Bash ya instalado, seleccionado explícitamente. Instalar binarios
+  científicos desde conda-forge y Snakemake mediante pip si es necesario. Registrar
+  resolución exacta de ambos gestores y probar un DAG pequeño mediante Pytest.
+  No modificar base, PATH persistente, perfiles de shell ni configuración global.
+- Scope: Preparación arquitectónica M008-S01; no genera prompts, implementa la API
+  científica ni acepta M008/M001. La integración final y comparación WSL siguen
+  pendientes. El canary técnico no es una evaluación científica.
+- Protocol: Un lote inicial Git Bash con diagnóstico y hasta dos correcciones
+  explícitas conservando sus resultados; máximo 1200 s por instalación o suite,
+  6 GiB de entorno/cache adicionales y 512 MiB de scratch de pruebas. Sin GPU,
+  servicios externos de pago ni ajustes científicos. No instalar un segundo Bash
+  mientras el existente resulte suficiente. Medición de tokens/RSS: unknown si
+  no está disponible. La excepción a R4 autoriza correcciones técnicas de este
+  lote; no nuevas evaluaciones estadísticas.
+- Supersedes: D013 sólo en la restricción documental de esta revisión. Mantiene
+  WSL recomendado y Windows sujeto a evidencia independiente.

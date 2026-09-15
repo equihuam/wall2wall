@@ -1,6 +1,6 @@
 # Diseño de Wall2Wall v0.1
 
-Contrato bajo D002–D008, actualizado por D010–D012. Tareas y fronteras: `roadmap.yaml`.
+Contrato bajo D002–D008, actualizado por D010–D013. Tareas y fronteras: `roadmap.yaml`.
 Los nombres son la API prevista, no funciones ya implementadas.
 
 ## Etapas naturales
@@ -100,7 +100,7 @@ sin recorte silencioso. Límites físicos opcionales sólo como diagnóstico.
 modelo y mapas. Datos reales/coordenadas fuera de Git; ejemplos versionados sintéticos.
 JSON estricto: métricas indefinidas como null con motivo, nunca NaN.
 
-Registrar esquema, paquete, Python/dependencias/GDAL, identidad del entorno Micromamba,
+Registrar esquema, paquete, Python/dependencias/GDAL, perfil y gestor de entorno/Bash,
 versión de Snakemake, revisión del flujo, configuración y semillas, parámetros, variables
 ordenadas/unidades/escala, respuesta/soporte, malla, remuestreo, filtros, folds,
 conteos, tiempos, tamaños y SHA-256 de entradas/salidas. Hash incremental una vez por
@@ -118,7 +118,8 @@ hash del mapa usado para entrenar; verificar cada ejecución por separado.
 `08_pkg/pyproject.toml`, `08_pkg/src/wall2wall/`, `08_pkg/tests/`,
 `08_pkg/examples/`, `08_pkg/docs/`, `08_pkg/workflow/`. Dev/test/orquestación separados
 de dependencias de importación del paquete. Compatibilidad mínima Python 3.11;
-desarrollo y producción en un único entorno Micromamba fijo, en Linux (WSL2 o nativo), según D012.
+desarrollo y producción en un entorno fijo por perfil: Micromamba en WSL/Linux
+(recomendado), Conda nativo en Windows (alternativa cualificada), según D013.
 El pyproject raíz permanece como paquete de herramientas de plantilla. El arquitecto
 mantiene `scripts/hermetic_verification.py`. Estas rutas de producto son salidas
 futuras, no lecturas existentes.
