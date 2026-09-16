@@ -1,0 +1,72 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M002-S05",
+  "round": 1,
+  "title": "Encabezados Python y comprobación obligatoria",
+  "objective": "Aplicar D016 al esqueleto y hacer comprobable la documentación de nuevos cambios antes de implementar simulaciones.",
+  "acceptance": [
+    "D016: usar el formato canónico de AGENTS.md; migrar los tres Python de M002-S01 y cada Python tocado por esta tarea. Revisión verifica contenido real; sin modificar comportamiento científico ni contrato del wheel.",
+    "Crear 06_infra/check_python_headers.py con stdlib ast y tokenize: validar docstring inicial, nombre real, cuatro secciones ordenadas no vacías, separador y ausencia de marcadores de plantilla. Aceptar shebang/codificación y No aplica justificado; no importar ni ejecutar archivos inspeccionados.",
+    "Crear 06_infra/python_header_scope.json con lista explícita de rutas relativas propias. Incluir tres Python del paquete, comprobador, 06_infra/run_checks.py y test_python_headers.py. Fallar ante lista vacía, archivo ausente, ruta absoluta, escape o enlace fuera del checkout; no recorrer entornos ni caches.",
+    "El arquitecto coteja el alcance con Python nuevos/modificados y baseline declarada antes de cada emisión y al revisar el manifiesto final. Incluir adiciones del coder antes de verificar; no sustituir esa cobertura con git diff HEAD. Conservar la lista de archivos ya incorporados.",
+    "Integrar gate y Pytest obligatorio en 06_infra/run_checks.py. Full conserva nueve pruebas de infraestructura y once de paquete; un fallo de encabezados impide pase. Añadir --headers-only como focused; no invoca el full ni omite silenciosamente pruebas requeridas.",
+    "Pytest cubre documento válido LF/CRLF, shebang/codificación, docstring ausente/no inicial, nombre erróneo, sección ausente/vacía/desordenada, plantilla sin completar, alcance inválido y propagación del fallo al lanzador; fixtures en scratch externo.",
+    "Windows D014/Python 3.11 mediante windows.ps1. R2/R3: 60 min, 20000 tokens o unknown, dos correcciones, full <=1200 s y scratch <=512 MiB. Sin dependencias nuevas, instalaciones, red, cambios de host ni pruebas científicas."
+  ],
+  "non_goals": [
+    "Migración masiva, API científica, nuevos motores, cambiar scripts/ o evidencia aceptada."
+  ],
+  "read_first": [
+    "00_brief/decisions.md",
+    "06_infra/run_checks.py",
+    "06_infra/windows_smoke/test_verification.py",
+    "06_infra/windows.ps1",
+    "scripts/hermetic_verification.py",
+    "08_pkg/src/wall2wall/__init__.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/README.md"
+  ],
+  "allowed_prefixes": [
+    "06_infra/check_python_headers.py",
+    "06_infra/python_header_scope.json",
+    "06_infra/run_checks.py",
+    "06_infra/windows_smoke/test_python_headers.py",
+    "08_pkg/src/wall2wall/__init__.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/README.md"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [
+    [
+      "python",
+      "06_infra/run_checks.py",
+      "--headers-only"
+    ]
+  ],
+  "full": [
+    "python",
+    "scripts/hermetic_verification.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 1200,
+  "observation": "process",
+  "notes": "Insertada tras M002-S01 conservando IDs existentes. Los archivos del comprobador, su alcance y sus pruebas son salidas nuevas.",
+  "findings": "",
+  "memory": ""
+}

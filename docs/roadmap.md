@@ -15,6 +15,7 @@ Holistic review: true
 Cualificar plataforma Linux/WSL2, entorno fijo 3.11, plantilla y DAG mínimo.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V1/V7/D013: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.
 - Arquitecto cualifica Git/ledger/lock/verificador en Linux antes de baseline. Probar GeoTIFF, CRS, RF y DAG de dos procesos con artefactos persistidos y segunda ejecución sin trabajo.
 - Crear 08_pkg/tests/run_checks.py con Pytest; full descubre suites y falla ante cero pruebas, skips requeridos o dependencia ausente; sólo usar procesos Linux del entorno fijo.
@@ -49,24 +50,49 @@ Non-goals:
 - Modificar scripts/, 06_infra/, roadmap, decisiones, entorno, locks o pruebas de infraestructura; instalar herramientas o emitir otros prompts.
 - Cualificar Linux, anunciar soporte completo Windows, publicar paquete o elegir licencia definitiva.
 
+### M002-S05 — Encabezados Python y comprobación obligatoria
+
+Aplicar D016 al esqueleto y hacer comprobable la documentación de nuevos cambios antes de implementar simulaciones.
+
+Acceptance:
+- D016: usar el formato canónico de AGENTS.md; migrar los tres Python de M002-S01 y cada Python tocado por esta tarea. Revisión verifica contenido real; sin modificar comportamiento científico ni contrato del wheel.
+- Crear 06_infra/check_python_headers.py con stdlib ast y tokenize: validar docstring inicial, nombre real, cuatro secciones ordenadas no vacías, separador y ausencia de marcadores de plantilla. Aceptar shebang/codificación y No aplica justificado; no importar ni ejecutar archivos inspeccionados.
+- Crear 06_infra/python_header_scope.json con lista explícita de rutas relativas propias. Incluir tres Python del paquete, comprobador, 06_infra/run_checks.py y test_python_headers.py. Fallar ante lista vacía, archivo ausente, ruta absoluta, escape o enlace fuera del checkout; no recorrer entornos ni caches.
+- El arquitecto coteja el alcance con Python nuevos/modificados y baseline declarada antes de cada emisión y al revisar el manifiesto final. Incluir adiciones del coder antes de verificar; no sustituir esa cobertura con git diff HEAD. Conservar la lista de archivos ya incorporados.
+- Integrar gate y Pytest obligatorio en 06_infra/run_checks.py. Full conserva nueve pruebas de infraestructura y once de paquete; un fallo de encabezados impide pase. Añadir --headers-only como focused; no invoca el full ni omite silenciosamente pruebas requeridas.
+- Pytest cubre documento válido LF/CRLF, shebang/codificación, docstring ausente/no inicial, nombre erróneo, sección ausente/vacía/desordenada, plantilla sin completar, alcance inválido y propagación del fallo al lanzador; fixtures en scratch externo.
+- Windows D014/Python 3.11 mediante windows.ps1. R2/R3: 60 min, 20000 tokens o unknown, dos correcciones, full <=1200 s y scratch <=512 MiB. Sin dependencias nuevas, instalaciones, red, cambios de host ni pruebas científicas.
+
+Non-goals:
+- Migración masiva, API científica, nuevos motores, cambiar scripts/ o evidencia aceptada.
+
 ### M002-S02 — Generador y contrato de datos
 
 Crear fixtures con verdad conocida y metadatos explícitos.
 
 Acceptance:
-- V2: generador por semilla produce seis campos, verdad oculta y puntos; incluye señal/no señal, agrupación y cambio de dominio sin filtrar verdad a predictores.
-- Fixtures analíticas cubren mallas, máscaras, escalas, bordes e IDs; esquemas describen unidad/soporte/período y no incluyen datos reales.
-- Salidas regenerables en scratch; checksum lógico reproducible con mismas versiones y semilla.
-- Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+- Windows D014, Python 3.11 mediante 06_infra/windows.ps1 -PythonArgs. Implementar únicamente el generador de fixtures de desarrollo en 08_pkg/examples/synthetic.py y sus pruebas; no añadir API científica al paquete.
+- V2: generar por semilla 17, 29 o 43 una malla 128x128 north-up, seis predictores continuos p01..p06 y 256 puntos, en CRS métrico explícito. Caso base distribuido en al menos 16 bloques. Documentar fórmulas, magnitud del ruido y algoritmo RNG; no adaptar parámetros a resultados de modelos.
+- Ofrecer variantes signal, no_signal, clustered y domain_shift. Signal usa respuesta no lineal conocida más ruido; no_signal genera respuesta independiente de predictores; clustered concentra observaciones en vecindades de sitios; domain_shift incluye región identificable fuera del rango predictor de los puntos de entrenamiento. Probar estas propiedades de construcción, sin entrenar modelos ni exigir correlaciones aleatorias exactas.
+- Crear predictors.tif, observations.csv, truth.tif y manifest.json en un directorio de salida nuevo fuera del checkout. CSV incluye sample_id único, x, y, response y site_id; índices de celda y bloques pueden ir en metadatos de prueba. Verdad y campos latentes son salidas separadas y nunca bandas predictoras. JSON estricto con rutas relativas, semilla, variante, fórmulas, nombres/orden, unidades sintéticas, soporte, período, CRS, afín, tamaño, escala/offset y nodata/máscara; no incluir rutas locales absolutas.
+- CLI mínima --output --seed --variant, invocable en proceso independiente desde cualquier cwd. Rechazar destino existente sin sobrescribir ni borrar contenido, semilla/variante inválida y salidas dentro del checkout. Dependencias ya instaladas: stdlib, numpy, pandas, rasterio; sin nuevas instalaciones.
+- Pytest compara dos generaciones en procesos/directorios distintos con igual semilla y variante: mismos arrays, máscaras, geometría, CSV y metadatos estables. Definir checksum lógico de esos contenidos, excluyendo timestamps y diferencias de contenedor TIFF. Otra semilla cambia valores sin cambiar esquema. Comprobar las tres semillas y cuatro variantes, sin elegir sólo las que resulten favorables.
+- Fixtures analíticas mínimas en 08_pkg/tests/test_synthetic.py cubren CRS distintos, origen/resolución, bandas reordenadas, bordes, escala/offset, máscaras parciales, cero válido, nodata, NaN, infinito, sin solapamiento e IDs repetidos. Documentar expectativas numéricas independientes; aquí se crean/inspeccionan las fixtures, no se implementa armonización ni muestreo de producción.
+- En 08_pkg/tests/run_checks.py añadir --synthetic-only con IDs obligatorios de las nuevas pruebas; el modo habitual conserva once pruebas de paquete y exige las nuevas. Full conserva también dieciséis pruebas de infraestructura/encabezados. Ausencia, cero pruebas o skips requeridos fallan. No llamar al full desde Pytest. Artefactos, caches y JUnit en scratch externo; actualizar documentación y encabezados del lanzador.
+- D016: cumplir AGENTS.md/Python file headers. Añadir synthetic.py y test_synthetic.py a 06_infra/python_header_scope.json, conservar todas las entradas anteriores e incluir cualquier otro Python autorizado modificado. El arquitecto coteja baseline y manifiesto al registrar la entrega. No alterar el comprobador ni sus pruebas.
+- R2/R3: 60 min por ronda, 20000 tokens si medibles o unknown, hasta dos correcciones, full <=1200 s, scratch <=512 MiB, un hilo numérico. Reportar límites no medidos. No versionar rasters/CSV generados, usar datos reales, ejecutar evaluaciones científicas, cambiar entorno, instalar dependencias ni hacer commit/push.
 
 Non-goals:
-- Experimentos reales ni afirmar habilidad ecológica.
+- Entrenar RF/dummy, validar habilidad predictiva o consumir los lotes científicos R4; las pruebas del generador son deterministas.
+- API pública, armonización, extracción de producción, folds, workflow Snakemake y publicación.
+- Modificar infraestructura ejecutable, pruebas aceptadas del paquete, pyproject, locks o evidencia histórica.
 
 ### M002-S03 — Armonización de predictores
 
 Implementar malla explícita y alineación por capa.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - Contrato Entradas y armonización de architecture.md: validar CRS/bandas/nombres/afín, reutilizar malla igual y armonizar sólo explícitamente.
 - V2 demuestra reproyección/remuestreo continuo y máscaras, escala/offset una vez y rechazo de falta de cobertura/CRS o entradas contradictorias.
 - Intersección válida por banda, cero válido conservado; archivos originales intactos y sin cubo completo en RAM.
@@ -80,6 +106,7 @@ Non-goals:
 Convertir observaciones y rásteres en tabla trazable.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V2: sample_points transforma CRS y extrae píxel contenedor con bordes definidos; conserva IDs/orden y reporta cada exclusión.
 - Rechazar IDs duplicados, respuesta no finita/inválida y tabla efectiva vacía; separar coordenadas/IDs/objetivo del esquema predictor.
 - Preservar site_id, celda, unidad/soporte/período; misma política de validez que armonización e inferencia.
@@ -99,6 +126,7 @@ Holistic review: true
 Construir folds auditables según el escenario espacial.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V3: tamaño/origen/CRS métrico/semilla explícitos; cada ID tiene una prueba externa y no se filtra a entrenamiento.
 - Celda y sitio indivisibles, incluyendo sitios que cruzan bloques mediante unión; error si faltan grupos/folds no vacíos.
 - Exportar asignaciones, tamaños, distribución de respuesta y distancia mínima; repetir semilla reproduce índices.
@@ -112,6 +140,7 @@ Non-goals:
 Verificar distancias y particiones externas.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V3: buffer excluye sólo entrenamiento y prueba distancia mínima >= radio; fallo claro si deja entrenamiento insuficiente.
 - Folds externos validados por índices, grupos, solapamiento y cobertura; no fallback aleatorio. Las comparaciones aleatorias se etiquetan diagnósticas.
 - CSV de folds incluye exclusiones por buffer; documentar cómo el escenario de despliegue guía tamaño/distancia.
@@ -131,6 +160,7 @@ Holistic review: true
 Implementar evaluación espacial OOF y ajuste final separados.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V4: clonar RF/dummy por fold, preservar estimador original, exportar OOF sin fuga y ajustar modelo final como operación separada.
 - Métricas RMSE/MAE/sesgo/R² exactas sobre ejemplos manuales; por fold y agrupadas diferenciadas; R² indefinido null con razón.
 - Fixture de señal fija, semilla 17: RMSE OOF RF <= 0.9 veces dummy; protocolo congelado antes del resultado. Variante sin señal admite desempeño pobre correctamente reportado.
@@ -144,6 +174,7 @@ Non-goals:
 Añadir búsqueda opt-in y permutación fuera de entrenamiento.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V4: folds internos espaciales sólo dentro de entrenamiento externo; prueba espía demuestra que selección/preprocesamiento no ve IDs externos.
 - Configurar candidatos/semilla y contar ajustes antes de lanzar; selección final distinguida de OOF. Elegir familia también dentro de CV interna.
 - Permutación opt-in en folds externos con repeticiones limitadas; exportar dispersión y límites por correlación; sin reselección usando ese OOF.
@@ -157,6 +188,7 @@ Non-goals:
 Soportar ambos motores con el mismo contrato de evaluación.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - Extras separados e imports perezosos; core funciona sin ellos y elección sin extra produce error accionable.
 - Perfil extras instala y prueba ambos en entorno exacto; clone/fit/predict, CV espacial, semillas e hilos satisfacen V4 con datos pequeños.
 - Desactivar/rechazar early stopping y eval_set/callbacks incompatibles con CV; n_estimators explícito. Actualizar full con perfil extras obligatorio para aceptar esta tarea.
@@ -176,6 +208,7 @@ Holistic review: true
 Conservar el estimador y evidencia necesaria para auditarlo.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - Expediente auditable: esquema, perfil/gestor/Bash/lock, Snakemake/flujo, código/configuración, parámetros, variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.
 - V5: entrenar/guardar/salir y cargar confiablemente en otro proceso conserva predicción; rechazar corrupción, incompatibilidad y carga sin trusted=True.
 - Rutas portables; nuevos resultados con nueva identidad; no incluir rutas de máquina ni datos privados en evidencia versionada.
@@ -189,6 +222,7 @@ Non-goals:
 Producir mapas completos sobre celdas válidas con RAM acotada.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V5: predictor y lote acotados, malla/orden/esquema iguales; GeoTIFF float32 tiled comprimido, nodata/CRS/transform/dimensiones correctos.
 - Equivalencia con referencia en memoria a tolerancia 1e-5, ventanas no divisoras y bloques inválidos; nuevo ráster compatible permitido.
 - Prevenir sobreescritura accidental; ante fallo no dejar mapa final parcial ni dañar destino previo; completar manifiesto tras cierre.
@@ -202,6 +236,7 @@ Non-goals:
 Entregar máscaras y medir comportamiento con un ráster mayor.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V5: máscara válida y número de predictores fuera de min/max de entrenamiento, con cero rango e inválidos definidos; alerta no presentada como AOA/incertidumbre.
 - Caso 2048x2048x8 por ventanas registra tiempo/memoria/buffers/caché y cumple R3; instrumentación rechaza lectura del cubo entero.
 - Documentar límites de memoria de puntos/modelo y de min/max; reporte de escala reproducible sin binarios grandes versionados.
@@ -221,6 +256,7 @@ Holistic review: true
 Unir API en un DAG común de artefactos persistidos con entorno fijo por perfil.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - orchestration.md/V7: preflight, alinear, muestrear, folds, evaluar, ajustar final, predecir y auditar con inputs/outputs/parámetros/código/lock declarados.
 - Targets production y validated; Pytest por módulo/regla con recibos ligados a código/pruebas/entorno. Smoke Pytest invoca production sin recursión.
 - Mismo Python 3.11 del perfil en todas las reglas; scripts llaman API sin duplicación ni operaciones POSIX innecesarias. Hashes detectan cambios sin mtime; límites R3, sin entornos por regla.
@@ -234,6 +270,7 @@ Non-goals:
 Demostrar el camino de producción y pruebas sin depender de una sesión viva.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V1/V5/V7: wheel fuera del checkout y Micromamba del lock, procesos separados y DAG completo; API y workflow producen mismos folds/mapas/métricas dentro de tolerancia 1e-5.
 - Pytest demuestra no-op, cambio de entrada con mtime conservado, parámetro/código/entorno, intermedio eliminado/corrupto y fallo/reinicio. Sólo descendientes afectados; compresión no reentrena.
 - Recrear réplica Micromamba exacta y ejecutar en scratch nuevo; core/extras probados, manifiesto completo y artefactos anteriores intactos. Full exige suites/smoke offline sin invocar validated recursivamente.
@@ -247,6 +284,7 @@ Non-goals:
 Preparar v0.1 local con instrucciones reproducibles y límites claros.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - Quickstart: perfil WSL/Micromamba base y Windows/Conda alternativo, Python 3.11, API, Snakemake validated, Pytest, dry-run, reanudación y auditoría.
 - Wheel/sdist y workflow con archivos necesarios; describir declaraciones environment-linux.yml/environment-windows.yml y locks linux-64/win-64 según perfil, sin rutas locales.
 - M006 demuestra WSL/Linux. Documentar Windows como alternativa no verificada hasta M008, con proveedor Bash y límites POSIX; no exigir Windows para aceptar entrega WSL.
@@ -266,6 +304,7 @@ Holistic review: true
 Fijar datos, permisos y protocolo antes de entrenar.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V6: propietario aporta metadatos/permiso/variable/soporte/fechas/malla/sitios y criterio de utilidad; no leer datos privados sin esa admisión.
 - Arquitecto registra en decisiones y roadmap el presupuesto real, particiones y criterio antes de resultados; si faltan, conservar planificación y registrar pregunta precisa.
 - Protocolo distingue evaluación del software, calidad del ajuste y validez de las inferencias; referencias saneadas sin coordenadas privadas.
@@ -279,6 +318,7 @@ Non-goals:
 Aplicar paquete al caso admitido y evaluar sus límites.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V6/V7: con M007-S01 admitida, ejecutar protocolo mediante Snakemake validated y Micromamba fijo; conservar manifiesto/lock y datos privados fuera de Git.
 - Informe entrega métricas espaciales/OOF/exclusiones/validez/extrapolación, soporte y sesgo de muestra; desempeño pobre válido no se declara éxito predictivo.
 - Reproducir camino documentado; defectos de código originan tareas correctivas acotadas con nuevo alcance/revisión, no cambios escondidos en esta tarea.
@@ -298,6 +338,7 @@ Holistic review: true
 Cualificar Windows/Conda 3.11 y un proveedor Bash sin cambiar el comportamiento científico.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - V1/V8/D013: resolver environment-windows.yml/lock win-64, Snakemake y proveedor Bash; Python/GDAL nativos Conda. Elegir Git Bash o MSYS2 explícito y registrar versión/identidad externa.
 - Canary real: dos reglas/procesos, rutas con espacios/Unicode, argv sin conversión indebida, códigos de error, LF/CRLF, temporales, Git/lock y archivos abiertos. Full Pytest descubre requisitos sin skips.
 - No mezclar runtimes/PATH ni usar Bash WSL desde Windows. Si se prueba otro proveedor consume su canary; reportar fallo/no verificado sin bloquear WSL. Sin cambios de algoritmo para obtener pase.
@@ -311,6 +352,7 @@ Non-goals:
 Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar soporte.
 
 Acceptance:
+- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
 - Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en Windows con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.
 - Mismos fixtures/código/configuración que WSL: IDs/folds/máscaras/CRS iguales; predicciones/métricas dentro de 1e-5. Reportar plataforma, versiones y proveedor Bash; investigar discrepancia sin relajar umbral silenciosamente.
 - Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash sin prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la API ni compartir entornos/.snakemake.

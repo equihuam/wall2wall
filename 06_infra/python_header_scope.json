@@ -1,0 +1,10 @@
+[
+  "06_infra/check_python_headers.py",
+  "06_infra/run_checks.py",
+  "06_infra/windows_smoke/test_python_headers.py",
+  "08_pkg/src/wall2wall/__init__.py",
+  "08_pkg/tests/run_checks.py",
+  "08_pkg/tests/test_package.py",
+  "08_pkg/examples/synthetic.py",
+  "08_pkg/tests/test_synthetic.py"
+]

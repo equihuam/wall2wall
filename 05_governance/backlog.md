@@ -6,6 +6,7 @@ Do not use this file as slice state or a substitute for `roadmap.yaml`.
 <!-- findings:begin -->
 | ID | Severity | Disposition | Source | Summary |
 | --- | --- | --- | --- | --- |
+| M002-S05-001 | P2 | closed_by_review | 05_governance/reviews/m002/M002-S05_r1_review.md (6cb7d2311d6655ffd45c0d0b5129fcbd4780cf410308678f208bc91a89920f20) | En 06_infra/check_python_headers.py, check_header compara TEMPLATE_TEXT directamente con doc. Una frase literal de la plantilla partida por un salto de línea no coincide y supera este control, aunque conserva contenido pendiente. Esto incumple la aceptación de ausencia de marcadores de plantilla. Normalizar espacios del docstring antes de comparar y añadir un caso de plantilla multilínea con diagnóstico exacto. |
 <!-- findings:end -->
 
-- D016 — Tras cerrar M002-S01, el arquitecto debe incorporar al roadmap una tarea acotada para el comprobador de encabezados Python (stdlib ast), su integración en el full con alcance explícito de archivos y pruebas positivas/negativas, y la migración de los tres Python del esqueleto más los Python tocados por esa integración. Añadir referencias a AGENTS.md/Python file headers en aceptación de futuras tareas aplicables antes de emitirlas. Trabajo autorizado y diferido por la frontera de revisión vigente; no modifica M002-S01 ni implica que el gate ya exista.
+- D016 — Transferido al roadmap como M002-S05, antes de M002-S02; alcance, pruebas y aceptación viven allí. Las futuras tareas remiten a AGENTS.md/Python file headers. El comprobador aún no está implementado.

@@ -1,4 +1,23 @@
-"""Offline distribution contract; no scientific evaluations."""
+"""
+## test_package.py
+
+## Descripción
+Comprueba imports core, construcción e importación del wheel offline y detección
+de suites incompletas, como contrato inicial de distribución de Wall2Wall.
+
+## Precondiciones
+Pytest, build, setuptools, wheel, pip y dependencias core en el entorno fijo.
+El lanzador del paquete prepara VERIFICATION_SCRATCH externo y limita hilos.
+
+## Resultados
+Once pruebas deben pasar. Copias de fuentes, wheel e instalación de prueba se
+crean bajo tmp_path; otro proceso confirma origen del import y metadatos.
+
+## Notas relevantes
+No usa datos espaciales ni demuestra habilidad predictiva. Las fuentes de pruebas
+generadas son temporales; no se instalan dependencias ni se modifica el entorno.
+=============================================================================
+"""
 from pathlib import Path
 import importlib
 import os
