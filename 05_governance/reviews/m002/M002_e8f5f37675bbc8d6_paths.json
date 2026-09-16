@@ -1,0 +1,219 @@
+[
+  {
+    "slice": "M002-S01",
+    "path": "08_pkg/README.md",
+    "sha": "4708e1d1f41e66a579ebd741676ceb19905ea31d092d6ea8424f2198db544f93",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S01",
+    "path": "08_pkg/pyproject.toml",
+    "sha": "207ab63b0a184a3efd228e3cea9cae663c05b6ad4e77537da8d48cb3b4899076",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S01",
+    "path": "08_pkg/src/wall2wall/__init__.py",
+    "sha": "3c842dd5e2be060e0734329d980c922d299279bb38e3f043275190cd67416d19",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S01",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "038377ed0ed2e1ff9e2a60f060737e0122306769df3f4c9b8cf1e188f5f8f12d",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S01",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "b83f3d5cf7de5ab9402c351633d2af35d1a10d592813b5fa41a3649182794f19",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "06_infra/run_checks.py",
+    "sha": "ee1b15be1f4c8b4b001bb12352709f8c6f776ba21bf3799ec94b44e59f921009",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M002-S05",
+    "path": "08_pkg/README.md",
+    "sha": "04448d1f6496355e7978634a534bed2a4f05ad1b73e8a5558623a546a88411ad",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "08_pkg/src/wall2wall/__init__.py",
+    "sha": "b508213d20b11682969785e87c07c6ea36349db31c0fa5e12c2ea22307566ea6",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "99abd8d4d8ddf28995ac4a9490c0604d219e8ab8c93afcbfdcd58cca46f14687",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "8b485bb48c2708d4967accf375e03a394f4701f526b8e151319e54b6ba9a9096",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "06_infra/check_python_headers.py",
+    "sha": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M002-S05",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "e0bf8a88e0172e1b3c8f3df1083036de9044b9721214d3f5fc10f1703409bdad",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S05",
+    "path": "06_infra/windows_smoke/test_python_headers.py",
+    "sha": "e6d21c77844c5f84b8ca1294685d233f8e992eaa90bd670de62f5a9b34b8bc17",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M002-S02",
+    "path": "08_pkg/README.md",
+    "sha": "3c576aedbdd520e2f64672eda98ebb7aeb06b9656019f33c49969a83e19a81d1",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S02",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "6a1273f6afd64c306fa72a6c67a2e10c2cf4bd4d1905fe8e11d9e164f50c64d0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S02",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "7522c29d3804f2b0b18fc55eeeda9d584b0ccb26b7192c159244ad3637c67fa4",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S02",
+    "path": "08_pkg/examples/synthetic.py",
+    "sha": "2f21c98c0f5a43c0787457d22ccac91168de378109b1a0a45dc6e12182bbb159",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S02",
+    "path": "08_pkg/tests/test_synthetic.py",
+    "sha": "532cfba5d4c1ebecf84fb4bad185f4f1be768ff4b0839d62f18ca816c496826b",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S03",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "fa5959f635ac20e03029481191178522178222f2741ddd202e42cd55c6aac0b4",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/README.md",
+    "sha": "6b781ca6cd54f4be952c1806c935680a7081a39eb2387b0f6dcf9f37f2b6648f",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/src/wall2wall/__init__.py",
+    "sha": "947d8dbbccbc1e25f31eb05e2d148b38164d8fcbdaf20372689f0a8f2afac4f0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "85b05fecb729f368e7aadef720d2db573fa84f33b7f8ec010ac5a0ac7c142c21",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "fb13b32c0ec9e6687ff3c3c099b3b5ea7d78d4be2b2019d817b91e69979031b1",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/src/wall2wall/spatial.py",
+    "sha": "613d7fe66ac9afd1d368062de7afaa506761b93dd2e4539b3762755c9fe3231c",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M002-S03",
+    "path": "08_pkg/tests/test_spatial.py",
+    "sha": "12192ad02c466f827351f145fd16c65a91c044e19b3dc914cb119d2e3befbbbe",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M002-S04",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "a4475a14654072979247970a652f390439853aec0a5718676f4fe2daf57de0ca",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S04",
+    "path": "08_pkg/README.md",
+    "sha": "d047ff8e31540c62c765f62ad651ddc6ab6d34c269bab9c6627fce76cb275846",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S04",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "bcc3588a015774a4f5d60a4a43c7900dcb3ecd55188178830bcc4f1d25a80ed0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S04",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "eddd4ed204db29edd7e528b399371349bcc04def8567dffa3dceec1ac829b22b",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M002-S04",
+    "path": "08_pkg/src/wall2wall/sampling.py",
+    "sha": "9d8ca91b443eec1eae1900aa54c35e730563a5322b7cce21fe7ff04dc532320e",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M002-S04",
+    "path": "08_pkg/tests/test_sampling.py",
+    "sha": "e5b1fb8d6dc0862913494751116be6d609cb4cc622b8612f5510fa8e70661834",
+    "kind": "added",
+    "round": 1
+  }
+]
