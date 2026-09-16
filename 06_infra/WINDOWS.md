@@ -99,6 +99,16 @@ ni `pip install -U` dentro del entorno utilizado para producción.
 
 ## Uso cotidiano
 
+D015 habilita el full oficial de la baseline y el primer ejercicio M002-S01:
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+Exige nueve pruebas de infraestructura, incluida la detección de pruebas ausentes
+u omitidas. Al crear el paquete incorpora su lanzador. Antes de ello imprime que
+sólo se comprobó infraestructura; no afirma que Wall2Wall esté implementado.
+
 Desde PowerShell, en la raíz del checkout:
 
 ```powershell

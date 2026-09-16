@@ -196,3 +196,70 @@ rewrite history when a decision changes.
   lote; no nuevas evaluaciones estadísticas.
 - Supersedes: D013 sólo en la restricción documental de esta revisión. Mantiene
   WSL recomendado y Windows sujeto a evidencia independiente.
+
+## D015 — Primer ejercicio manual en Windows
+
+- Status: accepted
+- Date: 2026-09-16
+- Authority: El propietario aprueba la preparación recomendada y pide el primer
+  ejercicio en Windows.
+- Decision: Activar M002 y emitir únicamente M002-S01, paquete instalable mínimo
+  y pruebas. M001 Linux y M008 integración Windows quedan planificados; no se
+  declaran aceptados por las pruebas de infraestructura D014.
+- Preparation: El arquitecto conecta el full a 06_infra/run_checks.py, que exige
+  la suite de infraestructura y rechaza pruebas faltantes/omitidas. Al existir
+  configuración o lanzador de paquete exige ambos y ejecuta las pruebas del paquete.
+  El focused de M002-S01 exige paquete incluso si se eliminan ambos archivos.
+  Se cualifica el ciclo manual en una fixture desechable, sin asientos/modelos.
+- Boundary: Esta sesión prepara y emite el prompt; no ejecuta al coder ni acepta
+  producto. Se permite --allow-dirty sólo para la baseline exacta del arquitecto,
+  registrada por las herramientas. Sin commit/push ni runner autónomo implícitos.
+- Installation test: M002-S01 construye sin red y prueba el wheel instalado con
+  pip --no-deps --no-index --target en scratch y proceso separado, usando el
+  intérprete fijo; no modifica el entorno. La recreación Conda de dependencias D014
+  ya fue comprobada; la instalación del paquete en réplica Conda queda para M006.
+- Budget: Preparación y pruebas técnicas deterministas bajo R3; ciclo desechable
+  máximo 1200 s, dos correcciones conservadas, sin intentos científicos ni servicios
+  de pago. La futura ronda de coder usa R2/R3 y no instala dependencias adicionales.
+- Supersedes: Restricción de no emitir prompts de D009/D014 para este primer prompt;
+  prioridad inicial Linux de M001. WSL sigue siendo alternativa recomendada general.
+
+## D016 — Encabezados descriptivos de Python
+
+- Status: accepted
+- Date: 2026-09-16
+- Authority: El propietario aprueba la propuesta de encabezados, comprobación y
+  adopción entre rondas, y autoriza continuar.
+- Decision: AGENTS.md, sección Python file headers, contiene la única definición
+  normativa del formato y alcance. Usar docstring de módulo válido, nombre real y
+  cuatro secciones en español; aplica a todo Python propio creado o modificado,
+  incluidos módulos, pruebas, infraestructura y __init__.py, para todos los roles.
+  Documentar sólo requisitos y resultados reales, con No aplica justificado cuando
+  corresponda. No duplicar el formato en los prompts.
+- Activation: M002-S01 ronda 1 y sus correcciones bajo el contrato emitido conservan
+  ese contrato. Completar su revisión y aceptación antes de modificar producto,
+  verificador o roadmap para esta regla. No reescribir prompts, envelopes, receipts
+  ni ledger anteriores. La regla aplica al trabajo emitido después de ese cierre.
+- Follow-through: Entre slices, el arquitecto incorporará una tarea acotada al
+  roadmap y referencias a la regla en la aceptación de futuras tareas aplicables.
+  Esa tarea implementará un comprobador con ast de la biblioteca estándar, conectado
+  al full, y encabezados para los tres archivos Python del esqueleto M002-S01 y los
+  archivos Python que deba tocar para integrar y probar el comprobador. El resto se
+  actualiza al modificarlo, sin migración masiva. El alcance de comprobación se
+  deriva de un manifiesto/baseline explícito, no de un diff HEAD indiscriminado.
+- Verification: Automatizar estructura, nombre, orden y contenido no vacío; probar
+  ejemplos válidos e inválidos, incluidos docstring ausente, secciones faltantes,
+  orden incorrecto y nombre equivocado. La revisión comprueba veracidad y utilidad.
+  Esta adopción documental no afirma que el gate automático ya esté implementado.
+- Boundary: Sin nuevas dependencias, cambios de entorno, API científica, nuevos
+  prompts, commit o push. El seguimiento diferido queda en backlog hasta poder
+  planificarlo en roadmap entre slices; no altera el estado de la ronda pendiente.
+- Sequencing correction: Al registrar la revisión de M002-S01, el control de
+  integridad detectó que esta adición documental posterior a la verificación había
+  cambiado la baseline. El arquitecto preservó D016 y sus reglas, recuperó el hash
+  exacto de decisions.md registrado al emitir la ronda y las reglas previas, registró
+  el informe recibido del propietario y aceptó M002-S01. Después reincorporó D016.
+  Sólo se normalizó la tabla vacía y el salto de línea del informe recibido; se
+  conservó su dictamen. No se cambió código, evidencia previa ni historia del ledger,
+  ni se repitieron pruebas. La aceptación cubre el esqueleto revisado; D016 y su
+  implementación posterior no quedan validados por esa revisión.

@@ -6,7 +6,7 @@ Project: `wall2wall`
 
 ## M001 — Linux/WSL2, Micromamba y cualificación Python 3.11
 
-Status: active
+Status: planned
 Risk: ordinary
 Holistic review: true
 
@@ -26,22 +26,28 @@ Non-goals:
 
 ## M002 — Paquete, simulaciones y datos alineados
 
-Status: planned
+Status: active
 Risk: ordinary
 Holistic review: true
 
-### M002-S01 — Paquete instalable mínimo
+### M002-S01 — Paquete instalable mínimo y pruebas en Windows
 
-Crear distribución aislada de las herramientas de plantilla.
+Crear el esqueleto instalable Wall2Wall y su verificación offline en el entorno Windows D014, sin algoritmos científicos.
 
 Acceptance:
-- Wheel declara compatibilidad mínima Python 3.11 e importa fuera del checkout en réplica Micromamba del lock; requisitos resueltos soportan 3.11.
-- Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar wall2wall. Documentar gestor/lock por perfil y exigir pruebas V1.
-- Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+- D015: operar en Windows nativo con el prefijo Conda 3.11 y Git Bash D014. Ejecutar los comandos Python mediante 06_infra/windows.ps1 -PythonArgs; no usar el alias python de WindowsApps ni cambiar el entorno.
+- Crear 08_pkg/pyproject.toml, 08_pkg/src/wall2wall/__init__.py, 08_pkg/README.md y 08_pkg/tests/run_checks.py. Layout src, setuptools/build existentes, nombre local wall2wall y versión inicial 0.1.0.dev0; Requires-Python >=3.11. No instalar la raíz de plantilla como producto.
+- Importar wall2wall no importa Snakemake ni LightGBM/XGBoost; no crear módulos vacíos, APIs ficticias ni dependencias nuevas. Núcleo autorizado numpy/pandas/rasterio/scikit-learn/joblib; herramientas de desarrollo/workflow separadas. Extras y sus rangos se concretan al implementar motores, sin instalar ahora.
+- Pytest construye wheel sin red ni aislamiento de build, desde copia acotada de fuentes en VERIFICATION_SCRATCH. Instalar con pip --no-deps --no-index --target en scratch y verificar en otro proceso/cwd fuera del checkout el origen del import, nombre, versión y Requires-Python del wheel. Sin modificar el prefijo fijo, usar venv ni resolver paquetes.
+- 08_pkg/tests/run_checks.py usa el intérprete actual y scratch externo, descubre IDs requeridos y falla con cero pruebas, IDs faltantes, pruebas omitidas o dependencias core ausentes. Pytest/JUnit y builds fuera del producto. No invocar el full desde las pruebas ni modificar la infraestructura del arquitecto.
+- Focused: python 08_pkg/tests/run_checks.py. Full: python scripts/hermetic_verification.py; exige además las nueve pruebas de infraestructura preparadas. Ambos deben pasar desde windows.ps1, sin cambios en archivos del producto por ejecución.
+- Documentar instalación local desde wheel, comandos exactos de prueba Windows y límites del esqueleto en 08_pkg/README.md; el primer ejercicio no anuncia mapas ni API científica funcional.
+- R2/R3: ronda manual <=60 min, <=20000 tokens si medibles (unknown si no), máximo dos correcciones; full <=1200 s, 1 ajuste concurrente/n_jobs=1, scratch <=512 MiB. Cero instalaciones de dependencias, red de pruebas, GPU, servicios de pago, datos reales o evaluaciones científicas. Sin commit/push del coder.
 
 Non-goals:
-- Implementar algoritmos futuros.
-- Publicar o elegir licencia sin propietario.
+- Algoritmos, simulador, CLI científica, workflow de producción, interfaces o módulos para etapas futuras.
+- Modificar scripts/, 06_infra/, roadmap, decisiones, entorno, locks o pruebas de infraestructura; instalar herramientas o emitir otros prompts.
+- Cualificar Linux, anunciar soporte completo Windows, publicar paquete o elegir licencia definitiva.
 
 ### M002-S02 — Generador y contrato de datos
 
@@ -283,7 +289,7 @@ Non-goals:
 
 ## M008 — Compatibilidad Windows opcional con Conda y Bash
 
-Status: active
+Status: planned
 Risk: high
 Holistic review: true
 

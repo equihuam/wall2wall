@@ -13,6 +13,11 @@ El lanzador mantenido rechazará cero pruebas, suites requeridas ausentes y skip
 pruebas obligatorias. Dependencia requerida ausente produce fallo, no skip.
 Los extras ausentes se permiten sólo en perfil core; el perfil extras los exige.
 
+D015 delimita el primer ejercicio Windows M002-S01: wheel construido offline en
+copia de fuentes en scratch, instalado con --no-deps --no-index --target e importado
+en otro proceso fuera del checkout. No es una réplica Conda; esa prueba adicional
+del paquete corresponde a M006. D014 ya comprobó recreación del entorno base.
+
 El wheel se construye y se importa fuera del checkout. Para comprobar instalación
 limpia se usa una réplica temporal del gestor/lock del perfil, sin modificar
 el entorno de producción ni usar venv. Es una fixture de instalación, no otro entorno

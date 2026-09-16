@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wall2wall"
+version = "0.1.0.dev0"
+description = "Esqueleto de la biblioteca Wall2Wall"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["numpy", "pandas", "rasterio", "scikit-learn", "joblib"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["wall2wall"]

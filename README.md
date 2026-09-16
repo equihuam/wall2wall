@@ -52,13 +52,14 @@ perteneciendo a la plantilla; instalar la raíz no instala Wall2Wall.
 La sesión inicial preparó especificación, decisiones, estados y plan completo.
 La ampliación D014 prepara además un entorno Windows aislado y su prueba técnica
 en 06_infra/, independiente de la implementación científica.
-No se han emitido prompts ni aceptado una baseline de producto. La primera tarea
-prevista es una prueba desechable del entorno exacto; los demás hitos están
-planificados. El piloto real requiere metadatos, permisos y protocolo posteriores.
+D015 autoriza el primer ejercicio manual en Windows, M002-S01: paquete instalable
+mínimo y pruebas. M001 Linux y M008 integración Windows quedan planificados, sin
+aceptación automática. El piloto real requiere metadatos, permisos y protocolo.
 
-El verificador raíz apunta a `08_pkg/tests/run_checks.py`, salida futura de la
-primera tarea. Su ausencia produce fallo explícito hasta preparar las pruebas;
-`roadmap: ok` únicamente comprueba la estructura del plan.
+El verificador raíz ejecuta `06_infra/run_checks.py`: nueve pruebas obligatorias
+de infraestructura y, al introducir el paquete, su `08_pkg/tests/run_checks.py`.
+La primera tarea exige además ese lanzador como focused; no puede aprobarse sólo
+con infraestructura. `roadmap: ok` únicamente comprueba la estructura del plan.
 
 ## Operación de la plantilla
 

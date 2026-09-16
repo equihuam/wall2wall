@@ -12,4 +12,5 @@ D014 admite instalación/canary Windows, documentados en 06_infra/WINDOWS.md;
 esto no constituye aceptación del paquete ni del workflow de producción.
 El plan y las fronteras viven sólo en
 roadmap.yaml; la historia del ciclo vive sólo en el ledger.
-Esta inicialización prepara el plan sin emitir prompts ni aceptar baseline.
+D015 autoriza el primer prompt manual M002-S01 en Windows. La emisión no equivale
+a implementación ni aceptación; no hay runner autónomo habilitado.

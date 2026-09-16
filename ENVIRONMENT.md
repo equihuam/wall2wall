@@ -66,13 +66,14 @@ descrita en la guía Windows (el lanzador selecciona el prefijo fijo):
 .\06_infra\windows.ps1 -PythonArgs @('scripts/ledger.py', 'check')
 ```
 
-El full de producto aún requiere el futuro 08_pkg/tests/run_checks.py; comprobar
-la instalación con el canary Windows no sustituye esa aceptación.
+D015 conecta el full con 06_infra/run_checks.py: infraestructura obligatoria y,
+al introducir el paquete, su futuro 08_pkg/tests/run_checks.py. M002-S01 exige
+también el lanzador del paquete como focused; infraestructura no sustituye producto.
 
 PowerShell sólo lanza el proceso Windows. La elección de Bash para las reglas es
 explícita e independiente del terminal. Las futuras instrucciones Snakemake fijarán
 Snakefile, configuración, perfil, directorio de trabajo y recursos. No hay un
-workflow de producto ejecutable todavía; el lanzador de pruebas está pendiente.
+workflow de producto ejecutable todavía; su lanzador de pruebas pertenece a M002-S01.
 
 ## Prevención de conflictos POSIX
 

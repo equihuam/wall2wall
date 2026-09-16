@@ -12,8 +12,8 @@ import _workspace
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# Product test launcher is delivered by M001-S01; until then verification fails closed.
-COMMANDS: list[object] = [["python", "08_pkg/tests/run_checks.py"]]
+# Qualified infrastructure baseline; package checks become mandatory when introduced.
+COMMANDS: list[object] = [["python", "06_infra/run_checks.py"]]
 
 
 def _command(value, project_root):

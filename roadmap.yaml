@@ -38,7 +38,7 @@ review:
 milestones:
 - id: M001
   title: Linux/WSL2, Micromamba y cualificación Python 3.11
-  status: active
+  status: planned
   risk: ordinary
   holistic_review: true
   slices:
@@ -74,35 +74,70 @@ milestones:
       existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
 - id: M002
   title: Paquete, simulaciones y datos alineados
-  status: planned
+  status: active
   risk: ordinary
   holistic_review: true
   slices:
   - id: M002-S01
-    title: Paquete instalable mínimo
-    objective: Crear distribución aislada de las herramientas de plantilla.
+    title: Paquete instalable mínimo y pruebas en Windows
+    objective: Crear el esqueleto instalable Wall2Wall y su verificación offline en el entorno Windows
+      D014, sin algoritmos científicos.
     acceptance:
-    - Wheel declara compatibilidad mínima Python 3.11 e importa fuera del checkout en réplica Micromamba
-      del lock; requisitos resueltos soportan 3.11.
-    - Dev/test/workflow separados de imports del núcleo; Snakemake y extras no se importan al cargar
-      wall2wall. Documentar gestor/lock por perfil y exigir pruebas V1.
-    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    - 'D015: operar en Windows nativo con el prefijo Conda 3.11 y Git Bash D014. Ejecutar los comandos
+      Python mediante 06_infra/windows.ps1 -PythonArgs; no usar el alias python de WindowsApps ni
+      cambiar el entorno.'
+    - Crear 08_pkg/pyproject.toml, 08_pkg/src/wall2wall/__init__.py, 08_pkg/README.md y 08_pkg/tests/run_checks.py.
+      Layout src, setuptools/build existentes, nombre local wall2wall y versión inicial 0.1.0.dev0;
+      Requires-Python >=3.11. No instalar la raíz de plantilla como producto.
+    - Importar wall2wall no importa Snakemake ni LightGBM/XGBoost; no crear módulos vacíos, APIs
+      ficticias ni dependencias nuevas. Núcleo autorizado numpy/pandas/rasterio/scikit-learn/joblib;
+      herramientas de desarrollo/workflow separadas. Extras y sus rangos se concretan al implementar
+      motores, sin instalar ahora.
+    - Pytest construye wheel sin red ni aislamiento de build, desde copia acotada de fuentes en VERIFICATION_SCRATCH.
+      Instalar con pip --no-deps --no-index --target en scratch y verificar en otro proceso/cwd fuera
+      del checkout el origen del import, nombre, versión y Requires-Python del wheel. Sin modificar
+      el prefijo fijo, usar venv ni resolver paquetes.
+    - 08_pkg/tests/run_checks.py usa el intérprete actual y scratch externo, descubre IDs requeridos
+      y falla con cero pruebas, IDs faltantes, pruebas omitidas o dependencias core ausentes. Pytest/JUnit
+      y builds fuera del producto. No invocar el full desde las pruebas ni modificar la infraestructura
+      del arquitecto.
+    - 'Focused: python 08_pkg/tests/run_checks.py. Full: python scripts/hermetic_verification.py;
+      exige además las nueve pruebas de infraestructura preparadas. Ambos deben pasar desde windows.ps1,
+      sin cambios en archivos del producto por ejecución.'
+    - Documentar instalación local desde wheel, comandos exactos de prueba Windows y límites del
+      esqueleto en 08_pkg/README.md; el primer ejercicio no anuncia mapas ni API científica funcional.
+    - 'R2/R3: ronda manual <=60 min, <=20000 tokens si medibles (unknown si no), máximo dos correcciones;
+      full <=1200 s, 1 ajuste concurrente/n_jobs=1, scratch <=512 MiB. Cero instalaciones de dependencias,
+      red de pruebas, GPU, servicios de pago, datos reales o evaluaciones científicas. Sin commit/push
+      del coder.'
     non_goals:
-    - Implementar algoritmos futuros.
-    - Publicar o elegir licencia sin propietario.
+    - Algoritmos, simulador, CLI científica, workflow de producción, interfaces o módulos para etapas
+      futuras.
+    - Modificar scripts/, 06_infra/, roadmap, decisiones, entorno, locks o pruebas de infraestructura;
+      instalar herramientas o emitir otros prompts.
+    - Cualificar Linux, anunciar soporte completo Windows, publicar paquete o elegir licencia definitiva.
     read_first:
     - 00_brief/CONTEXT.md
+    - 00_brief/decisions.md
     - 00_brief/architecture.md
     - 00_brief/validation.md
-    - 08_pkg/CONTEXT.md
-    - 00_brief/decisions.md
     - 00_brief/orchestration.md
+    - 08_pkg/CONTEXT.md
+    - 06_infra/WINDOWS.md
+    - 06_infra/environment-windows.yml
+    - 06_infra/windows.ps1
+    - 06_infra/run_checks.py
+    - 06_infra/windows_smoke/test_verification.py
+    - scripts/hermetic_verification.py
     allowed_prefixes:
     - 08_pkg/
-    focused: []
+    focused:
+    - - python
+      - 08_pkg/tests/run_checks.py
     kind: code
-    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
-      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+    notes: Primer ejercicio Windows autorizado por D015. Usar implementación mínima; los archivos
+      del paquete son salidas nuevas, no lecturas existentes. El arquitecto conserva la baseline
+      y la evidencia; el coder implementa sólo este alcance.
   - id: M002-S02
     title: Generador y contrato de datos
     objective: Crear fixtures con verdad conocida y metadatos explícitos.
@@ -162,8 +197,8 @@ milestones:
     title: Muestreo puntual y exclusiones
     objective: Convertir observaciones y rásteres en tabla trazable.
     acceptance:
-    - 'V2: sample_points transforma CRS y extrae píxel contenedor con bordes definidos; conserva IDs/orden
-      y reporta cada exclusión.'
+    - 'V2: sample_points transforma CRS y extrae píxel contenedor con bordes definidos; conserva
+      IDs/orden y reporta cada exclusión.'
     - Rechazar IDs duplicados, respuesta no finita/inválida y tabla efectiva vacía; separar coordenadas/IDs/objetivo
       del esquema predictor.
     - Preservar site_id, celda, unidad/soporte/período; misma política de validez que armonización
@@ -310,12 +345,12 @@ milestones:
     title: LightGBM y XGBoost opcionales
     objective: Soportar ambos motores con el mismo contrato de evaluación.
     acceptance:
-    - Extras separados e imports perezosos; core funciona sin ellos y elección sin extra produce error
-      accionable.
+    - Extras separados e imports perezosos; core funciona sin ellos y elección sin extra produce
+      error accionable.
     - Perfil extras instala y prueba ambos en entorno exacto; clone/fit/predict, CV espacial, semillas
       e hilos satisfacen V4 con datos pequeños.
-    - Desactivar/rechazar early stopping y eval_set/callbacks incompatibles con CV; n_estimators explícito.
-      Actualizar full con perfil extras obligatorio para aceptar esta tarea.
+    - Desactivar/rechazar early stopping y eval_set/callbacks incompatibles con CV; n_estimators
+      explícito. Actualizar full con perfil extras obligatorio para aceptar esta tarea.
     - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
     non_goals:
     - GPU, formatos nativos adicionales ni afirmar equivalencia numérica entre motores.
@@ -557,10 +592,10 @@ milestones:
     acceptance:
     - 'V6/V7: con M007-S01 admitida, ejecutar protocolo mediante Snakemake validated y Micromamba
       fijo; conservar manifiesto/lock y datos privados fuera de Git.'
-    - Informe entrega métricas espaciales/OOF/exclusiones/validez/extrapolación, soporte y sesgo de
-      muestra; desempeño pobre válido no se declara éxito predictivo.
-    - Reproducir camino documentado; defectos de código originan tareas correctivas acotadas con nuevo
-      alcance/revisión, no cambios escondidos en esta tarea.
+    - Informe entrega métricas espaciales/OOF/exclusiones/validez/extrapolación, soporte y sesgo
+      de muestra; desempeño pobre válido no se declara éxito predictivo.
+    - Reproducir camino documentado; defectos de código originan tareas correctivas acotadas con
+      nuevo alcance/revisión, no cambios escondidos en esta tarea.
     - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
     non_goals:
     - Publicación, nuevos datos o experimentos no admitidos.
@@ -582,7 +617,7 @@ milestones:
       existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
 - id: M008
   title: Compatibilidad Windows opcional con Conda y Bash
-  status: active
+  status: planned
   risk: high
   holistic_review: true
   slices:
@@ -618,22 +653,22 @@ milestones:
     focused: []
     kind: code
     notes: 'D014 admite preparación arquitectónica del entorno y canary Git Bash: un lote técnico,
-      hasta dos correcciones conservadas, 1200 s por instalación/suite, 6 GiB entorno/cache y
-      512 MiB scratch. Sin prompts ni aceptación automática. M001 no depende de este hito;
-      completar puertas de plantilla/producto antes de aceptación manual.'
+      hasta dos correcciones conservadas, 1200 s por instalación/suite, 6 GiB entorno/cache y 512
+      MiB scratch. Sin prompts ni aceptación automática. M001 no depende de este hito; completar
+      puertas de plantilla/producto antes de aceptación manual.'
   - id: M008-S02
     title: Workflow Windows y comparación con WSL
     objective: Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar
       soporte.
     acceptance:
-    - 'Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en Windows
-      con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.'
+    - 'Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en
+      Windows con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.'
     - 'Mismos fixtures/código/configuración que WSL: IDs/folds/máscaras/CRS iguales; predicciones/métricas
       dentro de 1e-5. Reportar plataforma, versiones y proveedor Bash; investigar discrepancia sin
       relajar umbral silenciosamente.'
-    - Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash sin
-      prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la API ni
-      compartir entornos/.snakemake.
+    - Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash
+      sin prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la
+      API ni compartir entornos/.snakemake.
     - Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en
       esta revisión.
     non_goals:
@@ -662,8 +697,9 @@ ruled_out:
   text: 'Sesión inicial: sólo planificación; cero prompts (incluido preview), asientos, experimentos
     de producto, baseline aceptada, commits, publicación o servicios de pago. Antes de emitir M001-S01
     el arquitecto prepara/cualifica en scratch entorno exacto y verificador y añade lecturas de implementación
-    precisas; preview sólo al reanudar. D014 admite ahora instalación Windows aislada y canary
-    arquitectónico M008-S01; no admite API, prompts ni baseline.'
+    precisas; preview sólo al reanudar. D014 admite ahora instalación Windows aislada y canary arquitectónico
+    M008-S01; no admite API, prompts ni baseline. D015 autoriza ahora preparación y emisión manual
+    de M002-S01 en Windows; las restricciones iniciales no impiden este prompt.'
 - id: R2
   text: 'Límites de cada futura ronda manual: 60 minutos, 20000 tokens si el proveedor permite medirlos,
     máximo 2 rondas correctivas por tarea. Sin métricas de tokens registrar unknown, nunca cero ni
@@ -672,12 +708,12 @@ ruled_out:
     asientos en esta sesión.'
 - id: R3
   text: 'Verificación de producto por invocación: 1200 segundos, 1 proceso de ajuste concurrente,
-    n_jobs=1 en pruebas, caché GDAL <=128 MiB, buffers de inferencia <=128 MiB; objetivo RSS <=1 GiB
-    en caso sintético, registrar si no puede medirse. Scratch generado <=512 MiB por suite y <=1 GiB
-    en escala; ficheros versionados de ejemplo <=1 MiB cada uno; mapas/modelos generados fuera de
-    Git. Snakemake --cores 1 en pruebas y retries=0; caches/.snakemake fuera del producto. Réplica
-    del gestor del perfil para instalación: hasta 6 GiB adicionales de disco y 1200 s, separada de
-    datos sintéticos; fallo conserva evidencia y no reemplaza entorno fijo.'
+    n_jobs=1 en pruebas, caché GDAL <=128 MiB, buffers de inferencia <=128 MiB; objetivo RSS <=1
+    GiB en caso sintético, registrar si no puede medirse. Scratch generado <=512 MiB por suite y
+    <=1 GiB en escala; ficheros versionados de ejemplo <=1 MiB cada uno; mapas/modelos generados
+    fuera de Git. Snakemake --cores 1 en pruebas y retries=0; caches/.snakemake fuera del producto.
+    Réplica del gestor del perfil para instalación: hasta 6 GiB adicionales de disco y 1200 s, separada
+    de datos sintéticos; fallo conserva evidencia y no reemplaza entorno fijo.'
 - id: R4
   text: 'Selección sintética acotada: hasta 5 folds externos, 3 internos y 6 candidatos totales incluyendo
     familias; máximo 128 ajustes por evaluación completa (incluye refits y dummy). Semillas 17,29,43:
@@ -686,25 +722,25 @@ ruled_out:
     los iniciados. Cada nuevo lote requiere protocolo del arquitecto antes de resultados. Pruebas
     deterministas del verificador no son nuevos intentos científicos; siguen sujetas a R3. Cualificación
     Windows M008: máximo dos canaries iniciales, uno por proveedor Git Bash/MSYS2, registrados antes
-    de ejecutar; no reemplazos ni intentos extra silenciosos. Excepción D014: lote Git Bash con
-    hasta dos correcciones técnicas explícitas, preservando fallos, sin evaluación científica.'
+    de ejecutar; no reemplazos ni intentos extra silenciosos. Excepción D014: lote Git Bash con hasta
+    dos correcciones técnicas explícitas, preservando fallos, sin evaluación científica.'
 - id: R5
   text: 'Fuera de v0.1: adquisición/compuestos EE, clasificación/multisalida, agregación zonal, categorías
     predictoras, imputación, AutoML, early stopping, incertidumbre calibrada/AOA formal, kriging,
     GPU, Dask, servicios y GUI. No añadir dependencia fuera de D004/D010/D011/D012/D013 (workflow:
     Snakemake; dev: pytest/build/setuptools/wheel; herramientas raíz: PyYAML) sin decisión del arquitecto.
     D013: WSL recomendado; Windows sólo tras M008. Un entorno/Bash por perfil, sin mezcla de runtimes
-    ni conda deployment por regla. Componentes MSYS2 opcionales sólo para el perfil Windows, con resolución/justificación
-    en M008.'
+    ni conda deployment por regla. Componentes MSYS2 opcionales sólo para el perfil Windows, con
+    resolución/justificación en M008.'
 - id: R6
   text: 'Piloto real sin admisión de ejecución hasta M007-S01: requiere datos/metadatos/permiso del
     propietario y protocolo previo. No existe presupuesto real implícito por completar simulaciones.
     Licencia, nombre público y publicación requieren decisión humana; sin push ni instalación global.'
 not_yet_specified:
 - id: N1
-  text: 'Antes de M001-S01: preparar perfil base WSL/Linux, Micromamba/prefijo 3.11 y lock linux-64;
-    cualificar plantilla POSIX y DAG. Windows tiene admisión propia M008. Preview sólo al reanudar;
-    no baseline aceptada.'
+  text: 'D015: primer ejercicio M002-S01 en Windows sobre D014; M001 Linux planificado y no prerrequisito
+    de esta emisión. Alcance y full conectados por el arquitecto antes del prompt; sin aceptación
+    de producto.'
 - id: N2
   text: 'Antes del piloto: objetivo/unidad/soporte, fechas, AOI/malla, CRS, sitios, representatividad,
     permisos/licencia, metadatos de predictores, recursos y criterio de utilidad aportados por el
@@ -715,5 +751,5 @@ not_yet_specified:
 - id: N4
   text: 'D014: preparación Windows Conda/Python 3.11 con Git Bash comprobada mediante instalación,
     recreación desde locks y canary; evidencia y guía en 06_infra/WINDOWS.md. Esto no acepta M008.
-    MSYS2 queda como alternativa sin cualificar. Integración de producto M008-S02 y
-    cualificación base WSL M001 permanecen independientes de este canary.'
+    MSYS2 queda como alternativa sin cualificar. Integración de producto M008-S02 y cualificación
+    base WSL M001 permanecen independientes de este canary.'
