@@ -3,7 +3,8 @@
 Paquete local `wall2wall`, versión `0.1.0.dev0`, Python >=3.11.
 `wall2wall.spatial.align_predictors` armoniza predictores ráster; examples/synthetic.py
 genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extrae
-casos completos desde el manifiesto de armonización. Todavía no hay modelos,
+casos completos desde el manifiesto de armonización. `wall2wall.validation.make_spatial_folds`
+crea folds por bloques y grupos indivisibles. Todavía no hay modelos,
 mapas predictivos, CLI ni workflow de producción. No cualifica Linux ni soporte
 Windows completo; la comprobación corresponde al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -23,8 +24,8 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 71 IDs: once de distribución, veintiuno del generador, veinticuatro
-de armonización espacial y quince de muestreo puntual.
+El lanzador exige 86 IDs: once de distribución, veintiuno del generador, veinticuatro
+de armonización espacial, quince de muestreo puntual y quince de folds.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -33,10 +34,11 @@ El lanzador crea un directorio temporal exclusivo bajo `VERIFICATION_SCRATCH`
 (o el temporal del sistema), exige que esté fuera del checkout y lo elimina al
 terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no se
 generan caches o metadatos en el producto. El build copia pyproject, README,
-`src/wall2wall/__init__.py`, `src/wall2wall/spatial.py` y `src/wall2wall/sampling.py`;
+`src/wall2wall/__init__.py`, `src/wall2wall/spatial.py`, `src/wall2wall/sampling.py`
+y `src/wall2wall/validation.py`;
 usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
-el origen de los imports, los metadatos instalados y alineación/muestreo mínimos desde
+el origen de los imports, los metadatos instalados y alineación/muestreo/folds mínimos desde
 el wheel. Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
@@ -271,6 +273,92 @@ Los modos focused son mutuamente excluyentes. Las pruebas cubren bordes, errores
 integridad, tipos CSV, ventanas mezcladas y generate/align/sample con signal semilla
 17 y sus 256 observaciones/seis predictores; no se entrenan modelos. Se mantiene
 la limitación de compatibilidad al entorno Windows D014, sin cualificación Linux.
+
+## Bloques espaciales y grupos indivisibles
+
+La API recibe directamente la tabla y el esquema devueltos por `sample_points`:
+
+```python
+from wall2wall.validation import make_spatial_folds
+
+folded = make_spatial_folds(
+    sampled["table"], sampled["schema"], "runs/folds-new",
+    block_size=320, origin=(500000, 4498720), n_splits=4, seed=17,
+)
+for train_indices, test_indices in folded["splits"]:
+    train = sampled["table"].iloc[train_indices]
+    test = sampled["table"].iloc[test_indices]
+```
+
+Estos parámetros corresponden a la prueba sintética signal de semilla 17: 256
+observaciones, 16 bloques de 320 m, cuatro folds. No son un tamaño universal.
+El tamaño y el origen se fijan según muestreo y escenario de despliegue, antes
+de comparar errores; esta API no selecciona tamaños para mejorar resultados.
+
+`make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_splits,
+seed)` exige DataFrame y dict `wall2wall.sampling.schema/1`; no acepta rutas CSV.
+block_size es un lado positivo finito en metros, origin es par x/y finito en
+el CRS de la malla, n_splits entero >=2 y seed entero >=0. No admite booleanos.
+CRS conocido, proyectado en metros y grid_crs coincidente: grados/pies se rechazan
+sin reproyección. La malla north-up, bounds/resolución y cada celda se validan;
+row/col/cell_id deben ser enteros, cell_id=row*width+col y el punto debe caer en
+esa celda por floor del afín inverso, sin epsilon. Bounds/resolución se comparan
+con tolerancia absoluta 1e-9, relativa cero. Respuesta numérica finita y sample_id
+no nulo/vacío y único son obligatorios; site_id opcional admite repeticiones pero
+no nulos/vacíos. IDs se comparan sin coerción y se conservan sus valores y tipos.
+
+block_x y block_y son floor((grid_coordinate-origin)/block_size); índices con
+signo, borde inferior incluido y superior excluido. Un bloque entero pertenece
+a un grupo. Bloques con una celda o sitio compartido se unen transitivamente:
+si A conecta 1/2 y B conecta 2/3, los tres quedan juntos. Una celda que cruza
+un borde de bloque tampoco puede dividirse. Sin site_id se mantiene la unión por
+celda. Si quedan menos grupos que folds, falla antes de crear salida con conteos
+y sugerencia de reducir n_splits o revisar el diseño; no divide grupos.
+
+Los group_id se numeran desde cero según el bloque (block_x,block_y)
+lexicográficamente mínimo de cada componente. Sobre ese orden, PCG64(seed) local
+genera una permutación; una ordenación estable por tamaño descendente conserva
+la permutación en empates. Se asigna cada grupo al fold con menos observaciones,
+desempatando por menor fold_id. Respuestas y predictores no intervienen. El RNG
+global queda intacto; misma tabla/configuración repite resultados en el entorno
+fijo. No se promete balance perfecto, invariancia al reordenar filas ni que cada
+semilla diferente produzca una partición distinta.
+
+El retorno contiene `splits`, lista por fold_id de pares de arrays enteros 1D
+(train_indices, test_indices), `assignments` como DataFrame y `diagnostics` como
+dict. Los índices son posiciones en la tabla recibida: usar iloc, nunca loc.
+No dependen del índice pandas ni del input_row heredado. Cada posición aparece
+una vez en test; train es su complemento ordenado, ambos no vacíos. IDs, celdas,
+sitios, bloques y grupos no cruzan train/test. assignments conserva orden,
+sample_id, site_id si existe y cell_id; añade position, block_x/block_y, group_id
+y fold_id. Los folds se numeran 0..n_splits-1.
+
+Los diagnósticos por fold contienen conteos train/test de muestras, bloques y
+grupos; mínimo/máximo/media/desviación poblacional de respuesta; y distancia
+euclídea mínima train/test en metros. Esa distancia es descriptiva, no buffer
+ni prueba de independencia estadística. Se calcula en lotes de hasta 64×64 pares,
+sin matriz N×N completa: buffers auxiliares acotados a 128 KiB, tiempo cuadrático.
+Tabla, coordenadas, grupos e índices caben en memoria. Un hilo; RAM nativa pico
+`unknown`. No se cualifica rendimiento de producción.
+
+Escribe folds.csv, diagnostics.json y manifest.json estricto con algoritmo,
+semilla, tamaño/origen, malla/CRS, tipos de columnas, conteos y rutas relativas.
+Destino existente, incluso vacío, se rechaza. El manifiesto se escribe al final
+mediante renombrado; un fallo conserva parciales sin manifiesto de éxito. Entradas
+inmutables. Para CSV, releer sample_id/site_id como texto con `keep_default_na=False`
+y columnas enteras con dtype int64, conservando `001`/`NA`. El retorno conserva
+IDs mixtos; CSV por sí solo no reconstruye sus tipos mixtos, como en muestreo.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--validation-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+El focused es mutuamente excluyente con los otros modos. Las pruebas verifican
+bordes, uniones transitivas, ausencia de fuga, reproducibilidad, estadísticas y
+distancias calculadas a mano, lotes acotados, persistencia, errores e integración
+generate/align/sample/folds. Buffer y folds externos se reservan para M003-S02;
+no se entrenan modelos ni se crean CLI o workflow de producción.
 
 ## Fixtures sintéticas de desarrollo
 

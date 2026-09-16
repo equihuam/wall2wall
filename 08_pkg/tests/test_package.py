@@ -12,7 +12,7 @@ El lanzador del paquete prepara VERIFICATION_SCRATCH externo y limita hilos.
 ## Resultados
 Once pruebas deben pasar. Copias de fuentes, wheel e instalación de prueba se
 crean bajo tmp_path; otro proceso confirma origen del import y metadatos, y
-ejecuta alineación y muestreo mínimos desde los módulos instalados en el wheel.
+ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en el wheel.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -44,7 +44,7 @@ def test_installed_wheel(tmp_path):
     assert not scratch.is_relative_to(PACKAGE.parent)
     source = tmp_path / "source"
     for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py",
-                     "src/wall2wall/spatial.py", "src/wall2wall/sampling.py"):
+                     "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -120,15 +120,27 @@ import pandas as pd
 import wall2wall.sampling
 assert Path(wall2wall.sampling.__file__).resolve() == target / "wall2wall" / "sampling.py"
 sampled = wall2wall.sampling.sample_points(
-    pd.DataFrame({"sample_id": ["001"], "x": [100.5], "y": [199.5], "response": [2.]}),
+    pd.DataFrame({"sample_id": ["001", "002"], "x": [100.5, 101.5], "y": [199.5, 199.5], "response": [2., 3.]}),
     result["manifest_path"], Path.cwd() / "sampled", points_crs="EPSG:32630",
     response="response", response_unit="u", response_support="point", window_size=1)
-assert sampled["table"].sample_id.tolist() == ["001"]
-assert sampled["table"].p01.tolist() == [7.]
-assert sampled["table"].cell_id.tolist() == [0]
+assert sampled["table"].sample_id.tolist() == ["001", "002"]
+assert sampled["table"].p01.tolist() == [7., 7.]
+assert sampled["table"].cell_id.tolist() == [0, 1]
 assert sampled["exclusions"].empty
 assert sampled["schema"]["predictors"] == [{"name": "p01", "unit": "u", "period": "unknown"}]
 assert (Path.cwd() / "sampled/manifest.json").is_file()
+import wall2wall.validation
+assert Path(wall2wall.validation.__file__).resolve() == target / "wall2wall" / "validation.py"
+folded = wall2wall.validation.make_spatial_folds(
+    sampled["table"], sampled["schema"], Path.cwd() / "folds",
+    block_size=1, origin=(100, 198), n_splits=2, seed=17)
+assert folded["assignments"].sample_id.tolist() == ["001", "002"]
+assert sorted(np.concatenate([test for train, test in folded["splits"]]).tolist()) == [0, 1]
+for train, test in folded["splits"]:
+    assert len(train) == len(test) == 1
+    assert set(train).isdisjoint(test)
+assert folded["diagnostics"]["counts"] == {"samples": 2, "blocks": 2, "groups": 2, "folds": 2}
+assert (Path.cwd() / "folds/manifest.json").is_file()
 '''
     result = subprocess.run(
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],

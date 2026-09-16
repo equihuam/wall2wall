@@ -27,7 +27,7 @@ Non-goals:
 
 ## M002 — Paquete, simulaciones y datos alineados
 
-Status: active
+Status: done
 Risk: ordinary
 Holistic review: true
 
@@ -136,23 +136,32 @@ Non-goals:
 
 ## M003 — Particiones espaciales reproducibles
 
-Status: planned
+Status: active
 Risk: high
 Holistic review: true
 
 ### M003-S01 — Bloques y grupos indivisibles
 
-Construir folds auditables según el escenario espacial.
+Implementar wall2wall.validation.make_spatial_folds con bloques explícitos, unión transitiva por celda/sitio y asignaciones reproducibles para la tabla de muestreo.
 
 Acceptance:
-- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
-- V3: tamaño/origen/CRS métrico/semilla explícitos; cada ID tiene una prueba externa y no se filtra a entrenamiento.
-- Celda y sitio indivisibles, incluyendo sitios que cruzan bloques mediante unión; error si faltan grupos/folds no vacíos.
-- Exportar asignaciones, tamaños, distribución de respuesta y distancia mínima; repetir semilla reproduce índices.
-- Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+- Windows D014/Python 3.11 mediante windows.ps1 -PythonArgs. Crear validation.py y test_validation.py usando stdlib, NumPy, pandas, Rasterio y sklearn instalados según necesidad. Conservar import wall2wall ligero; sin dependencias nuevas ni cambios de entorno.
+- API: make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_splits, seed). table es DataFrame y schema el dict wall2wall.sampling.schema/1 de sample_points. block_size es lado positivo finito en metros; origin es par x/y finito en CRS de malla; n_splits entero >=2 y seed entero >=0. Parámetros explícitos, sin booleanos; no aceptar rutas CSV ni otro formato en esta ronda.
+- Preflight antes de crear destino: tabla no vacía, columnas únicas, sample_id no nulo/vacío y único sin coerción; grid_x/grid_y finitos, row/col/cell_id enteros coherentes con afín y dimensiones de schema.grid, cell_id=row*width+col y celda contenedora correcta. Exigir CRS proyectado con unidades lineales metro y grid_crs coincidente; rechazar angular, pies o CRS desconocido sin reproyección automática. Si hay site_id permite repeticiones pero no nulos/vacíos. Respuesta nombrada por schema.response debe existir y ser finita. Preservar IDs/tipos/orden, sin depender del índice pandas ni input_row heredado.
+- Calcular block_x=floor((grid_x-origin_x)/block_size) y block_y análogo, con índices con signo y sin epsilon/recorte; borde inferior incluido y superior excluido. Un bloque completo pertenece a un grupo. Unir bloques que compartan site_id o cell_id con cierre transitivo, incluso si una celda contiene puntos a ambos lados del borde de bloque. Una cadena sitio A conecta bloques 1/2 y sitio B conecta 2/3 conserva los tres juntos. Sin site_id rige la celda.
+- Asignar grupos completos a folds 0..n_splits-1 sin usar respuesta ni predictores: ordenar grupos por tamaño descendente, desempatar con RNG local PCG64(seed) y asignar al fold con menos observaciones, desempatando por menor fold_id. Documentar orden inicial estable de grupos antes del RNG; no alterar RNG global. Misma tabla/configuración produce mismos grupos/índices. No exigir balance perfecto, invariancia a reordenar filas ni que cada semilla diferente produzca partición diferente.
+- Rechazar grupos efectivos <n_splits tras las uniones con conteos bloques/grupos/folds y acción sugerida. Cada posición aparece exactamente una vez en test; train es complemento ordenado de test, ambos no vacíos. Ningún ID, celda, sitio o grupo cruza train/test en un fold. No dividir grupos ni volver silenciosamente a partición aleatoria.
+- Retornar dict con splits como lista ordenada de pares (train_indices, test_indices) de arrays enteros unidimensionales posicionales respecto a table, assignments como DataFrame y diagnostics como dict. assignments conserva orden y sample_id/site_id si existe, incluye position base cero, cell_id, block_x/block_y, group_id y fold_id. Persistir folds.csv, diagnostics.json y manifest.json en output_dir nuevo; JSON estricto con algoritmo/semilla, tamaño/origen, CRS/malla, columnas/tipos, conteos y rutas relativas, sin rutas de máquina. Manifiesto de éxito al final; destino existente incluso vacío se rechaza, fallo de escritura no deja manifiesto de éxito. Entradas permanecen inmutables.
+- Diagnósticos por fold incluyen conteos train/test de muestras, bloques y grupos; mínimo, máximo, media y desviación poblacional de respuesta; distancia euclídea mínima train/test en metros. La distancia es descriptiva, no buffer ni prueba de independencia estadística. Calcular con vecinos más próximos o lotes acotados, nunca matriz N por N completa; auxiliares de distancia <=128 MiB. Tabla/grupos caben en memoria. Registrar estrategia y RAM nativa medida o unknown.
+- Pytest analítico: bordes y coordenadas negativas respecto al origen, celda repetida que cruza bloque, sitios repetidos, cadena transitiva entre tres bloques, ausencia de site_id, pocos grupos tras uniones, grupos desiguales e índice pandas duplicado/no consecutivo con input_row discontinuo. Afirmar bloques/componentes esperados, cobertura única y ausencia de fuga por cada identidad. Repetibilidad y RNG global inmutable; cambiar sólo respuesta o predictores no altera folds. Estadísticas y distancias con esperados calculados a mano; instrumentar ruta de distancia para comprobar lotes acotados o uso de vecinos sin matriz completa.
+- Probar parámetros/CRS inválidos (incluido proyectado en pies), metadatos/celdas inconsistentes, respuesta/IDs inválidos, destino existente y fallo de escritura. Releer CSV/JSON preservando IDs con ceros iniciales y literal NA mediante tipos explícitos. Integrar generate/align/sample/folds con fixture signal semilla 17, bloque 320 m, origen (500000,4498720), cuatro folds y seed=17; verificar 256 observaciones y 16 bloques sin entrenar modelos. Preservar tablas/esquemas y hashes de fuentes. Los oráculos no dependen exclusivamente de la función bajo prueba.
+- Extender test_installed_wheel para incluir validation.py y partición mínima válida desde wheel en proceso/cwd externo, conservando import ligero, alineación y muestreo. Añadir --validation-only mutuamente excluyente a tests/run_checks.py con IDs nuevos obligatorios; normal conserva las 71 pruebas previas y añade nuevas. Full mantiene gate y 16 pruebas de infraestructura; cero/omitidas/IDs faltantes fallan. Pytest nunca invoca full.
+- D016: encabezados canónicos AGENTS.md en Python nuevos/modificados; añadir validation.py y test_validation.py a python_header_scope.json conservando doce entradas. README documenta API, índices posicionales, unión transitiva, exportación/tipos, diagnóstico y comandos Windows. Explicar tamaño según escenario de despliegue, sin valor universal ni selección por error.
+- R2/R3: ronda <=60 min, <=20000 tokens medidos o unknown, dos correcciones como máximo; full <=1200 s, scratch <=512 MiB y un hilo. Pruebas deterministas en scratch externo, sin lotes científicos R4, datos reales, modelos, red, instalaciones, commit ni push del coder. Arquitecto coteja baseline/manifiesto con alcance de encabezados antes de verificar.
 
 Non-goals:
-- Tamaño universal o selección de tamaño por error observado.
+- Buffer y folds aportados (M003-S02), CV anidada, modelos, métricas predictivas, autocorrelación automática, tamaño óptimo, reproyección, CLI nueva o Snakemake de producción.
+- Modificar spatial.py, sampling.py, generador, suites previas salvo test_package.py, __init__.py, pyproject, infraestructura ejecutable, locks o evidencia histórica.
 
 ### M003-S02 — Buffer y folds aportados
 
