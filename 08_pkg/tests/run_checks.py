@@ -10,8 +10,9 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 56 pruebas: once de distribución, veintiuna del generador
-y veinticuatro espaciales. --synthetic-only y --spatial-only seleccionan sus grupos
+Sin argumentos exige 71 pruebas: once de distribución, veintiuna del generador,
+veinticuatro espaciales y quince de muestreo. --synthetic-only, --spatial-only
+y --sampling-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
@@ -60,6 +61,16 @@ SPATIAL_REQUIRED = {
     *{f"tests/test_spatial.py::test_window_boundaries_and_reads[{mode}]" for mode in ("identity", "reprojection")},
 }
 
+SAMPLING_REQUIRED = {
+    *{f"tests/test_sampling.py::{name}" for name in (
+        "test_edges_order_persistence", "test_crs_and_invalid_coordinates", "test_csv_ids",
+        "test_dataframe_ids", "test_masks_and_physical_values", "test_partial_coverage",
+        "test_observation_rejections", "test_manifest_rejections", "test_raster_metadata_rejections",
+        "test_output_and_failure", "test_window_reads", "test_signal_pipeline")},
+    *{f"tests/test_sampling.py::test_zero_eligible[{case}]"
+      for case in ("coordinates", "outside", "predictors")},
+}
+
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
 
@@ -77,12 +88,15 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--synthetic-only", action="store_true")
     group.add_argument("--spatial-only", action="store_true")
+    group.add_argument("--sampling-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
         target, required = "tests/test_spatial.py", SPATIAL_REQUIRED
+    elif args.sampling_only:
+        target, required = "tests/test_sampling.py", SAMPLING_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)

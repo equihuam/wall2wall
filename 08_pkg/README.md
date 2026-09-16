@@ -2,7 +2,8 @@
 
 Paquete local `wall2wall`, versión `0.1.0.dev0`, Python >=3.11.
 `wall2wall.spatial.align_predictors` armoniza predictores ráster; examples/synthetic.py
-genera fixtures de desarrollo separadas. Todavía no hay muestreo puntual, modelos,
+genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extrae
+casos completos desde el manifiesto de armonización. Todavía no hay modelos,
 mapas predictivos, CLI ni workflow de producción. No cualifica Linux ni soporte
 Windows completo; la comprobación corresponde al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -22,8 +23,8 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 56 IDs: once de distribución, veintiuno del generador y veinticuatro
-de armonización espacial.
+El lanzador exige 71 IDs: once de distribución, veintiuno del generador, veinticuatro
+de armonización espacial y quince de muestreo puntual.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -32,9 +33,10 @@ El lanzador crea un directorio temporal exclusivo bajo `VERIFICATION_SCRATCH`
 (o el temporal del sistema), exige que esté fuera del checkout y lo elimina al
 terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no se
 generan caches o metadatos en el producto. El build copia pyproject, README,
-`src/wall2wall/__init__.py` y `src/wall2wall/spatial.py`; usa `--wheel --no-isolation` y pip usa
+`src/wall2wall/__init__.py`, `src/wall2wall/spatial.py` y `src/wall2wall/sampling.py`;
+usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
-el origen de los imports, los metadatos instalados y una alineación mínima desde
+el origen de los imports, los metadatos instalados y alineación/muestreo mínimos desde
 el wheel. Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
@@ -178,6 +180,97 @@ ventana y buffers acotados. Una fuente 37×45 con ventanas 7×7 y salida desplaz
 entre ventanas. Otras pruebas usan medias manuales, constantes entre CRS, máscaras
 por banda, cobertura vacía, errores y fuentes con SHA-256 invariable. No se ha
 cualificado aún el consumo máximo de RAM nativa ni una escala de producción.
+
+## Muestreo puntual y exclusiones
+
+Tras ejecutar el ejemplo anterior de `align_predictors`:
+
+```python
+from wall2wall.sampling import sample_points
+
+sampled = sample_points(
+    "inputs/observations.csv", result["manifest_path"], "runs/sampled-new",
+    points_crs="EPSG:32630", response="response", response_unit="kg",
+    response_support="point", response_period="unknown", window_size=512,
+)
+table, exclusions, schema = sampled["table"], sampled["exclusions"], sampled["schema"]
+```
+
+`observations` acepta DataFrame o CSV, con `sample_id`, `x`, `y`, la columna
+indicada por `response` y `site_id` opcional. La tabla y la respuesta deben ser
+no vacías; la respuesta debe ser numérica y finita en todas las filas. Textos
+numéricos se validan como números sin modificar la columna original. Metadatos
+de respuesta (`response_unit`, `response_support`, `response_period`) son textos
+no vacíos. `points_crs` es obligatorio; período por defecto `unknown`.
+
+IDs nulos, vacíos o duplicados en sample_id rechazan la llamada; site_id puede
+repetirse pero no ser nulo/vacío. No se deduplican sitios ni celdas. Se conserva
+el tipo y orden de IDs del DataFrame, sin usar su índice. Se rechazan IDs
+distintos que producirían el mismo texto CSV, por ejemplo el entero 1 y el texto
+"1". CSV lee IDs como texto con `keep_default_na=False`, conservando `001` y `NA`.
+Se conservan todas las columnas originales; nombres duplicados, predictores que
+colisionen con ellas y columnas auxiliares reservadas rechazan la llamada.
+
+El único contrato espacial aceptado es `wall2wall.alignment/1`: se comprueban
+malla north-up, CRS/afín/dimensiones de capas y máscaras, bandas, unidad/nodata y
+codificación física identidad. La tolerancia del afín es absoluta 1e-9, relativa
+cero, como en spatial. Las rutas se resuelven respecto al manifiesto, incluso
+`../` de fuentes reutilizadas, sin depender del cwd. No se rearmoniza ni aplica
+de nuevo `effective_source_encoding`. Ambos CRS quedan en el esquema.
+
+La extracción transforma x/y al CRS de la malla y aplica floor al afín inverso.
+Izquierda/superior incluidos, derecha/inferior externos excluidos; bordes internos
+pertenecen a la celda derecha/inferior. No se recortan índices ni se añade epsilon.
+Pruebas exactas de bordes usan el mismo CRS; entre CRS se verifica lejos de bordes
+con tolerancia absoluta 1e-5. Se mantienen x/y originales y se añaden `input_row`
+(posición original base cero), `grid_x`, `grid_y`, `row`, `col` y `cell_id` igual
+a row*width+col. cell_id sólo se interpreta junto con la malla del esquema.
+
+Cada fila pertenece a table o exclusions una sola vez, en orden original.
+La precedencia de exclusión es `invalid_coordinates` (coordenadas no numéricas,
+no finitas o transformación fallida), `outside_grid`, `invalid_predictors`.
+Las filas dentro de la malla requieren máscara conjunta, máscaras individuales,
+máscara de la banda, exclusión de nodata y valores finitos en todos los predictores;
+cero válido se conserva. No se usa dataset_mask. `invalid_predictors` en exclusiones
+es un texto JSON con los nombres de capas inválidas en orden; `[]` indica que no
+se identificó una capa inválida, incluido un fallo exclusivo de máscara conjunta.
+Índices de celda externos o desconocidos se representan como enteros nullable vacíos.
+Cero filas elegibles falla antes de crear el destino.
+
+Retorna `table`/`exclusions` como DataFrame y `schema` como dict. Escribe table.csv,
+exclusions.csv (encabezados incluso vacía), schema.json y manifest.json estricto.
+Schema enumera predictores sólo mediante nombre/unidad/período, columnas/tipos,
+respuesta, malla y política de extracción. Manifest registra conteos, motivos,
+parámetros, productos y ruta relativa/SHA-256 del manifiesto de alineación. No
+contiene rutas absolutas ni NaN/Infinity numéricos. Origen y destino deben permitir
+rutas relativas (misma unidad en Windows). Los JSON no incluyen valores de filas.
+
+CSV no conserva tipos por sí solo. Releer IDs con `dtype={"sample_id": str,
+"site_id": str}, keep_default_na=False`; convertir explícitamente columnas
+numéricas según schema. Para row/col/cell_id de exclusiones, convertir los vacíos
+a pd.NA y usar `Int64`. IDs mixtos de un DataFrame quedan como texto en CSV:
+el retorno en memoria conserva sus tipos, pero no se promete reconstruir esos
+tipos mixtos desde CSV. Los datos originales excluidos se conservan en las columnas
+originales; las coordenadas transformadas desconocidas se escriben vacías.
+
+Destino existente, incluso vacío, se rechaza. Se cierran rásteres antes de escribir;
+manifest.json se publica al final mediante renombrado. Un fallo de escritura
+conserva productos parciales sin manifiesto de éxito. Las entradas son de lectura.
+La tabla de puntos/resultados cabe en memoria; los rásteres se leen por capas y
+ventanas ocupadas, compartiendo cada lectura entre puntos de la misma ventana.
+window_size entero 1..1024, por defecto 512; un hilo, caché GDAL 32 MiB,
+contabilidad conservadora de buffers ráster 32*window_size² bytes (máximo 32 MiB).
+RAM nativa y pico temporal: `unknown`; esto no cualifica escala de producción.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--sampling-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+Los modos focused son mutuamente excluyentes. Las pruebas cubren bordes, errores,
+integridad, tipos CSV, ventanas mezcladas y generate/align/sample con signal semilla
+17 y sus 256 observaciones/seis predictores; no se entrenan modelos. Se mantiene
+la limitación de compatibilidad al entorno Windows D014, sin cualificación Linux.
 
 ## Fixtures sintéticas de desarrollo
 

@@ -8,5 +8,7 @@
   "08_pkg/examples/synthetic.py",
   "08_pkg/tests/test_synthetic.py",
   "08_pkg/src/wall2wall/spatial.py",
-  "08_pkg/tests/test_spatial.py"
+  "08_pkg/tests/test_spatial.py",
+  "08_pkg/src/wall2wall/sampling.py",
+  "08_pkg/tests/test_sampling.py"
 ]
