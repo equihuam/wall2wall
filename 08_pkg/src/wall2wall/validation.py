@@ -4,6 +4,7 @@
 ## Descripción
 Construye folds espaciales para tablas de muestreo mediante bloques explícitos
 y unión transitiva de bloques que comparten celda o sitio, evitando dividirlos.
+Valida particiones aportadas y aplica un buffer opcional al entrenamiento por grupo.
 
 ## Precondiciones
 NumPy, pandas y Rasterio instalados. DataFrame y esquema wall2wall.sampling.schema/1
@@ -11,14 +12,15 @@ con malla proyectada en metros, celdas coherentes y respuesta finita. Tamaño,
 origen, número de folds y semilla son explícitos; el destino debe ser nuevo.
 
 ## Resultados
-make_spatial_folds devuelve splits posicionales, assignments y diagnostics.
-Escribe folds.csv, diagnostics.json y manifest.json al completar, con estadísticas
+make_spatial_folds devuelve splits posicionales, assignments, exclusions y diagnostics.
+Escribe folds.csv, exclusions.csv, diagnostics.json y manifest.json, con estadísticas
 de respuesta y distancia mínima descriptiva entre train y test por fold.
 
 ## Notas relevantes
 Tabla y grupos caben en memoria; distancias usan lotes de 64 por 64 pares.
-No reproyecta, no aplica buffer ni entrena modelos. No modifica entradas o RNG
-global. El balance es aproximado y la RAM nativa se registra como unknown.
+No reproyecta ni entrena modelos. Buffer estricto menor al radio, expandido al
+grupo completo, sin modificar test. No modifica entradas o RNG global.
+El balance es aproximado y la RAM nativa se registra como unknown.
 =============================================================================
 """
 import json
@@ -136,18 +138,25 @@ def _prepare(table, schema):
     return canonical, coordinates, values
 
 
-def _minimum_distance(coordinates, train, test):
-    """Euclidean minimum using bounded pair blocks, never a full N by N matrix."""
-    minimum = math.inf
+def _distance_batches(coordinates, train, test):
+    """Yield positions and per-point minima using only bounded distance buffers."""
     for start in range(0, len(train), DISTANCE_BATCH):
-        first = coordinates[train[start:start + DISTANCE_BATCH]]
+        positions = train[start:start + DISTANCE_BATCH]
+        first = coordinates[positions]
+        nearest = np.full(len(first), math.inf)
         for offset in range(0, len(test), DISTANCE_BATCH):
             second = coordinates[test[offset:offset + DISTANCE_BATCH]]
             with np.errstate(over="ignore", invalid="ignore"):
                 dx = first[:, 0, None] - second[None, :, 0]
                 dy = first[:, 1, None] - second[None, :, 1]
                 np.hypot(dx, dy, out=dx)
-            minimum = min(minimum, float(dx.min()))
+            np.minimum(nearest, dx.min(axis=1), out=nearest)
+        yield positions, nearest
+
+
+def _minimum_distance(coordinates, train, test):
+    """Euclidean minimum reduced from the shared bounded point-distance batches."""
+    minimum = min(float(distances.min()) for _, distances in _distance_batches(coordinates, train, test))
     if not math.isfinite(minimum):
         raise ValueError("train/test distance exceeds finite numeric range")
     return minimum
@@ -161,7 +170,64 @@ def _statistics(values):
             "mean": float(normalized.mean() * scale), "std_population": float(normalized.std(ddof=0) * scale)}
 
 
-def make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_splits, seed):
+def _provided_folds(provided, count, splits_count, groups):
+    """Validate complete positional partitions without coercion or repair."""
+    if not isinstance(provided, (list, tuple)) or len(provided) != splits_count:
+        raise ValueError("provided_splits must contain n_splits train/test pairs")
+    folds = np.full(count, -1, dtype="int64")
+    for fold, pair in enumerate(provided):
+        if not isinstance(pair, (list, tuple)) or len(pair) != 2:
+            raise ValueError("each provided fold must be a train/test pair")
+        normalized = []
+        for values in pair:
+            if (not isinstance(values, (list, np.ndarray))
+                    or isinstance(values, np.ndarray) and values.ndim != 1 or len(values) == 0):
+                raise ValueError("provided indices must be nonempty lists or 1D integer arrays")
+            indices = [_integer(value, 0, "provided index") for value in values]
+            if any(value >= count for value in indices) or len(set(indices)) != len(indices):
+                raise ValueError("provided indices are out of range or duplicated")
+            normalized.append(np.array(sorted(indices), dtype="int64"))
+        train, test = normalized
+        if np.intersect1d(train, test).size:
+            raise ValueError("provided train and test overlap")
+        complement = np.ones(count, dtype=bool)
+        complement[test] = False
+        if not np.array_equal(train, np.flatnonzero(complement)):
+            raise ValueError("provided train must be the exact complement of test before buffering")
+        if np.any(folds[test] != -1):
+            raise ValueError("provided test coverage is repeated")
+        folds[test] = fold
+    if np.any(folds == -1):
+        raise ValueError("provided test coverage must include each position exactly once")
+    group_fold = {}
+    for group, fold in zip(groups, folds):
+        if group_fold.setdefault(int(group), int(fold)) != fold:
+            raise ValueError("provided splits divide an indivisible block/cell/site group")
+    return folds
+
+
+def _buffer_fold(coordinates, train, test, groups, radius, minimum_samples, fold):
+    """Exclude complete training groups, retaining per-point reasons for audit."""
+    excluded_groups = set()
+    if radius > 0:
+        for positions, distances in _distance_batches(coordinates, train, test):
+            excluded_groups.update(int(group) for group in groups[positions[distances < radius]])
+    excluded = np.isin(groups[train], list(excluded_groups))
+    retained, removed = train[~excluded], train[excluded]
+    if len(retained) < minimum_samples:
+        raise ValueError(f"insufficient training after buffer: fold_id={fold}, before={len(train)}, "
+                         f"after={len(retained)}, excluded_groups={len(excluded_groups)}, radius={radius}, "
+                         f"min_train_samples={minimum_samples}; revise buffer_distance, minimum or partition design")
+    distances = []
+    for _, batch in _distance_batches(coordinates, removed, test):
+        if not np.isfinite(batch).all():
+            raise ValueError("excluded point distance exceeds finite numeric range")
+        distances.extend(batch.tolist())
+    return retained, removed, distances, len(excluded_groups)
+
+
+def make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_splits, seed,
+                       buffer_distance=0.0, min_train_samples=1, provided_splits=None):
     """Return reproducible indivisible groups and positional train/test indices."""
     size = _finite(block_size, "block_size")
     if size <= 0:
@@ -171,6 +237,10 @@ def make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_split
     origin_x, origin_y = [_finite(value, "origin") for value in origin]
     splits_count = _integer(n_splits, 2, "n_splits")
     seed = _integer(seed, 0, "seed")
+    radius = _finite(buffer_distance, "buffer_distance")
+    if radius < 0:
+        raise ValueError("buffer_distance must be nonnegative metres")
+    minimum_samples = _integer(min_train_samples, 1, "min_train_samples")
     output = Path(output_dir).resolve()
     if os.path.lexists(output_dir) or output.exists():
         raise FileExistsError("output_dir already exists")
@@ -208,36 +278,65 @@ def make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_split
     if group_count < splits_count:
         raise ValueError(f"insufficient effective groups: blocks={len(unique_blocks)}, groups={group_count}, "
                          f"folds={splits_count}; reduce n_splits or revise block_size/origin/site design; never split groups")
-    sizes = np.bincount(groups)
-    rng = np.random.Generator(np.random.PCG64(seed))
-    order = sorted(rng.permutation(group_count).tolist(), key=lambda group: -sizes[group])
-    loads = np.zeros(splits_count, dtype="int64")
-    group_folds = np.empty(group_count, dtype="int64")
-    for group in order:
-        fold = int(np.argmin(loads))
-        group_folds[group] = fold
-        loads[fold] += sizes[group]
-    folds = group_folds[groups]
+    if provided_splits is None:
+        sizes = np.bincount(groups)
+        rng = np.random.Generator(np.random.PCG64(seed))
+        order = sorted(rng.permutation(group_count).tolist(), key=lambda group: -sizes[group])
+        loads = np.zeros(splits_count, dtype="int64")
+        group_folds = np.empty(group_count, dtype="int64")
+        for group in order:
+            fold = int(np.argmin(loads))
+            group_folds[group] = fold
+            loads[fold] += sizes[group]
+        folds = group_folds[groups]
+    else:
+        folds = _provided_folds(provided_splits, len(table), splits_count, groups)
     assignments = table[[name for name in ("sample_id", "site_id", "cell_id") if name in table]].copy().reset_index(drop=True)
     assignments["position"] = np.arange(len(table), dtype="int64")
     assignments["block_x"] = [block[0] for block in blocks]
     assignments["block_y"] = [block[1] for block in blocks]
     assignments["group_id"], assignments["fold_id"] = groups, folds
-    splits, fold_diagnostics = [], []
+    exclusion_columns = [name for name in ("sample_id", "site_id", "cell_id", "position", "group_id") if name in assignments]
+    empty_exclusions = assignments[exclusion_columns].iloc[:0].copy()
+    for name, dtype in (("fold_id", "int64"), ("reason", "object"), ("distance_m", "float64"), ("buffer_distance_m", "float64")):
+        empty_exclusions[name] = pd.Series(dtype=dtype)
+    splits, fold_diagnostics, exclusion_frames = [], [], []
     for fold in range(splits_count):
-        train, test = np.flatnonzero(folds != fold), np.flatnonzero(folds == fold)
+        initial_train, test = np.flatnonzero(folds != fold), np.flatnonzero(folds == fold)
+        train, removed, distances, excluded_groups = _buffer_fold(
+            coordinates, initial_train, test, groups, radius, minimum_samples, fold)
+        if len(removed):
+            excluded = assignments.iloc[removed][exclusion_columns].copy()
+            excluded["fold_id"] = fold
+            excluded["reason"] = ["buffer_distance" if distance < radius else "buffer_group" for distance in distances]
+            excluded["distance_m"] = distances
+            excluded["buffer_distance_m"] = radius
+            exclusion_frames.append(excluded)
         splits.append((train, test))
-        record = {"fold_id": fold}
+        record = {"fold_id": fold,
+                  "train_before_buffer": {"samples": len(initial_train), "blocks": len(set(block_ids[initial_train])),
+                                          "groups": len(set(groups[initial_train]))},
+                  "excluded": {"samples": len(removed), "blocks": len(set(block_ids[removed])), "groups": excluded_groups}}
         for label, indices in (("train", train), ("test", test)):
             record[label] = {"samples": len(indices), "blocks": len(set(block_ids[indices])),
                              "groups": len(set(groups[indices])), "response": _statistics(responses[indices])}
         record["minimum_distance_m"] = _minimum_distance(coordinates, train, test)
+        if radius > 0 and record["minimum_distance_m"] < radius:
+            raise ValueError("buffer separation invariant failed")
         fold_diagnostics.append(record)
+    exclusions = pd.concat(exclusion_frames, ignore_index=True) if exclusion_frames else empty_exclusions
     parameters = {"block_size_m": size, "origin": [origin_x, origin_y], "n_splits": splits_count, "seed": seed}
     algorithm = {"name": "indivisible_blocks_greedy/1", "blocks": "floor((grid_coordinate-origin)/block_size); no epsilon",
                  "groups": "transitive union by cell_id and optional site_id; whole blocks",
                  "initial_order": "group_id ascending by lexicographically smallest (block_x,block_y) in component",
                  "assignment": "local PCG64(seed) permutation then stable descending size; least loaded fold, ties lowest fold_id"}
+    split_origin = "generated" if provided_splits is None else "provided"
+    if provided_splits is not None:
+        algorithm["name"] = "indivisible_blocks_provided/1"
+        algorithm["assignment"] = "provided full-coverage partitions; normalized order, no reassignment or RNG"
+    buffer_policy = {"distance_m": radius, "min_train_samples": minimum_samples,
+                     "comparison": "point distance strictly less than radius, no epsilon; equality retained",
+                     "expansion": "exclude whole training group; preserve test and original fold identities"}
     counts = {"samples": len(table), "blocks": len(unique_blocks), "groups": group_count, "folds": splits_count}
     diagnostics = {"schema": "wall2wall.folds.diagnostics/1", "algorithm": algorithm, "parameters": parameters,
                    "grid": grid, "grid_crs": grid["crs"], "counts": counts, "folds": fold_diagnostics,
@@ -245,19 +344,27 @@ def make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_split
                                  "distance_batch": DISTANCE_BATCH,
                                  "distance_buffer_bound_bytes": 128 * 1024,
                                  "native_peak_memory": "unknown", "threads": 1, "table_and_groups": "in memory"},
-                   "distance_interpretation": "descriptive minimum only; no buffer or statistical independence claim"}
+                   "distance_interpretation": ("final train/test minimum; no statistical independence claim" if radius > 0 else
+                                               "descriptive minimum only; no buffer or statistical independence claim"),
+                   "split_origin": split_origin, "seed_used": provided_splits is None,
+                   "coverage": "each position in test exactly once; original train is test complement",
+                   "buffer": buffer_policy}
     manifest = {"schema": "wall2wall.folds/1", "algorithm": algorithm, "parameters": parameters,
                 "grid": grid, "grid_crs": grid["crs"], "counts": counts,
                 "columns": [{"name": column, "dtype": str(assignments[column].dtype)} for column in assignments.columns],
                 "indices": "zero-based positions in supplied table; independent of pandas index and input_row",
                 "products": {"assignments": "folds.csv", "diagnostics": "diagnostics.json"}}
+    manifest.update(split_origin=split_origin, seed_used=provided_splits is None,
+                    coverage=diagnostics["coverage"], buffer=buffer_policy, exclusions_product="exclusions.csv",
+                    exclusion_columns=[{"name": name, "dtype": str(exclusions[name].dtype)} for name in exclusions.columns])
     # Serialize strict JSON before creating any destination; runtime write failures preserve partials.
     diagnostics_text = json.dumps(diagnostics, ensure_ascii=False, allow_nan=False, indent=2) + "\n"
     manifest_text = json.dumps(manifest, ensure_ascii=False, allow_nan=False, indent=2) + "\n"
     output.mkdir(parents=True, exist_ok=False)
     assignments.to_csv(output / "folds.csv", index=False)
+    exclusions.to_csv(output / "exclusions.csv", index=False, float_format="%.17g")
     (output / "diagnostics.json").write_text(diagnostics_text, encoding="utf-8")
     pending = output / "manifest.pending"
     pending.write_text(manifest_text, encoding="utf-8")
     pending.replace(output / "manifest.json")
-    return {"splits": splits, "assignments": assignments, "diagnostics": diagnostics}
+    return {"splits": splits, "assignments": assignments, "diagnostics": diagnostics, "exclusions": exclusions}

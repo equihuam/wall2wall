@@ -13,6 +13,7 @@ El lanzador del paquete prepara VERIFICATION_SCRATCH externo y limita hilos.
 Once pruebas deben pasar. Copias de fuentes, wheel e instalación de prueba se
 crean bajo tmp_path; otro proceso confirma origen del import y metadatos, y
 ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en el wheel.
+Comprueba además particiones aportadas con exclusiones por buffer positivo.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -141,6 +142,22 @@ for train, test in folded["splits"]:
     assert set(train).isdisjoint(test)
 assert folded["diagnostics"]["counts"] == {"samples": 2, "blocks": 2, "groups": 2, "folds": 2}
 assert (Path.cwd() / "folds/manifest.json").is_file()
+buffer_sample = wall2wall.sampling.sample_points(
+    pd.DataFrame({"sample_id": ["A", "B", "C"], "x": [100.9, 101.1, 100.1],
+                  "y": [199.9, 199.9, 198.1], "response": [1., 2., 3.]}),
+    result["manifest_path"], Path.cwd() / "sampled-buffer", points_crs="EPSG:32630",
+    response="response", response_unit="u", response_support="point")
+buffered = wall2wall.validation.make_spatial_folds(
+    buffer_sample["table"], buffer_sample["schema"], Path.cwd() / "buffered-folds",
+    block_size=1, origin=(100, 198), n_splits=3, seed=17, buffer_distance=.5,
+    provided_splits=[([1, 2], [0]), ([0, 2], [1]), ([0, 1], [2])])
+assert [train.tolist() for train, test in buffered["splits"]] == [[2], [2], [0, 1]]
+assert [test.tolist() for train, test in buffered["splits"]] == [[0], [1], [2]]
+assert buffered["exclusions"].position.tolist() == [1, 0]
+assert buffered["exclusions"].reason.tolist() == ["buffer_distance", "buffer_distance"]
+assert buffered["diagnostics"]["split_origin"] == "provided"
+assert buffered["diagnostics"]["seed_used"] is False
+assert (Path.cwd() / "buffered-folds/manifest.json").is_file()
 '''
     result = subprocess.run(
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],

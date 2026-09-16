@@ -10,9 +10,9 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 86 pruebas: once de distribución, veintiuna del generador,
-veinticuatro espaciales, quince de muestreo y quince de folds.
---synthetic-only, --spatial-only, --sampling-only y --validation-only seleccionan sus grupos
+Sin argumentos exige 105 pruebas: once de distribución, veintiuna del generador,
+veinticuatro espaciales, quince de muestreo, quince de folds y diecinueve de buffer.
+--synthetic-only, --spatial-only, --sampling-only, --validation-only y --buffer-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
@@ -81,6 +81,17 @@ VALIDATION_REQUIRED = {
     *{f"tests/test_validation.py::test_insufficient_groups[{case}]" for case in ("blocks", "sites", "cells")},
 }
 
+BUFFER_REQUIRED = {
+    *{f"tests/test_buffer.py::{name}" for name in (
+        "test_zero_compatibility", "test_analytic_buffer", "test_provided_order_seed_and_immutability",
+        "test_invalid_buffer_parameters", "test_invalid_provided_partitions", "test_bounded_buffer_distances",
+        "test_csv_reconstruction", "test_failure_and_existing")},
+    *{f"tests/test_buffer.py::test_modes[{radius}-{mode}]" for radius in ("zero", "positive")
+      for mode in ("generated", "provided")},
+    *{f"tests/test_buffer.py::test_insufficient_train[{case}]" for case in ("exhaustion", "minimum", "zero")},
+    *{f"tests/test_buffer.py::test_group_leakage[{case}]" for case in ("block", "cell", "site", "transitive")},
+}
+
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
 
@@ -100,8 +111,9 @@ def main():
     group.add_argument("--spatial-only", action="store_true")
     group.add_argument("--sampling-only", action="store_true")
     group.add_argument("--validation-only", action="store_true")
+    group.add_argument("--buffer-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
@@ -110,6 +122,8 @@ def main():
         target, required = "tests/test_sampling.py", SAMPLING_REQUIRED
     elif args.validation_only:
         target, required = "tests/test_validation.py", VALIDATION_REQUIRED
+    elif args.buffer_only:
+        target, required = "tests/test_buffer.py", BUFFER_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)

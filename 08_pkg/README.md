@@ -24,8 +24,9 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 86 IDs: once de distribución, veintiuno del generador, veinticuatro
-de armonización espacial, quince de muestreo puntual y quince de folds.
+El lanzador exige 105 IDs: once de distribución, veintiuno del generador, veinticuatro
+de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
+de buffer/particiones aportadas.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -296,7 +297,8 @@ El tamaño y el origen se fijan según muestreo y escenario de despliegue, antes
 de comparar errores; esta API no selecciona tamaños para mejorar resultados.
 
 `make_spatial_folds(table, schema, output_dir, *, block_size, origin, n_splits,
-seed)` exige DataFrame y dict `wall2wall.sampling.schema/1`; no acepta rutas CSV.
+seed, buffer_distance=0.0, min_train_samples=1, provided_splits=None)` exige
+DataFrame y dict `wall2wall.sampling.schema/1`; no acepta rutas CSV.
 block_size es un lado positivo finito en metros, origin es par x/y finito en
 el CRS de la malla, n_splits entero >=2 y seed entero >=0. No admite booleanos.
 CRS conocido, proyectado en metros y grid_crs coincidente: grados/pies se rechazan
@@ -325,23 +327,23 @@ fijo. No se promete balance perfecto, invariancia al reordenar filas ni que cada
 semilla diferente produzca una partición distinta.
 
 El retorno contiene `splits`, lista por fold_id de pares de arrays enteros 1D
-(train_indices, test_indices), `assignments` como DataFrame y `diagnostics` como
-dict. Los índices son posiciones en la tabla recibida: usar iloc, nunca loc.
+(train_indices, test_indices), `assignments` y `exclusions` como DataFrame y
+`diagnostics` como dict. Los índices son posiciones en la tabla recibida: usar iloc, nunca loc.
 No dependen del índice pandas ni del input_row heredado. Cada posición aparece
-una vez en test; train es su complemento ordenado, ambos no vacíos. IDs, celdas,
+una vez en test; train antes del buffer es su complemento ordenado, ambos no vacíos. IDs, celdas,
 sitios, bloques y grupos no cruzan train/test. assignments conserva orden,
 sample_id, site_id si existe y cell_id; añade position, block_x/block_y, group_id
 y fold_id. Los folds se numeran 0..n_splits-1.
 
 Los diagnósticos por fold contienen conteos train/test de muestras, bloques y
 grupos; mínimo/máximo/media/desviación poblacional de respuesta; y distancia
-euclídea mínima train/test en metros. Esa distancia es descriptiva, no buffer
-ni prueba de independencia estadística. Se calcula en lotes de hasta 64×64 pares,
+euclídea mínima train/test final en metros. Esa distancia es descriptiva y no
+prueba independencia estadística. Se calcula en lotes de hasta 64×64 pares,
 sin matriz N×N completa: buffers auxiliares acotados a 128 KiB, tiempo cuadrático.
 Tabla, coordenadas, grupos e índices caben en memoria. Un hilo; RAM nativa pico
 `unknown`. No se cualifica rendimiento de producción.
 
-Escribe folds.csv, diagnostics.json y manifest.json estricto con algoritmo,
+Escribe folds.csv, exclusions.csv, diagnostics.json y manifest.json estricto con algoritmo,
 semilla, tamaño/origen, malla/CRS, tipos de columnas, conteos y rutas relativas.
 Destino existente, incluso vacío, se rechaza. El manifiesto se escribe al final
 mediante renombrado; un fallo conserva parciales sin manifiesto de éxito. Entradas
@@ -357,8 +359,79 @@ IDs mixtos; CSV por sí solo no reconstruye sus tipos mixtos, como en muestreo.
 El focused es mutuamente excluyente con los otros modos. Las pruebas verifican
 bordes, uniones transitivas, ausencia de fuga, reproducibilidad, estadísticas y
 distancias calculadas a mano, lotes acotados, persistencia, errores e integración
-generate/align/sample/folds. Buffer y folds externos se reservan para M003-S02;
-no se entrenan modelos ni se crean CLI o workflow de producción.
+generate/align/sample/folds. No se entrenan modelos ni se crean CLI o workflow
+de producción.
+
+### Buffer y particiones aportadas
+
+Con los valores por defecto se conservan las asignaciones y splits de M003-S01.
+`buffer_distance` es un radio finito >=0 en metros; `min_train_samples` es un
+entero >=1, sin booleanos. Primero se define cada fold completo, después se
+excluye de su train todo grupo que tenga algún punto a distancia estrictamente
+menor al radio de cualquier punto test. No hay epsilon: la igualdad se conserva,
+salvo que otro miembro de su grupo esté dentro del radio. Radio cero no elimina
+nada. La exclusión se expande al grupo entero, incluidos miembros lejanos, y
+no cambia test, fold_id o group_id. No se reciclan excluidos como test.
+
+Si algún train final tiene menos de min_train_samples, falla toda la llamada
+antes de crear destino. El error incluye fold_id, muestras antes/después,
+grupos excluidos, radio, mínimo y acción sugerida; no ajusta automáticamente
+parámetros. El mínimo es operativo y no garantiza utilidad estadística.
+La distancia mínima final es >=radio cuando es positivo. El cálculo comparte
+la ruta de lotes acotados; tablas de auditoría, como las de puntos, caben en memoria.
+
+`provided_splits` admite lista/tupla de n_splits pares (train_indices,test_indices),
+cuyos índices son listas o arrays 1D enteros posicionales. Se copian y ordenan
+internamente, conservando el orden de folds. Se rechazan floats incluso enteros,
+booleanos, negativos, fuera de rango, duplicados, vacíos, formas inválidas y
+solapamientos. Antes del buffer cada train debe ser el complemento exacto de test;
+cada posición debe aparecer en test una sola vez entre todos los folds. No se
+admite cobertura parcial ni reparación automática. Se reconstruyen bloques y
+grupos desde tabla/esquema, sin confiar en un group_id externo, y se rechaza
+cualquier grupo dividido entre folds de prueba o entre train/test.
+
+Modo generado registra `split_origin="generated"` y `seed_used=true`. Modo
+aportado registra `split_origin="provided"` y `seed_used=false`; seed sigue
+siendo obligatorio y válido, pero no se utiliza RNG para asignación. Una partición
+aportada no es independiente sólo por su origen. Una partición aleatoria sólo
+podría describirse como comparación diagnóstica; aquí no se genera tal partición.
+
+folds.csv conserva la asignación única de test. exclusions.csv añade una fila
+por par fold_id/position excluido del train, en orden de fold y posición:
+sample_id, site_id opcional, cell_id, position, group_id, fold_id, reason,
+distance_m y buffer_distance_m. `buffer_distance` indica distancia estrictamente
+menor al radio; `buffer_group`, exclusión por expansión al grupo. distance_m
+siempre es la distancia mínima de ese punto a test. Puede repetirse una posición
+en distintos folds, nunca el par. Sin exclusiones se conservan encabezados y tipos.
+
+Los diagnósticos conservan test y calculan train después del buffer; añaden
+`train_before_buffer` y `excluded` con conteos de muestras, bloques y grupos.
+Manifest y diagnostics registran origen, uso de seed, cobertura completa y
+`buffer` con radio, mínimo y política estricta por grupos. El manifiesto conserva
+`products` previo y añade `exclusions_product` y `exclusion_columns` con tipos.
+Reconstrucción: test son las posiciones de folds.csv cuyo fold_id coincide; train
+son las otras posiciones menos las de exclusions.csv para ese fold. Ordenar ambos
+por posición. Para CSV, leer sample_id/site_id como str con keep_default_na=False,
+índices como int64 y distancias/radio como float64; así se conservan `001` y `NA`.
+
+```python
+# Ejemplo de buffer sobre la tabla de muestreo del ejemplo anterior.
+buffered = make_spatial_folds(
+    sampled["table"], sampled["schema"], "runs/folds-buffered",
+    block_size=320, origin=(500000, 4498720), n_splits=4, seed=17,
+    buffer_distance=10, min_train_samples=1,
+    provided_splits=folded["splits"],  # Folds originales, antes de cualquier buffer.
+)
+```
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--buffer-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+Las diecinueve pruebas adicionales cubren ambos modos, límites exactos del radio,
+expansión a grupos, mínimos, rechazos, RNG/entradas inmutables, lotes acotados,
+reconstrucción CSV y fallo de escritura. Las 86 pruebas previas se conservan.
 
 ## Fixtures sintéticas de desarrollo
 

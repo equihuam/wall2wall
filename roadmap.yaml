@@ -617,32 +617,109 @@ milestones:
       escrituras del coder. La revisión puede evaluar esa remediación documental.
   - id: M003-S02
     title: Buffer y folds aportados
-    objective: Verificar distancias y particiones externas.
+    objective: Extender make_spatial_folds con separación espacial del entrenamiento y
+      validación de particiones aportadas, conservando grupos y auditoría.
     acceptance:
-    - 'D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.'
-    - 'V3: buffer excluye sólo entrenamiento y prueba distancia mínima >= radio; fallo claro si deja
-      entrenamiento insuficiente.'
-    - Folds externos validados por índices, grupos, solapamiento y cobertura; no fallback aleatorio.
-      Las comparaciones aleatorias se etiquetan diagnósticas.
-    - CSV de folds incluye exclusiones por buffer; documentar cómo el escenario de despliegue guía
-      tamaño/distancia.
-    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    - Windows D014/Python 3.11 mediante 06_infra/windows.ps1 -PythonArgs. Extender validation.py,
+      crear test_buffer.py; usar sólo dependencias instaladas. Mantener API y pruebas M003-S01,
+      import wall2wall ligero, sin cambios de entorno ni nuevas dependencias.
+    - 'Añadir a make_spatial_folds los keywords buffer_distance=0.0, min_train_samples=1 y
+      provided_splits=None. Con valores por defecto preservar asignaciones, splits y diagnósticos
+      previos; campos/productos adicionales de auditoría son admisibles. Radio finito >=0 en metros,
+      mínimo entero >=1, sin booleanos. Mantener parámetros explícitos block_size/origin/n_splits/seed
+      y validación de tabla/schema/CRS métrico existentes. No introducir APIs para etapas futuras.'
+    - 'provided_splits admite lista/tupla de n_splits pares (train_indices,test_indices) como listas
+      o arrays 1D de enteros posicionales en table. Copiar sin mutar. Rechazar floats incluso enteros,
+      booleanos, negativos, fuera de rango, duplicados, formas inválidas, train/test vacíos o
+      solapados. Antes del buffer, cada train debe ser complemento exacto de test y cada posición
+      debe aparecer en test exactamente una vez en todo el conjunto; no admitir cobertura parcial
+      en esta versión. Normalizar índices internos a orden ascendente, conservar orden de folds.'
+    - Reconstruir bloques y grupos con las reglas transitivas aceptadas de celda/sitio; no confiar
+      en group_id externo ni producir salidas intermedias. Rechazar particiones aportadas que
+      dividan un grupo entre folds de prueba o entre train/test, aun si IDs individuales difieren.
+      No reasignar ni reparar particiones para conseguir pase. El modo aportado no usa RNG para
+      asignación; registrar su origen y que seed no intervino, sin anunciar aleatoriedad espacial.
+    - 'Aplicar buffer a cada fold después de definir sus conjuntos originales: eliminar del train
+      cualquier grupo completo si al menos uno de sus puntos está a distancia euclídea estrictamente
+      menor al radio de algún punto test. Conservar puntos exactamente al radio, sin epsilon;
+      radio cero no elimina nada. La expansión a todo el grupo preserva indivisibilidad, aunque
+      descarte puntos lejanos del mismo grupo. Test e identidad de folds no cambian. Excluir sólo
+      entrenamiento, sin reciclar excluidos en test ni recalcular grupos/particiones.'
+    - Exigir mínimo de muestras train posterior >=min_train_samples en cada fold; ante insuficiencia
+      rechazar toda la llamada antes de crear destino, con fold_id, conteos antes/después, grupos
+      excluidos, radio y acción sugerida. Nunca reducir radio, mínimo o n_splits automáticamente.
+      Distancia mínima final debe ser >=radio para buffer positivo; mantener memoria acotada por
+      lotes como M003-S01, sin matriz completa y sin cargar arrays de todos los pares.
+    - 'Conservar folds.csv como asignación única de test por observación y agregar exclusions.csv
+      con una fila por par fold_id/position excluido del entrenamiento: sample_id, site_id si existe,
+      cell_id, group_id, reason (buffer_distance o buffer_group), distancia mínima de ese punto a
+      test y radio. buffer_distance para puntos estrictamente cercanos y buffer_group para el resto
+      de su grupo. Sin buffer o sin exclusiones escribir sólo encabezados. Retornar también exclusions
+      como DataFrame. Los mismos puntos pueden estar excluidos de distintos folds, sin duplicar pares.'
+    - Diagnósticos train reflejan datos posteriores al buffer; añadir conteos previos/excluidos,
+      grupos excluidos y mínimo final por fold, conservando estadísticas de respuesta y test.
+      Manifest/diagnostics JSON estricto registra parámetros, origen generated/provided, semilla
+      usada o no, política de grupos y cobertura completa; rutas relativas y tipos explícitos.
+      Permitir reconstruir splits finales desde folds.csv más exclusions.csv y comprobarlo al
+      releer. IDs con ceros iniciales/literal NA conservados con tipos CSV documentados.
+    - Reutilizar validación, cálculo de bloques/grupos, diagnósticos y persistencia del módulo
+      mediante helpers locales si simplifica ambos modos; no llamar a make_spatial_folds recursivamente,
+      no crear directorios temporales de folds para luego reescribirlos, ni framework de estrategias.
+      Entradas/RNG global inmutables; destino existente se rechaza y manifiesto de éxito se publica
+      al final. Errores de contrato o entrenamiento insuficiente no dejan destino; fallo de escritura
+      no deja manifiesto final. Distancia usa buffers <=128 MiB; RAM nativa medida o unknown.
+    - 'Pytest nuevo en test_buffer.py: buffer cero equivalente al contrato previo; puntos dentro,
+      exactamente en y fuera del radio con geometría analítica; eliminación de grupo completo con
+      miembro lejano; test intacto/cobertura única; min_train_samples y agotamiento con error antes
+      de crear destino; parámetros inválidos. Particiones aportadas válidas, índices desordenados,
+      inválidos/duplicados/solapados, cobertura incompleta/repetida, train incompleto y fuga de
+      celda/sitio/grupo transitivo. Probar los dos modos con buffer y sin él, semillas sin efecto
+      en provided, inmutabilidad y cálculo acotado. Esperados independientes, estadísticas finales,
+      motivos exactos y reconstrucción desde CSV/JSON; fallo de escritura sin éxito aparente.'
+    - Conservar las 86 pruebas previas sin debilitar aserciones. Añadir --buffer-only mutuamente
+      excluyente a tests/run_checks.py y nuevos IDs obligatorios; full exige suite previa y nueva
+      más 16 pruebas de infraestructura/encabezados. Extender prueba del wheel con provided_splits
+      y buffer positivo en fixture pequeña suficiente, preservando ruta básica anterior y ejecución
+      en proceso/cwd externo. No invocar full desde Pytest ni entrenar modelos.
+    - 'D016: encabezados canónicos AGENTS.md en Python nuevos/modificados; añadir sólo test_buffer.py
+      al alcance acumulado conservando catorce rutas. README documenta ambos modos, coverage completa,
+      buffer estricto y expansión por grupos, interpretación de distancias, mínimos y ejemplo Windows.
+      No presentar folds externos como independientes sólo por ser aportados; partición aleatoria
+      sólo puede describirse como comparación diagnóstica, sin implementar generador aleatorio.'
+    - 'R2/R3: ronda <=60 min, <=20000 tokens medidos o unknown, hasta dos correcciones; full <=1200 s,
+      scratch <=512 MiB, un hilo. Temporales externos, sin datos reales, lotes científicos R4,
+      red, instalaciones, commit ni push del coder. Arquitecto coteja baseline y manifiesto con gate.'
     non_goals:
-    - Autocorrelación automática, CV temporal avanzada.
+    - CV anidada, modelos, predicción, selección automática de radio/tamaño, CV temporal o cobertura parcial.
+    - Nuevos módulos ajenos, CLI, Snakemake, modificar generador/spatial/sampling o suites previas
+      salvo test_package.py; cambios de __init__, pyproject, locks, infraestructura o evidencia histórica.
     read_first:
-    - 00_brief/CONTEXT.md
     - 00_brief/architecture.md
     - 00_brief/validation.md
-    - 08_pkg/CONTEXT.md
-    - 00_brief/decisions.md
+    - 08_pkg/README.md
+    - 08_pkg/src/wall2wall/validation.py
+    - 08_pkg/tests/test_validation.py
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/tests/test_package.py
+    - 06_infra/python_header_scope.json
+    - 06_infra/check_python_headers.py
+    - 06_infra/windows.ps1
+    - 06_infra/run_checks.py
     allowed_prefixes:
-    - 08_pkg/src/wall2wall/
-    - 08_pkg/tests/
-    - 08_pkg/docs/
-    focused: []
+    - 08_pkg/src/wall2wall/validation.py
+    - 08_pkg/tests/test_buffer.py
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/tests/test_package.py
+    - 08_pkg/README.md
+    - 06_infra/python_header_scope.json
+    focused:
+    - - python
+      - 08_pkg/tests/run_checks.py
+      - --buffer-only
     kind: code
-    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
-      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+    notes: M003-S01 está aceptado; esta ronda amplía su módulo existente. test_buffer.py es salida
+      nueva. min_train_samples es límite operativo explícito, no garantiza utilidad estadística.
+      Tras aceptación corresponde revisión holística M003 antes de pasar a modelos.
 - id: M004
   title: Regresión, evaluación y motores opcionales
   status: planned
