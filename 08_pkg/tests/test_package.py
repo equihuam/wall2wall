@@ -11,10 +11,11 @@ El lanzador del paquete prepara VERIFICATION_SCRATCH externo y limita hilos.
 
 ## Resultados
 Once pruebas deben pasar. Copias de fuentes, wheel e instalación de prueba se
-crean bajo tmp_path; otro proceso confirma origen del import y metadatos.
+crean bajo tmp_path; otro proceso confirma origen del import y metadatos, y
+ejecuta una alineación mínima desde wall2wall.spatial instalado en el wheel.
 
 ## Notas relevantes
-No usa datos espaciales ni demuestra habilidad predictiva. Las fuentes de pruebas
+Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
 generadas son temporales; no se instalan dependencias ni se modifica el entorno.
 =============================================================================
 """
@@ -42,7 +43,7 @@ def test_installed_wheel(tmp_path):
     assert tmp_path.resolve().is_relative_to(scratch)
     assert not scratch.is_relative_to(PACKAGE.parent)
     source = tmp_path / "source"
-    for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py"):
+    for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py", "src/wall2wall/spatial.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -87,6 +88,7 @@ sys.meta_path.insert(0, RejectOptional())
 sys.path.insert(0, str(target))
 import wall2wall
 assert Path(wall2wall.__file__).resolve() == target / "wall2wall" / "__init__.py"
+assert not {"numpy", "pandas", "rasterio", "sklearn", "joblib"}.intersection(sys.modules)
 assert not forbidden.intersection(name.split(".")[0] for name in sys.modules)
 distribution = importlib.metadata.distribution("wall2wall")
 assert Path(distribution.locate_file("")).resolve() == target
@@ -95,6 +97,24 @@ assert distribution.version == "0.1.0.dev0"
 assert distribution.metadata["Requires-Python"] == ">=3.11"
 assert sorted(distribution.requires) == ["joblib", "numpy", "pandas", "rasterio", "scikit-learn"]
 assert not distribution.metadata.get_all("Provides-Extra")
+import numpy as np
+import rasterio
+from rasterio.transform import Affine
+import wall2wall.spatial
+assert Path(wall2wall.spatial.__file__).resolve() == target / "wall2wall" / "spatial.py"
+source = Path.cwd() / "constant.tif"
+transform = Affine(1, 0, 100, 0, -1, 200)
+with rasterio.open(source, "w", driver="GTiff", width=2, height=2, count=1,
+                   dtype="float64", crs="EPSG:32630", transform=transform) as dataset:
+    dataset.write(np.full((1, 2, 2), 7.))
+result = wall2wall.spatial.align_predictors(
+    [{"path": source, "band": 1, "name": "p01", "unit": "u", "period": "unknown"}],
+    {"crs": "EPSG:32630", "transform": list(transform)[:6], "width": 2, "height": 2},
+    Path.cwd() / "aligned", window_size=1)
+assert result["layers"][0]["path"] == source
+with rasterio.open(result["mask_path"]) as mask:
+    np.testing.assert_array_equal(mask.read(1), [[255, 255], [255, 255]])
+assert result["manifest_path"].is_file()
 '''
     result = subprocess.run(
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],

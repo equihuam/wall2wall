@@ -6,5 +6,7 @@
   "08_pkg/tests/run_checks.py",
   "08_pkg/tests/test_package.py",
   "08_pkg/examples/synthetic.py",
-  "08_pkg/tests/test_synthetic.py"
+  "08_pkg/tests/test_synthetic.py",
+  "08_pkg/src/wall2wall/spatial.py",
+  "08_pkg/tests/test_spatial.py"
 ]

@@ -10,8 +10,9 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige once pruebas de distribución y veintiuna del generador.
---synthetic-only exige sólo las veintiuna del generador. Devuelve 0 si pasan las
+Sin argumentos exige 56 pruebas: once de distribución, veintiuna del generador
+y veinticuatro espaciales. --synthetic-only y --spatial-only seleccionan sus grupos
+respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
 ## Notas relevantes
@@ -44,6 +45,20 @@ SYNTHETIC_REQUIRED = {
         "test_variant_construction", "test_cli_rejections", "test_logical_checksum",
         "test_analytic_geometry", "test_analytic_bands_masks_ids")},
 }
+SPATIAL_REQUIRED = {
+    *{f"tests/test_spatial.py::test_rotated_no_overlap_preflight[{case}]"
+      for case in ("envelope_only", "point_contact", "other_crs")},
+    *{f"tests/test_spatial.py::{name}" for name in (
+        "test_identity_reuse", "test_origin_and_partial_coverage", "test_crs_change",
+        "test_band_validity", "test_invalid_inputs", "test_metadata_validation",
+        "test_existing_and_failure", "test_rotated_source")},
+    *{f"tests/test_spatial.py::test_scale_idempotence[{case}]" for case in ("metadata", "declaration")},
+    *{f"tests/test_spatial.py::{name}[{method}]"
+      for name in ("test_grid_methods", "test_invalid_interpolation")
+      for method in ("nearest", "bilinear", "average")},
+    *{f"tests/test_spatial.py::test_empty_coverage[{case}]" for case in ("geometric", "individual", "joint")},
+    *{f"tests/test_spatial.py::test_window_boundaries_and_reads[{mode}]" for mode in ("identity", "reprojection")},
+}
 
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
@@ -59,8 +74,15 @@ def main():
     import pytest
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--synthetic-only", action="store_true")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--synthetic-only", action="store_true")
+    group.add_argument("--spatial-only", action="store_true")
     args = parser.parse_args()
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED
+    if args.synthetic_only:
+        target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
+    elif args.spatial_only:
+        target, required = "tests/test_spatial.py", SPATIAL_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)
@@ -82,12 +104,11 @@ def main():
         sys.dont_write_bytecode = True
         os.chdir(package)
         result = pytest.main([
-            "tests/test_synthetic.py" if args.synthetic_only else "tests",
+            target,
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
             "--junitxml", str(scratch / "package.xml"),
-        ], plugins=[RequiredTests(SYNTHETIC_REQUIRED if args.synthetic_only
-                                  else REQUIRED | SYNTHETIC_REQUIRED)])
+        ], plugins=[RequiredTests(required)])
         size = sum(path.stat().st_size for path in scratch.rglob("*") if path.is_file())
         print(f"Package scratch: {size} bytes (limit {512 * 1024 * 1024})")
         if size > 512 * 1024 * 1024:

@@ -277,33 +277,107 @@ milestones:
       de desarrollo.
   - id: M002-S03
     title: Armonización de predictores
-    objective: Implementar malla explícita y alineación por capa.
+    objective: Implementar wall2wall.spatial.align_predictors con malla explícita, valores físicos
+      y validez por banda, sin cargar el cubo completo.
     acceptance:
-    - 'D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.'
-    - 'Contrato Entradas y armonización de architecture.md: validar CRS/bandas/nombres/afín, reutilizar
-      malla igual y armonizar sólo explícitamente.'
-    - V2 demuestra reproyección/remuestreo continuo y máscaras, escala/offset una vez y rechazo de
-      falta de cobertura/CRS o entradas contradictorias.
-    - Intersección válida por banda, cero válido conservado; archivos originales intactos y sin cubo
-      completo en RAM.
-    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    - Windows D014/Python 3.11 mediante windows.ps1. Crear sólo spatial.py y test_spatial.py;
+      exponer align_predictors desde wall2wall.spatial, sin imports científicos nuevos al hacer
+      import wall2wall. Usar stdlib, NumPy y Rasterio instalados; sin dependencias ni cambios
+      de entorno.
+    - 'API documentada: lista ordenada de capas con path, band base 1, name único, unidad, período
+      o unknown y escala/offset opcionales; grid con CRS, afín de seis coeficientes, width y height;
+      output_dir nuevo, allow_reprojection=False y window_size=512 por defecto. Devolver información
+      reutilizable de capas y máscara conjunta, y escribir manifest.json portable con rutas relativas.
+      No inventar una API de etapas futuras.'
+    - 'Validar antes de generar salidas: entradas no vacías, nombres únicos, archivo/banda existente,
+      CRS conocido, afín finito no degenerado, dimensiones enteras positivas y destino north-up.
+      Derivar bounds/resolución del afín y rechazar discrepancias si también se proporcionan.
+      Rechazar entradas contradictorias, capas sin solapamiento y resultado sin celdas conjuntamente
+      válidas. Cobertura parcial conserva la malla objetivo y marca fuera de cobertura como inválido.'
+    - Comparar CRS, dimensiones y todos los coeficientes del afín, con tolerancia declarada y
+      sin confundir matrices del mismo tamaño con mallas iguales. Malla coincidente y escala/offset
+      identidad reutiliza archivo/banda, sin copiar ni modificar fuente. Cambios de malla requieren
+      allow_reprojection=True y método explícito por capa; soportar nearest, bilinear y average
+      para continuas y registrar el elegido. Máscaras se reproyectan con nearest.
+    - 'Resolver escala/offset desde metadatos o declaración: una declaración sólo reemplaza valores
+      por defecto identidad; si el archivo tiene valores no triviales, debe coincidir o fallar.
+      Aplicar valor_fisico=raw*scale+offset una sola vez, tras determinar validez cruda. Si la
+      codificación no es identidad, materializar una capa física aunque la malla coincida; salida
+      normalizada declara scale=1/offset=0 y conserva procedencia. Probar segundo paso idempotente.'
+    - Validez por banda combina máscara, nodata, finitud y cobertura; cero válido se conserva.
+      Excluir NaN, infinito y nodata de la interpolación, sin contaminación por sentinelas. Máscara
+      conjunta equivale a AND de todas las bandas, nunca OR de máscaras del dataset; comprobar
+      también finitud tras transformar/codificar. Escribir máscara conjunta uint8 con 0 inválido
+      y 255 válido; conservar validez individual.
+    - Procesar por ventanas y capas, con lecturas acotadas también durante reproyección; no construir
+      un array de todas las capas completas ni leer fuentes completas por ventana. GeoTIFF normalizados
+      con CRS/afín objetivo, nodata y máscara explícitos. Manifest JSON estricto conserva orden,
+      fuentes/bandas, codificación original/efectiva, métodos, malla y referencia a productos;
+      escribirlo sólo al completar. Destino existente se rechaza y fuentes conservan SHA-256;
+      fallo no deja manifiesto que anuncie éxito.
+    - 'Pytest usa fixtures analíticas pequeñas: identidad/reutilización, origen desplazado con
+      igual shape, cambio de resolución, reproyección entre CRS, nearest/bilinear/average, escala/offset,
+      nodata/NaN/infinito/cero, máscaras distintas por banda, cobertura parcial/vacía, entradas
+      inválidas y destino existente. Esperados independientes: constantes y planos analíticos
+      para interpolación, media manual para average; tolerancia rtol/atol <=1e-5 y geometría/máscaras
+      exactas. No llamar al mismo algoritmo para obtener todos los esperados.'
+    - Probar ventana que no divide dimensiones y límites entre ventanas, comparando con fixture
+      analítica; instrumentar lecturas para rechazar lecturas sin ventana y limitar buffers. Usar
+      un caso sintético de varias ventanas, sin evaluación de modelos. Registrar memoria medida
+      o unknown y contabilidad de buffers; no afirmar medición de RAM nativa mediante tracemalloc.
+    - Extender test_installed_wheel para copiar spatial.py y comprobar en proceso fuera del checkout
+      que wall2wall.spatial proviene del wheel y ejecuta una alineación mínima. Conservar las
+      garantías existentes y las 32 pruebas del paquete. Añadir --spatial-only a tests/run_checks.py,
+      con nuevos IDs obligatorios; modo normal exige toda la suite y full conserva 16 pruebas
+      de infraestructura/encabezados. Skips/cero/IDs ausentes fallan; Pytest nunca invoca el full.
+    - 'D016: encabezados conforme AGENTS.md para todo Python creado/modificado; añadir spatial.py
+      y test_spatial.py a python_header_scope.json conservando las ocho rutas existentes. README
+      documenta API, política de validez/cobertura, reutilización, unidades, ejemplo y comandos;
+      eliminar afirmaciones de que no existe ninguna API científica sin anunciar mapas predictivos.
+      En __init__.py sólo actualizar el encabezado; conservar import wall2wall sin cargar dependencias científicas.'
+    - 'R2/R3: ronda <=60 min, <=20000 tokens si medibles o unknown, hasta dos correcciones; full
+      <=1200 s, scratch <=512 MiB, GDAL cache y buffers <=128 MiB cada uno, un hilo. Pruebas y
+      temporales fuera del checkout, sin datos reales, red, modelos, instalaciones, commit ni
+      push. El arquitecto mantiene roadmap y evidencia; coteja alcance y manifiesto antes de verificar.'
     non_goals:
-    - Descargas/EE, categorías predictoras, creación de índices.
+    - Muestreo puntual, folds, regresiones, inferencia, Snakemake de producción, descarga de datos
+      y nuevos índices.
+    - Categorías predictoras, imputación, malla destino rotada, COG, paralelismo, abstracciones
+      de plugins o migración masiva.
+    - Cambiar generador/pruebas sintéticas, verificador de infraestructura, comprobador de encabezados,
+      pyproject, locks o evidencia anterior.
     read_first:
-    - 00_brief/CONTEXT.md
+    - 08_pkg/src/wall2wall/spatial.py
+    - 08_pkg/tests/test_spatial.py
     - 00_brief/architecture.md
     - 00_brief/validation.md
     - 08_pkg/CONTEXT.md
-    - 00_brief/decisions.md
-    - 00_brief/orchestration.md
+    - 08_pkg/README.md
+    - 08_pkg/pyproject.toml
+    - 08_pkg/src/wall2wall/__init__.py
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/tests/test_package.py
+    - 08_pkg/tests/test_synthetic.py
+    - 08_pkg/examples/synthetic.py
+    - 06_infra/python_header_scope.json
+    - 06_infra/check_python_headers.py
+    - 06_infra/windows.ps1
+    - 06_infra/run_checks.py
     allowed_prefixes:
-    - 08_pkg/src/wall2wall/
-    - 08_pkg/tests/
-    - 08_pkg/docs/
-    focused: []
+    - 08_pkg/src/wall2wall/spatial.py
+    - 08_pkg/src/wall2wall/__init__.py
+    - 08_pkg/tests/test_spatial.py
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/tests/test_package.py
+    - 08_pkg/README.md
+    - 06_infra/python_header_scope.json
+    focused:
+    - - python
+      - 08_pkg/tests/run_checks.py
+      - --spatial-only
     kind: code
-    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
-      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+    notes: Ronda correctiva sobre spatial.py y test_spatial.py existentes. Las fixtures aportan
+      ejemplos geométricos; el generador sintético sigue siendo una herramienta de desarrollo.
   - id: M002-S04
     title: Muestreo puntual y exclusiones
     objective: Convertir observaciones y rásteres en tabla trazable.
