@@ -287,7 +287,7 @@ Non-goals:
 
 ## M005 — Mapas y expediente auditable
 
-Status: active
+Status: done
 Risk: high
 Holistic review: true
 
@@ -370,9 +370,25 @@ Non-goals:
 
 ## M006 — Producción Snakemake, reproducibilidad y entrega v0.1
 
-Status: planned
+Status: active
 Risk: release
 Holistic review: true
+
+### M006-S00 — Sincronización documental tras el cierre de M005
+
+Corregir los dos textos obsoletos detectados por la revisión holística de M005, sin cambiar comportamiento ni ejecutar pruebas científicas.
+
+Acceptance:
+- Alcance de dos archivos exclusivamente. En 08_pkg/src/wall2wall/__init__.py modificar sólo el docstring inicial; en 08_pkg/CONTEXT.md actualizar el estado vigente sin reescribir historia. No modificar imports, API, lógica, pruebas, versiones, entorno ni otros archivos de producto.
+- CONTEXT.md debe indicar que M005 está cerrado y que M005-S00, M005-S01, M005-S02 y M005-S03 están aceptados. Debe resumir que audit conserva expedientes confiables, prediction produce mapas por ventanas y quality=True añade validez y alerta min/max con escala acreditada. Mantener workflow M006, Linux M001 y cualificación integral Windows M008 como pendientes; el ledger sigue siendo la autoridad. No afirmar cualificación entre plataformas, AOA, incertidumbre ni utilidad predictiva.
+- En el encabezado de __init__.py eliminar que la inferencia de mapas no está implementada. Describir de forma duradera que la inferencia está disponible mediante importación explícita de wall2wall.prediction, conservando que import wall2wall es ligero y no genera archivos ni importa motores opcionales o Snakemake. No convertir el encabezado en historial de hitos.
+- D016 aplica al encabezado conforme a AGENTS.md. El scope mantenido ya incluye __init__.py y no debe modificarse. Verificar que el AST de __init__.py excluyendo únicamente el primer docstring no cambió; el SHA-256 de ast.dump(module, include_attributes=False), UTF-8, tras quitar module.body[0], debe ser 3543b4693a36a1098850b8bc928887694ed59a6deb7d3dfd0339de01f55a77b6 en Python 3.11. Revisar además que el diff Python sólo toca el docstring.
+- Verificación específica mediante 06_infra/windows.ps1 -PythonArgs. Focused usa python 06_infra/check_python_headers.py; full de esta tarea es python 06_infra/run_checks.py --headers-only, una vez, que exige el gate y sus pruebas de encabezados. No ejecutar hermetic_verification.py, suites del paquete, fits, inferencia, escala, canaries ni benchmarks.
+- git diff --check sobre los dos archivos pasa. El informe declara comandos observados, igualdad AST y ausencia de cambios de lógica; no inventa aprobación del reviewer. Sin dependencias, red, instalaciones, commit ni push. Hasta 20 minutos, 5000 tokens medidos o unknown, dos correcciones técnicas, scratch externo <=512 MiB y cero fits.
+- Mantener M005-S02-H1-F1 y M005-S03-H1-F1 carried hasta que un reviewer los cierre con referencia a 05_governance/reviews/m005/M005_holistic_review.md y SHA-256 06ab0d98cafe0b533f5af9aff17083463f6acaf1630d33d978f2bd31b3a8e6ad. El coder no edita reportes, backlog ni ledger. Esta tarea no reabre M005 ni implementa M006-S01.
+
+Non-goals:
+- Cambios funcionales, workflow Snakemake, nuevas pruebas de producto, ampliación de APIs o actualización documental fuera de los dos textos señalados.
 
 ### M006-S01 — Workflow Snakemake y Pytest por etapas
 
