@@ -10,6 +10,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["numpy", "pandas", "rasterio", "scikit-learn", "joblib"]
 
+[project.optional-dependencies]
+lightgbm = ["lightgbm>=4"]
+xgboost = ["xgboost>=2"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["wall2wall"]

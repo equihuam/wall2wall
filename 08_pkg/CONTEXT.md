@@ -10,8 +10,13 @@ Existen la distribución instalable, fixtures sintéticas, la API de armonizaci�
 `wall2wall.spatial.align_predictors` y la de muestreo
 `wall2wall.sampling.sample_points`. La API `wall2wall.validation.make_spatial_folds`
 construye particiones por bloques/grupos, admite particiones aportadas y aplica
-buffer al entrenamiento. Modelos, mapas predictivos y workflow de producción
-siguen pendientes. La evidencia y aceptación viven en el ledger.
+buffer al entrenamiento. wall2wall.modeling entrega evaluate con evaluación fija o
+selección espacial anidada y permutación externa, fit_final para configuración fija
+y select_and_fit para selección interna y ajuste final. M004-S01/S02 están aceptados.
+Motores opcionales, mapas predictivos y workflow de producción siguen pendientes.
+M004-S03 prepara el contrato opcional sin instalaciones; M004-S04 debe cualificar
+ambos motores reales antes de anunciar soporte. La evidencia y aceptación viven
+en el ledger.
 Contratos en 00_brief/architecture.md y 00_brief/validation.md; alcance en roadmap.yaml.
 El pyproject y tests de la raíz pertenecen a la plantilla, no al producto.
 Antes de emitir cada tarea, el arquitecto añade sus lecturas concretas de código

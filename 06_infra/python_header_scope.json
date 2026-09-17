@@ -16,5 +16,7 @@
   "08_pkg/tests/test_buffer.py",
   "08_pkg/src/wall2wall/modeling.py",
   "08_pkg/tests/test_modeling.py",
-  "08_pkg/tests/test_selection.py"
+  "08_pkg/tests/test_selection.py",
+  "08_pkg/src/wall2wall/engines.py",
+  "08_pkg/tests/test_engines.py"
 ]

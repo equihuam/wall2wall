@@ -242,7 +242,27 @@ Non-goals:
 - AutoML/Optuna, grids implícitos, early stopping, motores extras, CV temporal, piloto real, nuevas evaluaciones científicas, inferencia raster o persistencia de modelos.
 - Cambiar validation/spatial/sampling, simulador, suites anteriores salvo test_package.py, __init__, pyproject, infraestructura, locks, evidencia histórica o documentos del arquitecto.
 
-### M004-S03 — LightGBM y XGBoost opcionales
+### M004-S03 — Contrato e integración opcional de motores
+
+Preparar extras e imports perezosos sin modificar el entorno core; cualificar motores reales en M004-S04.
+
+Acceptance:
+- Windows D014/Python 3.11 mediante 06_infra/windows.ps1. Mantener las 127 pruebas del paquete y 16 de infraestructura. Ninguna instalación, red ni ajuste adicional en esta tarea; el full conserva los ajustes de las suites aceptadas.
+- Declarar extras separados lightgbm y xgboost en pyproject.toml, con dependencias lightgbm>=4 y xgboost>=2 respectivamente. No alterar dependencias core ni versión. Estas cotas expresan API requerida, no compatibilidad demostrada de todas las versiones.
+- Crear wall2wall.engines.make_regressor(engine, *, n_estimators, random_state, max_depth=None, learning_rate=0.1). engine acepta únicamente lightgbm o xgboost; devuelve el estimador sklearn sin ajustar. No añadir registros, wrappers, plugins ni kwargs abiertos. evaluate/select_and_fit/fit_final reciben el objeto mediante sus contratos existentes, sin cambios científicos.
+- Validar antes de importar el motor. n_estimators entero positivo; random_state entero de 0 a 2147483647; max_depth None o entero positivo; learning_rate real finito mayor que cero y menor o igual a uno. Rechazar booleanos en campos numéricos, motores desconocidos y argumentos extra con diagnóstico claro.
+- Imports locales exclusivamente al solicitar motor. LightGBM usa LGBMRegressor con objective=regression, boosting_type=gbdt, n_jobs=1, device_type=cpu, deterministic=True, force_col_wise=True; max_depth None se traduce a -1. XGBoost usa XGBRegressor con objective=reg:squarederror, booster=gbtree, tree_method=hist, device=cpu, n_jobs=1; max_depth None se traduce a 0. Ambos reciben árboles, semilla y learning_rate explícitos. No activar early stopping, callbacks ni eval_set; no llamar fit en la fábrica.
+- Cuando falte exactamente el módulo opcional solicitado, elevar ImportError accionable indicando el extra wall2wall[lightgbm] o wall2wall[xgboost] y el entorno activo, sin rutas locales. Preservar causa. Errores de DLL o dependencias transitivas no se disfrazan como paquete ausente ni generan fallback. No instalar automáticamente.
+- Pruebas offline con importación bloqueada y dobles mínimos de constructor comprueban imports perezosos, ambos mapeos exactos, objeto devuelto intacto, cero fits, validación anterior al import, módulos ausentes y errores transitivos/nativos preservados. Usar parametrización/subTest cuando comparta estructura. Los dobles sólo acreditan el contrato local, nunca clone/fit/predict ni compatibilidad real.
+- Proceso fresco comprueba import wall2wall e import wall2wall.engines sin importar paquetes opcionales o dependencias científicas. Ampliar prueba del wheel para incluir engines.py, metadatos Provides-Extra/Requires-Dist con marcadores correctos y API instalada sin extras. Mantener consumo offline y fuente instalada comprobada; cero ajustes nuevos en el wheel.
+- Crear test_engines.py y modo --engines-only mutuamente excluyente con modos previos. Full exige IDs nuevos y todos los anteriores; cero pruebas, omisiones y skips fallan. No tocar suites científicas anteriores ni repetir su protocolo fuera del full.
+- D016 conforme a AGENTS.md para todo Python propio nuevo/modificado. Añadir engines.py y test_engines.py al scope conservando las dieciocho rutas existentes. README documenta API, parámetros, mensajes e integración por objetos; declara explícitamente motores reales pendientes de M004-S04 y no promete soporte Windows/Linux ni instala desde las pruebas.
+- R2/R3 — hasta 60 minutos, 20000 tokens medidos o unknown, dos correcciones técnicas, full una vez <=1200 segundos, scratch <=512 MiB. Un hilo; sin fits nuevos, datos reales, GPU, red, instalaciones, cambios de entorno, commit ni push. RAM/scratch máximos no medidos se reportan unknown.
+
+Non-goals:
+- Instalar o cualificar motores reales, cambiar modeling.py/validation.py, entrenar modelos fuera de las pruebas previas del full, ampliar búsqueda, callbacks, early stopping, GPU o persistencia. La evidencia con dobles no cierra M004-S04 ni el hito M004.
+
+### M004-S04 — Cualificación real de LightGBM y XGBoost
 
 Soportar ambos motores con el mismo contrato de evaluación.
 

@@ -14,7 +14,9 @@ Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
 El núcleo declarado es NumPy, pandas, Rasterio, scikit-learn y joblib. Importar
 `wall2wall` no carga Snakemake, LightGBM ni XGBoost. Pytest, build, setuptools,
 wheel y Snakemake son herramientas del entorno fijo, separadas del núcleo.
-Los extras y sus rangos se definirán cuando se implementen los motores.
+Los extras separados son `lightgbm` (lightgbm>=4) y `xgboost` (xgboost>=2).
+Estas cotas expresan API requerida; no acreditan todas las versiones ni soporte
+real de motores en Windows/Linux. La cualificación real está pendiente de M004-S04.
 No se añaden ni resuelven dependencias durante estas pruebas.
 
 ## Verificación Windows
@@ -26,9 +28,10 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 127 IDs: once de distribución, veintiuno del generador, veinticuatro
+El lanzador exige 138 IDs: once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
-de buffer/particiones aportadas, doce de modelado fijo y diez de selección/permutación.
+de buffer/particiones aportadas, doce de modelado fijo, diez de selección/permutación
+y once del contrato offline de motores.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -38,7 +41,7 @@ El lanzador crea un directorio temporal exclusivo bajo `VERIFICATION_SCRATCH`
 terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no se
 generan caches o metadatos en el producto. El build copia pyproject, README,
 `src/wall2wall/__init__.py`, `src/wall2wall/spatial.py`, `src/wall2wall/sampling.py`
-y `src/wall2wall/validation.py` y `src/wall2wall/modeling.py`;
+y `src/wall2wall/validation.py`, `src/wall2wall/modeling.py` y `src/wall2wall/engines.py`;
 usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
 el origen de los imports, los metadatos instalados, alineación/muestreo/folds y
@@ -436,6 +439,61 @@ expansión a grupos, mínimos, rechazos, RNG/entradas inmutables, lotes acotados
 reconstrucción CSV y fallo de escritura. Las 86 pruebas previas se conservan.
 
 ## Evaluación OOF fija y ajuste final
+
+### Construcción opcional de motores (contrato offline)
+
+`wall2wall.engines.make_regressor(engine, *, n_estimators, random_state,
+max_depth=None, learning_rate=0.1)` devuelve el estimador sklearn sin ajustar.
+Sólo acepta `lightgbm` o `xgboost`. Importar wall2wall o wall2wall.engines no
+carga motores opcionales ni dependencias científicas. El import del motor sucede
+únicamente al solicitarlo, después de validar todos los argumentos.
+
+`n_estimators` es entero positivo; `random_state` es entero entre 0 y 2147483647;
+`max_depth` es None o entero positivo; `learning_rate` es real finito en (0,1].
+Se rechazan booleanos numéricos, motores desconocidos y kwargs adicionales.
+Los parámetros inválidos producen ValueError con el nombre del campo; argumentos
+extra o requeridos ausentes producen TypeError por la firma explícita.
+
+LightGBM recibe objective="regression", boosting_type="gbdt", n_jobs=1,
+device_type="cpu", deterministic=True y force_col_wise=True; profundidad None
+se traduce a -1. XGBoost recibe objective="reg:squarederror", booster="gbtree",
+tree_method="hist", device="cpu" y n_jobs=1; profundidad None se traduce a 0.
+Ambos reciben árboles, semilla y tasa explícitos. La fábrica no llama fit ni
+activa early stopping, callbacks o eval_set; no añade wrappers ni registros.
+
+La integración prevista es por objetos: entregar el resultado como `estimator`
+a evaluate/fit_final o como `candidates[i]["estimator"]` a evaluate/select_and_fit,
+respetando sus validaciones existentes. Ejemplo de construcción, sólo cuando el
+motor esté disponible en un entorno cualificado:
+
+```python
+from wall2wall.engines import make_regressor
+
+estimator = make_regressor("lightgbm", n_estimators=100, random_state=17,
+                           max_depth=3, learning_rate=0.1)
+```
+
+Si falta exactamente el módulo solicitado, ImportError indica el extra
+`wall2wall[lightgbm]` o `wall2wall[xgboost]` que debe provisionarse en el entorno
+Python activo, sin rutas locales y conservando la causa. No instala nada.
+Errores de DLL, dependencias transitivas o constructor se propagan intactos;
+no hay fallback ni se presentan como motor ausente.
+
+Las pruebas offline usan imports bloqueados y dobles mínimos de constructor:
+acreditan parámetros, identidad del retorno, cero fits e importación ligera en
+proceso fresco. El wheel comprueba API instalada y marcadores de extras sin
+añadir ajustes. Los dobles no acreditan clone/fit/predict ni compatibilidad real.
+M004-S04 debe cualificar ambos motores; este contrato no cierra ese trabajo ni
+promete soporte Windows/Linux. No se instalan extras desde las pruebas.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--engines-only')
+```
+
+Este modo es mutuamente excluyente con los focused anteriores. El full conserva
+las 127 pruebas previas, sus ajustes y las 16 pruebas de infraestructura.
+
+### Evaluación y ajuste con configuración fija
 
 ```python
 from wall2wall.modeling import evaluate, fit_final

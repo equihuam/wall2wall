@@ -16,6 +16,7 @@ ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en 
 Comprueba además particiones aportadas con exclusiones por buffer positivo.
 Verifica fit_final y predicción desde el wheel con un único ajuste dummy mínimo.
 Comprueba disponibilidad de select_and_fit y opciones de evaluate sin fits extra.
+Verifica engines instalado, import ligero y metadatos de extras sin importarlos.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -48,7 +49,7 @@ def test_installed_wheel(tmp_path):
     source = tmp_path / "source"
     for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py",
                      "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py",
-                     "src/wall2wall/modeling.py"):
+                     "src/wall2wall/modeling.py", "src/wall2wall/engines.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -92,6 +93,9 @@ class RejectOptional(importlib.abc.MetaPathFinder):
 sys.meta_path.insert(0, RejectOptional())
 sys.path.insert(0, str(target))
 import wall2wall
+import wall2wall.engines
+assert Path(wall2wall.engines.__file__).resolve() == target / "wall2wall" / "engines.py"
+assert callable(wall2wall.engines.make_regressor)
 assert Path(wall2wall.__file__).resolve() == target / "wall2wall" / "__init__.py"
 assert not {"numpy", "pandas", "rasterio", "sklearn", "joblib"}.intersection(sys.modules)
 assert not forbidden.intersection(name.split(".")[0] for name in sys.modules)
@@ -100,8 +104,10 @@ assert Path(distribution.locate_file("")).resolve() == target
 assert distribution.metadata["Name"] == "wall2wall"
 assert distribution.version == "0.1.0.dev0"
 assert distribution.metadata["Requires-Python"] == ">=3.11"
-assert sorted(distribution.requires) == ["joblib", "numpy", "pandas", "rasterio", "scikit-learn"]
-assert not distribution.metadata.get_all("Provides-Extra")
+assert sorted(distribution.requires) == ["joblib", 'lightgbm>=4; extra == "lightgbm"',
+                                        "numpy", "pandas", "rasterio", "scikit-learn",
+                                        'xgboost>=2; extra == "xgboost"']
+assert sorted(distribution.metadata.get_all("Provides-Extra")) == ["lightgbm", "xgboost"]
 import numpy as np
 import rasterio
 from rasterio.transform import Affine
