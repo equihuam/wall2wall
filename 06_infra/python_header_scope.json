@@ -21,5 +21,7 @@
   "08_pkg/tests/test_engines.py",
   "08_pkg/tests/test_engine_integration.py",
   "08_pkg/src/wall2wall/audit.py",
-  "08_pkg/tests/test_audit.py"
+  "08_pkg/tests/test_audit.py",
+  "08_pkg/src/wall2wall/prediction.py",
+  "08_pkg/tests/test_prediction.py"
 ]

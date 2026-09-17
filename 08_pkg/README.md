@@ -7,8 +7,10 @@ casos completos desde el manifiesto de armonización. `wall2wall.validation.make
 crea folds por bloques y grupos indivisibles. `wall2wall.modeling` ofrece evaluación
 OOF fija o con selección espacial anidada, permutación externa opt-in y ajuste
 final separado. `wall2wall.audit` guarda y carga el ajuste final en un expediente
-portable con procedencia e integridad comprobadas. Todavía no hay mapas predictivos,
-CLI de producción ni workflow de producción. La cualificación Linux M001 y la
+portable con procedencia e integridad comprobadas. `wall2wall.prediction.predict_raster`
+produce mapas GeoTIFF por ventanas desde ese expediente y predictores alineados.
+Las alertas min/max, la prueba de escala, la CLI y el workflow de producción siguen
+pendientes. La cualificación Linux M001 y la
 cualificación integral Windows M008 siguen pendientes; la comprobación corresponde
 al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -31,7 +33,8 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 188 IDs: los 151 previos y 37 de auditoría. Los previos son
+El lanzador exige 221 IDs: los 188 previos (151 más 37 de auditoría) y 33 de
+inferencia por ventanas. Los primeros 151 son
 once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
 de buffer/particiones aportadas, doce de modelado fijo, diez de selección/permutación
@@ -46,14 +49,16 @@ terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no 
 generan caches o metadatos en el producto. El build copia pyproject, README,
 `src/wall2wall/__init__.py`, `src/wall2wall/spatial.py`, `src/wall2wall/sampling.py`
 y `src/wall2wall/validation.py`, `src/wall2wall/modeling.py`, `src/wall2wall/engines.py`
-y `src/wall2wall/audit.py`;
+y `src/wall2wall/audit.py` y `src/wall2wall/prediction.py`;
 usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
 el origen de los imports, los metadatos instalados, alineación/muestreo/folds y
 fit_final/predicción mínimos desde el wheel. Ese proceso guarda con `audit.save_run`
 el ajuste dummy mínimo existente; después de terminar, otro proceso carga con
 `audit.load_run(..., trusted=True)` y predice desde el wheel fuera del checkout,
-sin ajustes adicionales. Importar sólo wall2wall sigue sin cargar dependencias científicas.
+sin ajustes adicionales. Ese segundo proceso también genera un GeoTIFF mediante
+`prediction.predict_raster` reutilizando el expediente guardado, sin nuevos fits.
+Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
 Ejecución secuencial y un hilo numérico; ningún ajuste científico. Presupuesto
@@ -865,6 +870,11 @@ Estas pruebas inspeccionan datos con resultados conocidos: no implementan
 armonización, muestreo de producción, folds ni evaluaciones científicas.
 
 ## Instalación local desde un wheel
+
+La [guía de inferencia por ventanas](docs/prediction.md) documenta `predict_raster`,
+la transferencia a otra malla, nodata y máscaras, límites de buffers/lotes y
+publicación protegida ante fallos. El modo `--prediction-only` ejecuta sus 33
+pruebas obligatorias, con cuatro llamadas fit planificadas y límite de ocho.
 
 La [guía de persistencia y manifiestos](docs/audit.md) documenta `save_run`,
 `load_run`, la procedencia explícita y la carga de modelos confiables con

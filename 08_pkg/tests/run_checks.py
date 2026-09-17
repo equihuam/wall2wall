@@ -10,9 +10,10 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige las 151 pruebas previas y las pruebas explícitas de auditoría.
+Sin argumentos exige 221 pruebas: las 188 previas y 33 de inferencia por ventanas.
 --synthetic-only, --spatial-only, --sampling-only, --validation-only, --buffer-only
-y --modeling-only, --selection-only, --engines-only, --engine-integration-only y --audit-only seleccionan sus grupos
+y --modeling-only, --selection-only, --engines-only, --engine-integration-only,
+--audit-only y --prediction-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
@@ -141,6 +142,20 @@ AUDIT_REQUIRED = {
         "posix", "windows", "unc", "drive_relative", "traversal", "ancestor", "reserved", "invalid_character")},
 }
 
+PREDICTION_REQUIRED = {
+    *{f"tests/test_prediction.py::{name}" for name in (
+        "test_current_masks_and_all_invalid", "test_existing_alias_and_trust", "test_source_hash_once_and_pipeline_once")},
+    *{f"tests/test_prediction.py::test_windowed_reference[{case}]" for case in ("empty-window", "uneven", "small-batches")},
+    *{f"tests/test_prediction.py::test_fresh_process_scaled_transfer[{case}]" for case in ("rf", "pipeline")},
+    *{f"tests/test_prediction.py::test_preflight_metadata[{case}]" for case in (
+        "order", "unit", "band", "encoding", "raster_encoding", "grid", "mask_grid", "count", "period", "nodata")},
+    *{f"tests/test_prediction.py::test_configuration_before_raster_reads[{case}]" for case in (
+        "bool-window", "zero", "large-window", "bool-batch", "large-batch", "fraction", "budget")},
+    *{f"tests/test_prediction.py::test_prediction_failure_preserves_partial[{case}]" for case in (
+        "shape", "length", "nan", "inf", "overflow", "error")},
+    *{f"tests/test_prediction.py::test_io_failure_after_window[{case}]" for case in ("read", "write")},
+}
+
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
 
@@ -166,8 +181,9 @@ def main():
     group.add_argument("--engines-only", action="store_true")
     group.add_argument("--engine-integration-only", action="store_true")
     group.add_argument("--audit-only", action="store_true")
+    group.add_argument("--prediction-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
@@ -188,6 +204,8 @@ def main():
         target, required = "tests/test_engine_integration.py", ENGINE_INTEGRATION_REQUIRED
     elif args.audit_only:
         target, required = "tests/test_audit.py", AUDIT_REQUIRED
+    elif args.prediction_only:
+        target, required = "tests/test_prediction.py", PREDICTION_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)
@@ -212,7 +230,7 @@ def main():
             target,
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
-            *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only else []),
+            *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only or args.prediction_only else []),
             "--junitxml", str(scratch / "package.xml"),
         ], plugins=[RequiredTests(required)])
         size = sum(path.stat().st_size for path in scratch.rglob("*") if path.is_file())

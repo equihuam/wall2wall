@@ -19,6 +19,7 @@ Comprueba disponibilidad de select_and_fit y opciones de evaluate sin fits extra
 Verifica engines instalado, import ligero y metadatos antes de importar extras.
 Después ajusta una vez cada motor real CPU del perfil fijo y predice desde el wheel.
 Guarda el ajuste dummy existente con audit y lo carga en otro proceso sin fits extra.
+Ese segundo proceso produce también un mapa mediante prediction desde el wheel.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -51,7 +52,8 @@ def test_installed_wheel(tmp_path):
     source = tmp_path / "source"
     for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py",
                      "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py",
-                     "src/wall2wall/modeling.py", "src/wall2wall/engines.py", "src/wall2wall/audit.py"):
+                     "src/wall2wall/modeling.py", "src/wall2wall/engines.py", "src/wall2wall/audit.py",
+                     "src/wall2wall/prediction.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -230,6 +232,14 @@ assert loaded["predictors"] == ["p01"]
 assert loaded["manifest"]["versions"]["wall2wall"] == "0.1.0.dev0"
 np.testing.assert_allclose(loaded["estimator"].predict(pd.DataFrame({"p01": [7., 7.]})),
                            [2.5, 2.5], rtol=1e-10, atol=1e-10)
+import rasterio
+import wall2wall.prediction
+assert Path(wall2wall.prediction.__file__).resolve() == Path(sys.argv[1]) / "wall2wall/prediction.py"
+mapped = wall2wall.prediction.predict_raster("audit-run", "aligned/manifest.json", "predicted",
+                                            trusted=True, window_size=1, batch_size=1)
+with rasterio.open(mapped["prediction_path"]) as ds:
+    np.testing.assert_allclose(ds.read(1), np.full((2, 2), 2.5), rtol=1e-5, atol=1e-5)
+    np.testing.assert_array_equal(ds.read_masks(1), np.full((2, 2), 255, dtype="uint8"))
 '''
     result = subprocess.run([sys.executable, "-I", "-B", "-c", load_code, str(target)],
                             cwd=outside, capture_output=True, text=True, timeout=60)
