@@ -17,8 +17,10 @@ cuatro entregas M004-S01, M004-S02, M004-S03 y M004-S04 están aceptadas. La fá
 opcional wall2wall.engines.make_regressor está disponible; la cualificación real
 comprende LightGBM 4.6.0 y XGBoost 3.1.3 con Python 3.11.16 en el perfil Windows
 del proyecto. No implica soporte universal ni equivalencia entre plataformas.
-Persistencia, mapas predictivos y workflow de producción siguen pendientes,
-al igual que Linux M001 y la cualificación integral Windows M008.
+M005-S01 está aceptado: wall2wall.audit guarda y carga expedientes portables
+con confianza explícita, integridad y compatibilidad comprobadas. Mapas predictivos
+y workflow de producción siguen pendientes, al igual que Linux M001 y la
+cualificación integral Windows M008.
 El registro autoritativo de evidencia y aceptación sigue siendo el ledger.
 Contratos en 00_brief/architecture.md y 00_brief/validation.md; alcance en roadmap.yaml.
 El pyproject y tests de la raíz pertenecen a la plantilla, no al producto.

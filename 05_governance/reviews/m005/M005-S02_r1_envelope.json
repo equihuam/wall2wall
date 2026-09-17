@@ -1,0 +1,85 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M005-S02",
+  "round": 1,
+  "title": "Inferencia GeoTIFF por ventanas",
+  "objective": "Producir un GeoTIFF de regresión por ventanas desde un expediente confiable y predictores alineados, con memoria acotada y salidas protegidas.",
+  "acceptance": [
+    "D014/D015: Python 3.11 del entorno Windows Conda fijo mediante 06_infra/windows.ps1 -PythonArgs. Reutilizar Rasterio/NumPy/pandas y audit existentes; sin nuevas dependencias, instalaciones ni cambios de entorno. No afirmar cualificación Linux M001 ni integración Windows M008.",
+    "Crear wall2wall.prediction.predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False, window_size=512, batch_size=65536). Cargar mediante audit.load_run y respetar su confianza literal, integridad y versiones antes de predecir; no deserializar por otra vía ni modificar el expediente. Consumir el manifiesto wall2wall.alignment/1 de align_predictors. No ajustar modelos, alinear ni reproyectar implícitamente. Reutilizar helpers existentes sin modificar sus módulos ni crear abstracciones generales.",
+    "Preflight antes de crear salidas: destino inexistente incluso si está vacío; parámetros enteros positivos sin booleanos, window_size <=1024, batch_size <=65536, y presupuesto de buffers comprobado. Validar esquema, orden exacto de nombres y unidades frente al expediente, número/bandas/encoding, CRS/afín/dimensiones comunes de todas las capas y máscaras. No ordenar predictores silenciosamente. La malla de inferencia puede diferir de la malla de entrenamiento en extensión/resolución/dimensiones; todas las entradas y la salida deben compartir la malla de inferencia declarada. Registrar periodo de inferencia sin exigir identidad con el periodo de entrenamiento. No exigir hashes iguales a los datos de entrenamiento: permitir un nuevo ráster compatible y registrar su propia identidad.",
+    "Valores físicos conforme al contrato de alineación: scale=1 y offset=0 en productos alineados; no aplicar dos veces la escala ni el preprocesamiento del Pipeline. Validez por celda es intersección de máscara por banda, nodata, valores finitos y máscaras individuales/conjunta declaradas; nunca OR. Conservar cero válido. No invocar predict en ventanas sin celdas válidas; permitir salida íntegramente nodata si las fuentes actuales carecen de celdas válidas y declarar el conteo observado, sin confiar en un conteo antiguo del manifiesto.",
+    "Recorrer ventanas, con lectura explícita window de datos y máscaras y lotes predict <=batch_size. Pasar DataFrame con nombres/orden del modelo y el Pipeline completo. Validar predicción unidimensional, longitud, finitud y representabilidad float32 antes de escribir; fallo explícito ante NaN/Inf/desbordamiento, sin clipping. GeoTIFF de una banda float32, tiled y DEFLATE, nodata NaN y máscara de validez interna; CRS/afín/dimensiones iguales a la malla de inferencia. BigTIFF cuando sea necesario por tamaño estimado. No crear máscaras de calidad separadas todavía.",
+    "R3: buffers propios de inferencia <=128 MiB, calculados incluyendo arrays por predictor/ventana, máscaras, selección de filas, DataFrame y predicciones; rechazar combinaciones que excedan la cota antes de leer ventanas. Caché GDAL explícita <=128 MiB, un hilo, sin cubo completo ni acumulación de predicciones de todas las ventanas. Modelos y tablas del ajuste siguen en memoria; no prometer cota sobre memoria interna del estimador. Registrar estimación conservadora, ventana/lote y caché; RAM nativa no medida se declara unknown.",
+    "Escribir prediction.tif temporal dentro del destino nuevo, cerrar handles y publicar el mapa completo; manifest.json se publica al final. Nunca sobrescribir resultados existentes ni fuentes/expediente, tampoco por alias de ruta o enlace. Fallo de lectura/predict/escritura no deja un mapa parcial bajo nombre final ni manifiesto de éxito; parciales conservados se identifican como incompletos. No reanudar ni borrar resultados ajenos. Manifiesto JSON estricto versionado con identidad nueva, run_id y hash del manifiesto audit, hash del manifiesto de alineación y fuentes/máscaras actuales, geometría, esquema/periodos, parámetros, conteos válidos/inválidos, recursos, tiempo y tamaño/hash de salida. Hash incremental sobre bytes; entradas únicas una vez por ejecución; referencias portables sin rutas locales resueltas.",
+    "V5: test_prediction.py compara con referencia pequeña en memoria rtol=atol=1e-5, máscara/geometría exactas. Casos parametrizados: ventanas no divisoras, lotes menores que ventana, ventana vacía, todo inválido, máscaras distintas por banda, nodata/NaN/Inf y cero válido, nuevo ráster compatible y geometría distinta del entrenamiento. Probar orden/unidades/bandas/encoding/malla inválidos, configuración fuera de presupuesto, predicciones erróneas y destino existente. Instrumentar reads de datasets y máscaras para exigir window y spy de predict para tamaños de lote; comparar bytes de fuentes/destino previo y simular fallo tras una ventana escrita. Acreditar escala aplicada una sola vez mediante align_predictors y Pipeline con transformación una sola vez. No usar la función bajo prueba para calcular la referencia.",
+    "Integración mínima: un proceso ajusta/guarda un RF pequeño y un Pipeline; otro proceso fresco carga y produce un mapa desde el expediente, conservando predicciones. Fixtures <=32 filas de entrenamiento y rásteres <=64x64, <=2 predictores, semilla 17, RF <=4 árboles y max_depth<=2, un hilo; hasta 8 llamadas fit nuevas por invocación prediction, incluyendo Pipeline/pasos/procesos hijos, planificadas y contadas con corte previo. Negativos reutilizan modelos, sin fits adicionales de motores reales, selección ni lotes científicos. Prueba wheel incluye prediction.py y predice desde el wheel fuera del checkout reutilizando el modelo audit ya guardado, sin nuevos fits.",
+    "Agregar --prediction-only y IDs obligatorios al lanzador; full conserva las 188 pruebas previas y 16 de infraestructura e incorpora las nuevas. Cero descubrimiento, IDs faltantes y skips fallan. Focused python 08_pkg/tests/run_checks.py --prediction-only; full una vez antes de finalizar python scripts/hermetic_verification.py. Documentar API, ejemplo, nodata, transferencia de malla, límites y fallos en docs/prediction.md; actualizar README para estado, conteos e inventario wheel coherentes, sin afirmar que existen alertas, escala o workflow pendientes.",
+    "D016: encabezados conforme a AGENTS.md y gate mantenido. Scope Python explícito de ronda: prediction.py, test_prediction.py, tests/run_checks.py y tests/test_package.py. Conservar todas las entradas previas de 06_infra/python_header_scope.json y añadir los dos Python nuevos. Veracidad en revisión; ningún otro Python nuevo/modificado sin volver al arquitecto. R2/R3: <=60 minutos, <=20000 tokens medidos o unknown, dos correcciones técnicas, <=1200 s por verificación, scratch externo <=512 MiB. Sin red, GPU, datos reales, commit ni push; scratch pico y RAM desconocidos se declaran unknown."
+  ],
+  "non_goals": [
+    "Máscaras separadas y alerta min/max, AOA/incertidumbre y prueba de escala 2048x2048x8 (M005-S03); Snakemake/reanudación (M006); COG obligatorio, entrenamiento fuera de memoria, nuevos modelos, generalización de audit o refactor de spatial/sampling/modeling."
+  ],
+  "read_first": [
+    "00_brief/CONTEXT.md",
+    "00_brief/architecture.md",
+    "00_brief/validation.md",
+    "08_pkg/CONTEXT.md",
+    "00_brief/decisions.md",
+    "00_brief/orchestration.md",
+    "08_pkg/README.md",
+    "08_pkg/docs/audit.md",
+    "08_pkg/src/wall2wall/audit.py",
+    "08_pkg/src/wall2wall/spatial.py",
+    "08_pkg/src/wall2wall/sampling.py",
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/tests/test_spatial.py",
+    "08_pkg/tests/test_audit.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/tests/run_checks.py",
+    "06_infra/windows.ps1",
+    "06_infra/python_header_scope.json",
+    "06_infra/run_checks.py"
+  ],
+  "allowed_prefixes": [
+    "08_pkg/src/wall2wall/prediction.py",
+    "08_pkg/tests/test_prediction.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/docs/prediction.md",
+    "08_pkg/README.md",
+    "06_infra/python_header_scope.json"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [
+    [
+      "python",
+      "08_pkg/tests/run_checks.py",
+      "--prediction-only"
+    ]
+  ],
+  "full": [
+    "python",
+    "scripts/hermetic_verification.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 1200,
+  "observation": "process",
+  "notes": "M005-S01 aceptado y publicado en el commit previo. El propietario solicita el siguiente prompt. Baseline arquitectónica: roadmap, vista generada y contexto del paquete actualizado a persistencia aceptada. prediction.py, test_prediction.py y docs/prediction.md son salidas nuevas. Preparación manual, sin ejecución de asientos.",
+  "findings": "",
+  "memory": ""
+}
