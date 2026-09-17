@@ -1,11 +1,13 @@
 # Workspace: package
 Status: active
-Paquete Wall2Wall. Salidas previstas: pyproject.toml, src/wall2wall/, tests/,
+Paquete Wall2Wall. Estructura existente: pyproject.toml, src/wall2wall/, tests/,
 examples/, docs/ y workflow/ para Snakemake. Python 3.11 en entorno fijo del perfil;
 WSL/Linux con Micromamba es el perfil recomendado general según D013. El trabajo
-actual usa Windows nativo, Conda fijo y Python 3.11, preparados bajo D014/D015.
-Las pruebas de M002 acreditan ese entorno; la cualificación integral Windows M008
-y la cualificación Linux M001 siguen siendo tareas independientes.
+de esta ronda documental usa exclusivamente el checkout Linux propietario D021,
+seleccionado por la configuración local ignorada de WSL. Windows queda de consulta.
+El desarrollo y las pruebas anteriores se realizaron en Windows nativo con Conda
+fijo y Python 3.11 bajo D014/D015. Esa evidencia se conserva; M008 integral y
+M001 Linux siguen requiriendo sus propias puertas y aceptación.
 Existen la distribución instalable, fixtures sintéticas, la API de armonización
 `wall2wall.spatial.align_predictors` y la de muestreo
 `wall2wall.sampling.sample_points`. La API `wall2wall.validation.make_spatial_folds`
@@ -24,8 +26,11 @@ produce mapas GeoTIFF por ventanas desde un expediente confiable. El modo
 `quality=True` añade validez y alerta univariada min/max; la escala está acreditada
 con el protocolo técnico 1024×1024×8 y 2048×2048×8 en Windows D014. Esta evidencia
 no acredita cualificación entre plataformas, AOA, incertidumbre ni utilidad
-predictiva. El workflow de producción M006, Linux M001 y la cualificación integral
-Windows M008 siguen pendientes.
+predictiva. El workflow RF fijo M006-S01 existe y está aceptado sólo bajo
+Windows D014; entrega production y estructura/contratos de validated.
+M006-S02 (validated integral y reanudación/invalidación selectiva) y M008 siguen
+pendientes; M006 no está cerrado. La preparación Linux D020 no acredita
+production/validated en Linux ni satisface esas puertas.
 El registro autoritativo de evidencia y aceptación sigue siendo el ledger.
 Contratos en 00_brief/architecture.md y 00_brief/validation.md; alcance en roadmap.yaml.
 El pyproject y tests de la raíz pertenecen a la plantilla, no al producto.
@@ -34,7 +39,29 @@ y pruebas existentes. No explorar todo el repositorio por defecto.
 
 D015 inició M002-S01 con distribución mínima y pruebas offline de wheel en scratch.
 Las tareas posteriores usan su propio alcance, sin crear stubs. El full
-06_infra/run_checks.py exige encabezados, infraestructura y suite del paquete
+Windows 06_infra/run_checks.py exige encabezados, infraestructura y suite del paquete
 mediante tests/run_checks.py; mantiene comprobación desde el wheel.
 Para las tareas posteriores rigen sus fronteras explícitas en roadmap.yaml;
 la aceptación y evidencia de cada entrega se consultan en el ledger.
+
+Para M001-S01 r1, usar bash 06_infra/linux.sh sin activación global:
+focused 06_infra/check_python_headers.py --scope 06_infra/python_header_scope_m001.json;
+full una vez 06_infra/linux_smoke/verify_preparation.py. Desde Windows, wsl.ps1
+sólo despacha al mismo checkout mediante local_state/wsl-tools.json ignorado.
+El full actual comprueba identidad/runtime, wheel retenido y encabezados explícitos;
+no reejecuta las cinco pruebas ni el fit RF históricos de D020.
+linux_smoke/run_checks.py sí ejecuta ese canary y NO se lanza en esta ronda.
+Ni scripts/hermetic_verification.py ni 06_infra/run_checks.py son su full Linux.
+
+D020 conserva Ubuntu 24.04.4 WSL2 x86_64, Micromamba 2.5.0, Python 3.11.16,
+Snakemake 9.27.0 y Pytest 9.1.1. environment-linux.yml declara requisitos;
+los locks linux-64 de 06_infra/ fijan 115 paquetes Conda y 48 artefactos pip.
+El wheel instalado se construyó offline y se importó fuera del checkout.
+Evidencia y cinco contratos en 06_infra/LINUX.md y linux-validation.json:
+runtime/dependencias, GeoTIFF/reproyección/extracción/RF, DAG de dos procesos,
+Git/ledger/lock desechable y rechazo de descubrimiento vacío/ausente/skips.
+Los cinco tests, un fit, 10.55 s y 5782728 bytes de scratch final son históricos.
+No se acredita recreación completa desde locks, suite científica completa Linux,
+LightGBM/XGBoost Linux ni equivalencia numérica entre plataformas.
+Reviewer inspecciona la baseline arquitectónica completa, no sólo estos documentos;
+M001 requiere dictamen y registro en el ledger antes de declararse aceptado.

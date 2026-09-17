@@ -6,24 +6,29 @@ Project: `wall2wall`
 
 ## M001 — Linux/WSL2, Micromamba y cualificación Python 3.11
 
-Status: planned
+Status: active
 Risk: ordinary
 Holistic review: true
 
-### M001-S01 — Prueba exacta Linux, Micromamba y Snakemake
+### M001-S01 — Cualificación documental Linux y preservación de evidencia D020
 
-Cualificar plataforma Linux/WSL2, entorno fijo 3.11, plantilla y DAG mínimo.
+Cerrar la documentación de la infraestructura Linux ya preparada, comprobando identidades y runtime sin repetir el canary D020; someter la baseline completa a revisión.
 
 Acceptance:
-- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
-- V1/V7/D013: Linux x86-64 en WSL2 o nativo; Python 3.11 del prefijo Micromamba fijo. Registrar distribución, arquitectura, canales, builds/hashes, GDAL, Pytest y Snakemake.
-- Arquitecto cualifica Git/ledger/lock/verificador en Linux antes de baseline. Probar GeoTIFF, CRS, RF y DAG de dos procesos con artefactos persistidos y segunda ejecución sin trabajo.
-- Crear 08_pkg/tests/run_checks.py con Pytest; full descubre suites y falla ante cero pruebas, skips requeridos o dependencia ausente; sólo usar procesos Linux del entorno fijo.
-- Perfil base WSL/Linux: sin entornos por regla ni ejecutables Windows. Windows se cualifica por separado en M008; no instalar sistema ni migrar archivos automáticamente. Respetar R1–R6.
+- D021: trabajar y escribir sólo en el checkout Linux propietario seleccionado por la configuración local de WSL. Usar bash 06_infra/linux.sh para Python; desde Windows, wsl.ps1 sólo despacha al mismo checkout. No escribir ni sincronizar la copia Windows, cambiar HEAD/índice, instalar, hacer commit o push.
+- Entrega documental sobre la preparación D020 ya ejecutada: modificar sólo 06_infra/LINUX.md, ENVIRONMENT.md y 08_pkg/CONTEXT.md. Corregir afirmaciones obsoletas sobre inexistencia del paquete/workflow y reflejar el propietario Linux de esta ronda; conservar la historia Windows y la autoridad del ledger. No afirmar que M001 está aceptado antes del dictamen y registro, ni que M006/M008 están cerrados.
+- Documentar Ubuntu 24.04.4 WSL2 x86_64, Micromamba 2.5.0, Python 3.11.16, Snakemake 9.27.0 y Pytest 9.1.1; referenciar declaraciones/locks linux-64, sus 115 paquetes Conda y 48 artefactos pip, y el wheel instalado. Distinguir YAML declarativo de locks exactos. Sólo rutas relativas o configuración ignorada, sin rutas resueltas de máquina ni credenciales.
+- Preservar sin modificar 06_infra/linux-validation.json, SHA-256 bruto 254e1b195053c843e2b8c7fa39ec36f14007230c528ba1fd35d5956ed5e78c8c, sus nueve identidades, locks, fuentes del canary y scripts de verificación. La evidencia D020 acredita cinco pruebas, un fit RF, 10.55 s y 5782728 bytes de scratch final; el verificador actual comprueba identidad/runtime y no reejecuta esas pruebas. Citar esta distinción explícitamente en documentación e informe.
+- Describir los cinco contratos acreditados: runtime Linux y dependencias, GeoTIFF/reproyección/extracción con RF pequeño, DAG de dos procesos con persistencia/no-op/error, Git/ledger/lock en repositorio desechable y rechazo de descubrimiento vacío/ausente/skips. Reviewer inspecciona código y evidencia de la baseline arquitectónica, no sólo el diff documental. El wheel fue construido offline e importado fuera del checkout; no atribuirle una suite científica Linux completa.
+- Mantener explícitos los límites: sin recreación completa de prefijo desde locks, sin suite científica completa Linux, sin LightGBM/XGBoost Linux, sin production/validated de M006 en Linux ni equivalencia numérica entre plataformas. El workflow RF fijo de M006-S01 está aceptado sólo bajo Windows D014. M006-S02 y M008 siguen pendientes; la presente cualificación no satisface sus puertas.
+- Actualizar instrucciones de operación: bash 06_infra/linux.sh para el checkout Linux, wsl.ps1 como puente opcional desde Windows con configuración ignorada, sin activación global. El full de esta ronda es verify_preparation.py; run_checks.py de linux_smoke ejecuta el canary histórico y NO se lanza aquí. No presentar scripts/hermetic_verification.py ni 06_infra/run_checks.py como full Linux de esta entrega.
+- D016: ningún Python nuevo o modificado por el coder. Scope arquitectónico explícito de la ronda en 06_infra/python_header_scope_m001.json: linux_smoke/run_checks.py, test_linux.py y verify_preparation.py. El verificador comprueba ese scope y el scope mantenido previo; no inferir alcance de git diff HEAD ni editar scopes para silenciar fallos.
+- Focused: python 06_infra/check_python_headers.py --scope 06_infra/python_header_scope_m001.json. Full una vez al terminar: python 06_infra/linux_smoke/verify_preparation.py, siempre mediante linux.sh. Git diff --check sobre los tres documentos debe pasar. Cero Pytest, Snakemake, canaries, fits, benchmarks, invocaciones de tests/run_checks.py, pip install o comandos de preparación del entorno.
+- Presupuesto: 20 minutos, 5000 tokens medidos o unknown, hasta dos correcciones documentales/técnicas, 120 segundos por comando, scratch <=16 MiB y cero ajustes/evaluaciones científicas/red/coste. Conservar RSS/pico scratch/tokens unknown cuando no se midan. Si cambia una identidad o falta el entorno/evidencia, detenerse y devolver requisito, evidencia, actor y acción; no regenerar hashes, reinstalar ni repetir el canary.
 
 Non-goals:
-- API final, workflow completo o experimentos científicos.
-- Modificar sistema, entorno base o herramientas de plantilla desde el asiento coder.
+- Reejecutar el canary, reconstruir entornos/wheel, adaptar producto a Linux, ampliar soporte o ejecutar suites científicas.
+- Cambiar código, locks, evidencias históricas, configuración local, herramientas de plantilla, servicios o estado Git.
 
 ## M002 — Paquete, simulaciones y datos alineados
 

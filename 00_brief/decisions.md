@@ -337,3 +337,85 @@ rewrite history when a decision changes.
   de gobernanza de la recuperación/aceptación D017 y de esta preparación,
   después de inspeccionar el diff y la vista previa. No modificar HEAD o índice
   durante la ronda hasta registrar revisión y aceptación.
+
+## D019 — Disponibilidad Linux y preparación previa de M001-S01
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario autoriza commit/push de lo aceptado y solicita
+  preparar M001-S01 comprobando Linux/WSL y Micromamba sin modificar el sistema.
+- Observed: M006-S00/M006-S01 se publicaron en b7e68e2. Ubuntu 24.04.4 LTS
+  funciona en WSL2 x86_64; Git 2.43.0 y Bash disponibles. Python del sistema es
+  3.12.3. Micromamba 2.5.0 existe en bin del usuario; sólo registra base y
+  qgis_env. No se infiere ausencia de prefijos no registrados ni se inspeccionan
+  entornos ajenos.
+- Decision: Mantener M001-S01 planned/unstarted, sin emitir prompt, hasta
+  identificar o preparar un prefijo dedicado Python 3.11 con resolución Linux
+  exacta y cualificar su verificador. 06_infra/LINUX.md concreta la preparación;
+  questions/open/M001-S01-linux-environment.md solicita la autoridad faltante.
+  Horizonte v0.1; M006-S02 requiere M001 cualificado. La frontera de esta sesión
+  es publicación de lo aceptado y diagnóstico/preparación documental.
+- Boundary: Sin instalación, cambios de sistema, uso de base/qgis_env para
+  producto, migración de entorno, fits, canaries ni pruebas científicas nuevas.
+  El presupuesto de instalación/canary en LINUX.md es propuesta, no ampliación
+  implícita de D014, cuya autorización de instalación sólo cubría Windows.
+
+## D020 — Preparación aislada autorizada de WSL2
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario autoriza crear el entorno y lo necesario para
+  operar en WSL2, respondiendo a M001-S01-linux-environment.
+- Decision: Crear un checkout Linux separado del commit aceptado y un prefijo
+  Micromamba dedicado con Python 3.11, core científico, herramientas de paquete,
+  PyYAML, Pytest y Snakemake. Resolución exacta y hashes propios linux-64.
+  No modificar base, qgis_env, Python del sistema, servicios ni perfiles globales.
+- Budget: Hasta 6 GiB de prefijo/cache nuevos; 1200 segundos por instalación
+  o suite; scratch <=512 MiB. Un canary técnico predeclarado de un fit RF con
+  cuatro árboles, semilla 17 y n_jobs=1, GeoTIFF/reproyección/extracción y DAG
+  de dos procesos con persistencia/no-op. Cero evaluaciones científicas.
+  Conservar fallos; no repetir fits ni instalaciones fallidas automáticamente.
+- Qualification: Preparar lanzador y verificador Linux aislados, comprobar
+  descubrimiento Pytest y Git/ledger/locks en scratch. Conservar evidencia previa
+  y gates Windows. Registrar cualquier frontera pendiente antes de emitir M001.
+  Esta autorización no acepta M001/M006/M008 ni autoriza push adicional.
+- Result: Prefijo Linux creado con 115 paquetes Conda y 48 artefactos pip;
+  Python 3.11.16, Snakemake 9.27.0 y Pytest 9.1.1. Cinco pruebas de cualificación
+  pasaron en 10.55 s con un fit RF y 5782728 bytes de scratch final. pip check,
+  roadmap check y ledger check pasaron. Wheel propio construido offline,
+  instalado sin dependencias e importado fuera del checkout. Locks saneados con
+  SHA-256; dry-run offline del lock Conda pasó sin crear otro entorno.
+  El prefijo/cache medido antes del wheel ocupó 2202255360 bytes (<6 GiB).
+- Operation: bash 06_infra/linux.sh selecciona el prefijo Linux. Desde Windows,
+  06_infra/wsl.ps1 usa configuración ignorada para despachar al checkout Linux.
+  No hay sincronización automática ni dos escritores simultáneos del ledger.
+  Evidencia en 06_infra/linux-validation.json; falta revisión/aceptación M001,
+  recreación completa y adaptación del workflow de producción Windows a Linux.
+
+## D021 — Emisión M001-S01 con propietario Linux y canary conservado
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario solicita emitir M001-S01 desde el checkout Linux como
+  único propietario, con baseline exacta y sin repetir el canary ni commit/push.
+- Decision: Cierre documental de la preparación D020. Su evidencia inmutable
+  linux-validation.json tiene SHA-256 bruto
+  254e1b195053c843e2b8c7fa39ec36f14007230c528ba1fd35d5956ed5e78c8c.
+  Las cinco pruebas y el fit pertenecen a D020; no se ejecutan de nuevo. La
+  baseline incluye los scripts y locks preparados para revisión completa.
+- Verification: El arquitecto aporta verify_preparation.py: compara el informe
+  fijado, sus identidades, versiones instaladas, prefijo Linux, wheel retenido
+  y encabezados del scope explícito M001. No llama a Pytest, Snakemake ni fits.
+  La comprobación actual no es una nueva ejecución del canary ni acredita
+  recreación del entorno o compatibilidad del workflow Windows en Linux.
+- Ownership: Desde esta emisión sólo el checkout Linux recibe cambios y eventos
+  de la ronda. La copia Windows permanece de consulta; wsl.ps1 sólo despacha
+  comandos a Linux. No sincronizar archivos o ledgers en paralelo. La ubicación
+  concreta vive exclusivamente en configuración local ignorada.
+- Scope: Coder modifica tres documentos, sin código ni evidencia. Roadmap fija
+  lecturas, gates y presupuesto de 20 minutos/5000 tokens o unknown/120 s por
+  comando, cero canaries y fits. M001 sigue requiriendo revisión y aceptación;
+  el horizonte v0.1 y los pendientes M006-S02/M008 no se amplían.
+- Default temporal de verificación del checkout Linux: comprobación D020 sin fits,
+  timeout 120 s. Antes de otra entrega funcional el arquitecto fijará su propio
+  full y presupuesto; no heredar por accidente el full Windows.

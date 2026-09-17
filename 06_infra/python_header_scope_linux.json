@@ -1,0 +1,4 @@
+[
+  "06_infra/linux_smoke/run_checks.py",
+  "06_infra/linux_smoke/test_linux.py"
+]

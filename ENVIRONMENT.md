@@ -1,17 +1,22 @@
 # Perfiles de ejecución de Wall2Wall
 
-Autoridad: D013/D014 en 00_brief/decisions.md. Python 3.11 y CPU en ambos perfiles.
+Autoridad: D013/D014/D020/D021 en 00_brief/decisions.md. Python 3.11 y CPU en ambos perfiles.
 La opción recomendada es WSL2. Windows nativo es una alternativa que debe superar
 su propia cualificación; instalar Bash no demuestra que todo Snakemake funcione.
 La preparación Windows autorizada por D014 instala un entorno aislado. La guía
 operativa y sus resultados están en [06_infra/WINDOWS.md](06_infra/WINDOWS.md).
-El paquete y su workflow de producción siguen pendientes de implementación.
+El paquete y el workflow RF fijo existen; M006-S01 está aceptado sólo en
+Windows D014. M006-S02 y M008 siguen pendientes. D021 asigna esta ronda al
+checkout Linux propietario seleccionado en la configuración local de WSL;
+Windows queda de consulta. M001 requiere revisión y registro de aceptación.
+La [guía Linux](06_infra/LINUX.md) delimita la evidencia histórica D020 y el
+full documental actual, que sólo comprueba identidades/runtime y encabezados.
 
 ## Opciones
 
 | Perfil | Python y paquetes científicos | Shell para reglas que lo necesiten | Estado |
 | --- | --- | --- | --- |
-| WSL2 o Linux x86-64 | Entorno fijo Micromamba, linux-64 | Bash Linux | Base recomendada; cualificación M001 pendiente. |
+| WSL2 o Linux x86-64 | Entorno fijo Micromamba, linux-64 | Bash Linux | Preparación D020 conservada; revisión/aceptación M001 pendiente. |
 | Windows x64 con Git Bash | Entorno fijo Conda, win-64 | Bash de Git for Windows explícito | Instalación y canary técnico comprobados; integración M008 pendiente. |
 | Windows x64 con MSYS2 | Entorno fijo Conda, win-64 | Un runtime MSYS2 explícito | Variante Windows alternativa; cualificación independiente. |
 
@@ -29,14 +34,20 @@ No añadir compiladores/toolchains completos sin necesidad.
 
 ## Entorno y selección
 
-Declaraciones previstas en 06_infra/environment-linux.yml y
+Declaraciones en 06_infra/environment-linux.yml y
 06_infra/environment-windows.yml, más locks exactos linux-64 y win-64. Compartir
 requisitos lógicos y configuración científica; resolver builds/hashes por sistema.
 Fijar Python 3.11, dependencias core/extras, Pytest, Snakemake y auxiliares requeridos.
 En Windows registrar también versión/distribución del Bash externo y su identidad;
 un lock Conda no fija una instalación Git for Windows externa.
 
-Nombre sugerido del entorno dedicado: wall2wall. El perfil y proveedor de shell se
+D020 preparó Ubuntu 24.04.4 WSL2 x86_64 con Micromamba 2.5.0, Python 3.11.16,
+Snakemake 9.27.0 y Pytest 9.1.1. El YAML Linux es declarativo; los locks exactos
+linux-64 fijan 115 paquetes Conda y 48 artefactos pip. El wheel propio instalado
+se construyó offline y se importó fuera del checkout. Esto no acredita la suite
+científica completa Linux ni recreación completa desde locks.
+
+El prefijo Linux dedicado es local_state/envs/wall2wall-linux. El perfil y proveedor de shell se
 seleccionan explícitamente antes del preflight, sin fallback según el primer bash
 que aparezca en PATH. Intérprete en project.local.toml ignorado, conforme a su esquema
 actual. Bash mediante variable local WALL2WALL_BASH o configuración local del workflow;
@@ -48,17 +59,22 @@ entre perfiles. Snakemake se ejecuta desde el entorno fijo; no usar conda: por r
 ni --sdm conda. El gestor prepara dependencias antes del run y no se modifica durante
 verificación. Cambiar versión, plataforma o proveedor Bash exige recualificación.
 
-Comandos orientativos una vez creado el entorno:
+Operación sin activación global, con el entorno dedicado ya preparado:
 
 WSL2, desde Bash Linux:
 
 ```bash
-micromamba run -n wall2wall python scripts/roadmap.py check
-micromamba run -n wall2wall python scripts/ledger.py check
-micromamba run -n wall2wall python scripts/hermetic_verification.py
+bash 06_infra/linux.sh 06_infra/check_python_headers.py --scope 06_infra/python_header_scope_m001.json
+bash 06_infra/linux.sh 06_infra/linux_smoke/verify_preparation.py
 ```
 
-Windows, desde PowerShell y la raíz del repositorio, después de la instalación
+El segundo comando es el full de esta ronda, una vez al terminar. Desde Windows,
+06_infra/wsl.ps1 puede despacharlo al mismo checkout mediante
+local_state/wsl-tools.json ignorado. No sincronizar copias ni cambiar HEAD/índice.
+linux_smoke/run_checks.py reejecuta el canary D020 y NO se lanza aquí.
+
+Referencia histórica Windows D014/D015, fuera de esta ronda, desde PowerShell
+y la raíz del repositorio, después de la instalación
 descrita en la guía Windows (el lanzador selecciona el prefijo fijo):
 
 ```powershell
@@ -66,14 +82,18 @@ descrita en la guía Windows (el lanzador selecciona el prefijo fijo):
 .\06_infra\windows.ps1 -PythonArgs @('scripts/ledger.py', 'check')
 ```
 
-D015 conecta el full con 06_infra/run_checks.py: infraestructura obligatoria y,
-al introducir el paquete, su futuro 08_pkg/tests/run_checks.py. M002-S01 exige
-también el lanzador del paquete como focused; infraestructura no sustituye producto.
+D015 conectó el full Windows con 06_infra/run_checks.py: infraestructura y
+08_pkg/tests/run_checks.py, que ya existe. Ni ese full ni
+scripts/hermetic_verification.py son el full Linux de esta entrega.
+Las cinco pruebas, un fit RF, 10.55 s y 5782728 bytes de scratch final pertenecen
+a D020; verify_preparation.py preserva y comprueba esa evidencia, sin repetirla.
 
 PowerShell sólo lanza el proceso Windows. La elección de Bash para las reglas es
-explícita e independiente del terminal. Las futuras instrucciones Snakemake fijarán
-Snakefile, configuración, perfil, directorio de trabajo y recursos. No hay un
-workflow de producto ejecutable todavía; su lanzador de pruebas pertenece a M002-S01.
+explícita e independiente del terminal. La CLI y los contratos del workflow
+existente están en 08_pkg/docs/workflow.md; su evidencia sigue limitada a
+Windows D014. No se han acreditado production/validated ni LightGBM/XGBoost
+en Linux, ni equivalencia numérica entre plataformas. Esta ronda no satisface
+las puertas pendientes de M006-S02/M008.
 
 ## Prevención de conflictos POSIX
 

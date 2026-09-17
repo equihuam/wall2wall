@@ -1,0 +1,23 @@
+[
+  {
+    "slice": "M001-S01",
+    "path": "08_pkg/CONTEXT.md",
+    "sha": "7ac7639e9ecee80ff1b622803876fc38656b6795d95afeeb3fe6c5bc934b6200",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M001-S01",
+    "path": "ENVIRONMENT.md",
+    "sha": "f32a63fa2fbc7a46da5bc9644e352db8b90b72e48b76f3f0151268d60771c7f5",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M001-S01",
+    "path": "06_infra/LINUX.md",
+    "sha": "a2a05947882f6f290f514deeb23f67b56b0a763d7cd9d22196ea8dd212b2d847",
+    "kind": "added",
+    "round": 1
+  }
+]

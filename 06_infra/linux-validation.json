@@ -1,0 +1,107 @@
+{
+  "schema": "wall2wall.linux-preparation/1",
+  "date": "2026-09-17",
+  "authority": "D020",
+  "base_commit": "b7e68e2509d20ca0447e1ac1c9d93827f703606c",
+  "platform": {
+    "distribution": "Ubuntu 24.04.4 LTS",
+    "wsl": 2,
+    "machine": "x86_64",
+    "kernel": "5.15.167.4-microsoft-standard-WSL2",
+    "python": "3.11.16",
+    "micromamba": "2.5.0",
+    "git": "2.43.0"
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.5",
+    "rasterio": "1.4.4",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0",
+    "pytest": "9.1.1",
+    "snakemake": "9.27.0",
+    "PyYAML": "6.0.3",
+    "wall2wall": "0.1.0.dev0"
+  },
+  "identities": [
+    {
+      "path": "06_infra/linux.sh",
+      "sha256": "02666f426055496b0c04be856a7451905be27508f494875e9c0bb0769aa55370"
+    },
+    {
+      "path": "06_infra/environment-linux.yml",
+      "sha256": "092929ca550218879ea775003be7e61d492b090db78b58226d885ea260af6a2a"
+    },
+    {
+      "path": "06_infra/conda-linux-64.lock.txt",
+      "sha256": "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"
+    },
+    {
+      "path": "06_infra/pip-linux-64.lock.txt",
+      "sha256": "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"
+    },
+    {
+      "path": "06_infra/python_header_scope_linux.json",
+      "sha256": "499ff7826aae397649424436632232bf8552e972cc1f43346f461dbb1cd1fd45"
+    },
+    {
+      "path": "06_infra/linux_smoke/run_checks.py",
+      "sha256": "5c3544792f97c8920cd4653911dfa08a2b2260b3adf7adf66d5fdfb97bf301cb"
+    },
+    {
+      "path": "06_infra/linux_smoke/test_linux.py",
+      "sha256": "bc14415b6ef3db14ba700aa55f9428748d6bd8d2e3a5c80196a22a6c66ccef1a"
+    },
+    {
+      "path": "06_infra/check_python_headers.py",
+      "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+    },
+    {
+      "path": "06_infra/python_header_scope.json",
+      "sha256": "7819394343f87973cb84aba781ffce10d2bf3708db908665cc5e56606582e49c"
+    }
+  ],
+  "conda_packages": 115,
+  "pip_artifacts": 48,
+  "canary": {
+    "argv": [
+      "bash",
+      "06_infra/linux.sh",
+      "06_infra/linux_smoke/run_checks.py"
+    ],
+    "passed": 5,
+    "warnings": 1,
+    "seconds": 10.55,
+    "fits": 1,
+    "scratch_final_bytes": 5782728,
+    "scope": "runtime; raster/reprojection/RF; two-process DAG/no-op/error; Git/ledger/lock; discovery guard"
+  },
+  "checks": {
+    "pip_check": "passed",
+    "roadmap_check": "passed",
+    "ledger_check": "passed",
+    "conda_lock_offline_dry_run": "passed",
+    "powershell_wsl_dispatch": "passed"
+  },
+  "wheel": {
+    "filename": "wall2wall-0.1.0.dev0-py3-none-any.whl",
+    "sha256": "ced2a23c1f19218255d297881156d95eaebe90fa94fadfa67b1593fd11810cb8",
+    "bytes": 64605,
+    "import": "passed"
+  },
+  "resources": {
+    "prefix_and_caches_bytes_before_wheel": 2202255360,
+    "limit_bytes": 6442450944,
+    "scratch_peak": "unknown",
+    "rss_peak": "unknown",
+    "tokens": "unknown"
+  },
+  "not_verified": [
+    "full recreation from locks",
+    "scientific package suite on Linux",
+    "LightGBM/XGBoost on Linux",
+    "M006 production/validated on Linux",
+    "Windows/Linux numerical equivalence"
+  ],
+  "acceptance": "architect preparation only; M001 not accepted"
+}
