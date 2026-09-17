@@ -10,10 +10,10 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 243 pruebas: las 221 previas, 21 de calidad y una de escala.
+Sin argumentos exige 251 pruebas: las 243 previas y ocho del workflow Windows.
 --synthetic-only, --spatial-only, --sampling-only, --validation-only, --buffer-only
 y --modeling-only, --selection-only, --engines-only, --engine-integration-only,
---audit-only, --prediction-only, --quality-only y --scale-only seleccionan sus grupos
+--audit-only, --prediction-only, --quality-only, --scale-only y --workflow-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
@@ -165,6 +165,10 @@ QUALITY_REQUIRED = {
     *{f"tests/test_quality.py::test_quality_write_failure[{role}]" for role in ("validity", "out_of_range")},
 }
 SCALE_REQUIRED = {"tests/test_scale.py::test_scale_protocol"}
+WORKFLOW_REQUIRED = {"tests/test_workflow.py::" + name for name in (
+    "test_production_processes_and_reference", "test_noop", "test_content_change_same_mtime",
+    "test_invalid_config_before_fit", "test_corrupt_intermediate_refused", "test_validated_contract",
+    "test_failure_preserves_outputs", "test_fit_budget")}
 
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
@@ -194,8 +198,9 @@ def main():
     group.add_argument("--prediction-only", action="store_true")
     group.add_argument("--quality-only", action="store_true")
     group.add_argument("--scale-only", action="store_true")
+    group.add_argument("--workflow-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED | WORKFLOW_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
@@ -222,6 +227,8 @@ def main():
         target, required = "tests/test_quality.py", QUALITY_REQUIRED
     elif args.scale_only:
         target, required = "tests/test_scale.py", SCALE_REQUIRED
+    elif args.workflow_only:
+        target, required = "tests/test_workflow.py", WORKFLOW_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)
@@ -246,7 +253,7 @@ def main():
             target,
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
-            *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only or args.prediction_only or args.quality_only else []),
+            *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only or args.prediction_only or args.quality_only or args.workflow_only else []),
             "--junitxml", str(scratch / "package.xml"),
         ], plugins=[RequiredTests(required)])
         report = scratch / "scale-validation.json"

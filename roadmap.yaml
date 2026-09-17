@@ -1303,38 +1303,77 @@ milestones:
     notes: El cierre holístico de M005 dejó dos P3 documentales carried. Se admite sólo M006-S00 para corregirlos antes del workflow; M006-S01 conserva su planificación sin emitir. Baseline arquitectónica limitada al cierre de M005 y esta planificación, sin cambios de producto.
   - id: M006-S01
     title: Workflow Snakemake y Pytest por etapas
-    objective: Unir API en un DAG común de artefactos persistidos con entorno fijo por perfil.
+    objective: Integrar un primer DAG de producción y targets Pytest con la API existente, para RF fijo en Windows D014; conservar la reproducción Linux y cualificación integral para las entregas posteriores.
     acceptance:
-    - 'D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.'
-    - 'orchestration.md/V7: preflight, alinear, muestrear, folds, evaluar, ajustar final, predecir
-      y auditar con inputs/outputs/parámetros/código/lock declarados.'
-    - Targets production y validated; Pytest por módulo/regla con recibos ligados a código/pruebas/entorno.
-      Smoke Pytest invoca production sin recursión.
-    - Mismo Python 3.11 del perfil en todas las reglas; scripts llaman API sin duplicación ni operaciones
-      POSIX innecesarias. Hashes detectan cambios sin mtime; límites R3, sin entornos por regla.
-    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    - 'D018 delimita esta ronda: Windows D014, Python 3.11.16, Snakemake 9.27.0 y Pytest 9.1.1 ya instalados. Usar 06_infra/windows.ps1 -PythonArgs en todos los comandos Python. Sin instalar, actualizar dependencias, cambiar locks o afirmar cualificación Linux M001, Windows M008 o cierre M006.'
+    - 'Crear exactamente 08_pkg/workflow/Snakefile, run.py, stages.py y stage_checks.py, 08_pkg/examples/workflow.json, 08_pkg/tests/test_workflow.py y 08_pkg/docs/workflow.md. Se permite actualizar 08_pkg/tests/run_checks.py y 08_pkg/README.md para descubrimiento y uso. No modificar src/wall2wall, algoritmos, pyproject ni pruebas previas. Los wrappers llaman API pública y no duplican geometría, métricas, validación de folds, ajuste o inferencia.'
+    - 'CLI pública: python 08_pkg/workflow/run.py --config <JSON> --run-dir <directorio> --target production|validated, con --dry-run opcional. JSON declarativo estricto sin imports/código arbitrarios: capas/malla, CSV y CRS, respuesta/unidad/soporte/período, particiones, RF fijo, inferencia y locks. Rutas relativas resueltas respecto al archivo de configuración; run-dir externo al checkout y sin solaparse con entradas. No sobrescribir destinos ajenos ni aceptar un parcial como completo.'
+    - 'DAG real: preflight, align_predictors, sample_points, make_spatial_folds, evaluate, fit_final con save_run, predict_raster y auditoría final. Cada regla persiste productos para un proceso posterior con el mismo sys.executable/prefijo; no pasar modelos en memoria entre reglas. Reconstruir folds.csv por sample_id y usar provided_splits en evaluate para acreditar los mismos folds, conservando buffer/exclusiones. No añadir un parámetro inexistente a la API ni usar funciones privadas.'
+    - 'Resolver la dependencia modelo/mapas con un expediente confiable de ajuste guardado antes de predecir; el cierre final es un inventario JSON del workflow que enlaza con rutas relativas, tamaños y SHA-256 el expediente, evaluación y manifiesto/mapas de prediction. No ampliar los roles aceptados por audit.save_run ni reescribir sus manifiestos para introducir mapas. Cierre sólo después de verificar todos los productos; trusted=True sólo para el expediente propio cuya integridad se comprobó.'
+    - 'Preflight se ejecuta antes de cada planificación, incluso dry-run/no-op; hashes incrementales de entradas, scripts, módulos de producto usados, configuración por etapa y locks, sin depender sólo de mtime. Declarar dependencias y recursos Snakemake, --cores 1 --retries 0 --scheduler greedy. Rechazar un entorno/lock distinto al fijado antes de fits. No-op mantiene bytes y mtimes; cambios de contenido con mtime conservado se detectan. Para esta entrega puede rechazar con diagnóstico un run existente cambiado/corrupto y pedir otro run-dir; no borrar/reparar automáticamente ni implementar un gestor propio. Reutilización selectiva y reanudación completa se prueban en M006-S02.'
+    - 'production produce el inventario final. validated depende de production y recibos Pytest de spatial, sampling, validation (incluido buffer), modeling (incluida selección), audit y prediction (incluida calidad). stage_checks.py reutiliza los selectores existentes de tests/run_checks.py, rechaza cero pruebas/IDs ausentes/skips y emite recibos sólo tras éxito, ligados a código, pruebas/fixtures, configuración, locks e intérprete. No falsificar identidades ni reutilizar un recibo obsoleto. Excluir test_workflow.py de esas suites: el full y su smoke invocan sólo production, nunca validated. En esta ronda probar el DAG validated con dry-run y contratos de dependencias/recibos; su ejecución integral en proceso limpio corresponde a M006-S02.'
+    - 'Smoke real del camino documentado: fixture analítica nueva de 16x16, dos predictores continuos y 16 puntos en al menos cuatro bloques, CRS EPSG:32630, semilla 17, dos folds, buffer 0, RF n_estimators=4/max_depth=2/n_jobs=1, sin selección ni permutación, quality=True, ventana 8 y lote 16. Cinco fits por producción (RF+dummy por fold y RF final); cada evaluate max_fits=4. Generar la fixture sólo en scratch desde test_workflow.py. Comparar con llamadas públicas directas: mismos IDs/folds/CRS/máscaras, predicción y métricas con atol=rtol=1e-5, sin umbral de mejora predictiva. Entrenar/guardar y predecir en procesos distintos, y probar rutas con espacios/acentos.'
+    - 'Añadir --workflow-only al lanzador del paquete y exigir ocho IDs estables de test_workflow.py: test_production_processes_and_reference, test_noop, test_content_change_same_mtime, test_invalid_config_before_fit, test_corrupt_intermediate_refused, test_validated_contract, test_failure_preserves_outputs y test_fit_budget. Compartir la producción mediante fixture para no repetir fits; conservar esos ocho nodeids sin parametrización externa y agrupar variantes afines en tablas dentro de cada prueba. Full conserva los 243 IDs previos y añade estos ocho, sin skips. Fallos de regla preservan evidencia y no producen inventario final; ausencia de suite y recibo obsoleto fallan en las pruebas del contrato validated.'
+    - 'D016: cumplir AGENTS.md/Python file headers. Alcance Python nuevo fijado por arquitecto: workflow/run.py, workflow/stages.py, workflow/stage_checks.py y tests/test_workflow.py bajo 08_pkg. El coder añade sólo esas cuatro rutas a 06_infra/python_header_scope.json, sin quitar entradas; tests/run_checks.py ya está incluido. No crear otros Python ni stubs. El gate mantenido valida estructura; reviewer comprueba exactitud y cobertura del manifiesto cambiado, incluida baseline arquitectónica.'
+    - 'Focused: python 08_pkg/tests/run_checks.py --workflow-only y python 06_infra/check_python_headers.py. Full una vez al terminar: python scripts/hermetic_verification.py, que encadena gate, 16 pruebas de infraestructura y suite del paquete ampliada. No ejecutar validated dentro de full ni suites adicionales después sin un fallo/cambio que lo justifique. Declarar comandos observados y límites de evidencia; git diff --check debe pasar.'
+    - 'Presupuesto por ronda: 60 minutos, 20000 tokens medidos o unknown, máximo dos rondas correctivas; 1200 s por invocación de verificación, un fit concurrente/n_jobs=1, GDAL y buffers <=128 MiB cada uno, objetivo RSS <=1 GiB (unknown si no medido), scratch <=512 MiB por suite y ejemplo versionado <=1 MiB. Suite workflow: máximo 40 fits contando procesos y referencia directa, contador/plan verificado antes de ajustes; suites previas conservan sus planes, sin nuevos lotes científicos, canaries, escala manual ni cambios de semillas. Cero red, pagos, datos reales, instalaciones, commit/push o procesos del host terminados. Al agotar un límite conservar evidencia y devolver bloqueo preciso.'
     non_goals:
-    - DAG por píxel, ejecución distribuida o gestores propios.
+    - Selección de motores/candidatos por configuración, Pipelines arbitrarios, DAG por píxel, distribución, nuevos modelos o dependencias.
+    - Reproducción Micromamba/Linux, wheel con workflow incluido, ejecución integral validated, invalidación selectiva/reanudación exhaustiva o cualificación Windows M008 en esta ronda; no reclamar esas garantías.
     read_first:
-    - 00_brief/CONTEXT.md
+    - 00_brief/decisions.md
+    - 00_brief/orchestration.md
     - 00_brief/architecture.md
     - 00_brief/validation.md
     - 08_pkg/CONTEXT.md
-    - 00_brief/decisions.md
-    - 00_brief/orchestration.md
+    - 08_pkg/README.md
+    - 08_pkg/pyproject.toml
+    - 08_pkg/src/wall2wall/spatial.py
+    - 08_pkg/src/wall2wall/sampling.py
+    - 08_pkg/src/wall2wall/validation.py
+    - 08_pkg/src/wall2wall/modeling.py
+    - 08_pkg/src/wall2wall/audit.py
+    - 08_pkg/src/wall2wall/prediction.py
+    - 08_pkg/docs/audit.md
+    - 08_pkg/docs/prediction.md
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/tests/test_package.py
+    - 08_pkg/tests/test_sampling.py
+    - 08_pkg/tests/test_buffer.py
+    - 08_pkg/tests/test_audit.py
+    - 08_pkg/tests/test_prediction.py
+    - 06_infra/windows.ps1
+    - 06_infra/WINDOWS.md
+    - 06_infra/conda-win-64.lock.txt
+    - 06_infra/pip-win-64.lock.txt
+    - 06_infra/windows_smoke/Snakefile
+    - 06_infra/windows_smoke/test_windows.py
+    - 06_infra/check_python_headers.py
+    - 06_infra/python_header_scope.json
+    - 06_infra/run_checks.py
+    - scripts/hermetic_verification.py
     allowed_prefixes:
-    - 08_pkg/workflow/
-    - 08_pkg/tests/
-    - 08_pkg/docs/
-    - 08_pkg/examples/
-    focused: []
+    - 08_pkg/workflow/Snakefile
+    - 08_pkg/workflow/run.py
+    - 08_pkg/workflow/stages.py
+    - 08_pkg/workflow/stage_checks.py
+    - 08_pkg/tests/test_workflow.py
+    - 08_pkg/tests/run_checks.py
+    - 08_pkg/examples/workflow.json
+    - 08_pkg/docs/workflow.md
+    - 08_pkg/README.md
+    - 06_infra/python_header_scope.json
+    focused:
+    - [python, 08_pkg/tests/run_checks.py, --workflow-only]
+    - [python, 06_infra/check_python_headers.py]
+    verification: [python, scripts/hermetic_verification.py]
     kind: code
-    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
-      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+    notes: D018 admite sólo M006-S01 como primera integración Windows D014. El full mantenido ya acreditó 243 pruebas de paquete y 16 de infraestructura en M005-S03 r2; M006-S00 sólo cambió textos. Baseline arquitectónica exacta incluye aceptación/recuperación D017 y preparación D018, sin cambios de producto. Las rutas de workflow son salidas nuevas, no lecturas existentes. Mantener HEAD e índice hasta registrar revisión y aceptación.
   - id: M006-S02
     title: Reproducción limpia, invalidación y reanudación
     objective: Demostrar el camino de producción y pruebas sin depender de una sesión viva.
     acceptance:
+    - 'Completar lo diferido por M006-S01/D018: ejecutar validated integral fuera del full recursivo y acreditar invalidación selectiva, reutilización de modelo al cambiar sólo inferencia, reparación explícita de intermedios y reanudación. Linux requiere M001 cualificado antes de emitir; no sustituir esta puerta por evidencia Windows.'
     - 'D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.'
     - 'V1/V5/V7: wheel fuera del checkout y Micromamba del lock, procesos separados y DAG completo;
       API y workflow producen mismos folds/mapas/métricas dentro de tolerancia 1e-5.'

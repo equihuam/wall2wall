@@ -1,0 +1,86 @@
+import os
+from pathlib import Path
+import sys
+
+sys.path.insert(0, str(Path(workflow.basedir)))
+from stages import CODE, configuration
+from stage_checks import GROUPS, suite_contract
+
+shell.executable(os.environ["WALL2WALL_BASH"])
+PYTHON = Path(sys.executable).as_posix()
+WORKER = (Path(workflow.basedir) / "stages.py").as_posix()
+CHECKER = (Path(workflow.basedir) / "stage_checks.py").as_posix()
+RUN = Path.cwd().as_posix()
+SOURCES = [p.as_posix() for p in CODE]
+INPUTS = [p.as_posix() for p in set(configuration(Path(os.environ["WALL2WALL_CONFIG"]))[2].values())]
+
+rule production:
+    input: "production.json"
+
+rule validated:
+    input: "production.json", expand("pytest-{group}.json", group=GROUPS)
+
+rule preflight:
+    input: "preflight.json", SOURCES, INPUTS
+    output: "preflight.checked"
+    threads: 1
+    resources: mem_mb=128
+    shell: "{PYTHON:q} {WORKER:q} preflight {RUN:q}"
+
+rule align_predictors:
+    input: "preflight.checked", "preflight.json", SOURCES
+    output: "align.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} align {RUN:q}"
+
+rule sample_points:
+    input: "align.json", "preflight.json", SOURCES
+    output: "sample.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} sample {RUN:q}"
+
+rule make_spatial_folds:
+    input: "sample.json", "preflight.json", SOURCES
+    output: "folds.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} folds {RUN:q}"
+
+rule evaluate:
+    input: "sample.json", "folds.json", "preflight.json", SOURCES
+    output: "evaluate.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} evaluate {RUN:q}"
+
+rule fit_final:
+    input: "align.json", "sample.json", "evaluate.json", "preflight.json", SOURCES
+    output: "fit.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} fit {RUN:q}"
+
+rule predict_raster:
+    input: "align.json", "fit.json", "preflight.json", SOURCES
+    output: "predict.json"
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {WORKER:q} predict {RUN:q}"
+
+rule audit_workflow:
+    input: expand("{stage}.json", stage=["align", "sample", "folds", "evaluate", "fit", "predict"]), SOURCES
+    output: "production.json"
+    threads: 1
+    resources: mem_mb=128
+    shell: "{PYTHON:q} {WORKER:q} close {RUN:q}"
+
+rule pytest_stage:
+    input: "production.json", "preflight.json", SOURCES,
+           lambda wildcards: sorted(p.as_posix() for p in suite_contract(wildcards.group)[1])
+    output: "pytest-{group}.json"
+    wildcard_constraints: group="|".join(GROUPS)
+    threads: 1
+    resources: mem_mb=1024
+    shell: "{PYTHON:q} {CHECKER:q} {wildcards.group:q} {RUN:q}"

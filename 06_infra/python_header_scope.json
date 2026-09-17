@@ -25,5 +25,9 @@
   "08_pkg/src/wall2wall/prediction.py",
   "08_pkg/tests/test_prediction.py",
   "08_pkg/tests/test_quality.py",
-  "08_pkg/tests/test_scale.py"
+  "08_pkg/tests/test_scale.py",
+  "08_pkg/workflow/run.py",
+  "08_pkg/workflow/stages.py",
+  "08_pkg/workflow/stage_checks.py",
+  "08_pkg/tests/test_workflow.py"
 ]

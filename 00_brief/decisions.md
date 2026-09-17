@@ -263,3 +263,77 @@ rewrite history when a decision changes.
   conservó su dictamen. No se cambió código, evidencia previa ni historia del ledger,
   ni se repitieron pruebas. La aceptación cubre el esqueleto revisado; D016 y su
   implementación posterior no quedan validados por esa revisión.
+
+## D017 — Recuperación exacta de M006-S00 tras commit anticipado
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario solicita resolver la pregunta de recuperación,
+  preservar evidencia e historial remoto y registrar dictamen y aceptación.
+- Decision: Recuperar el contexto de verificación en un worktree separado y
+  detached en 6400fad7e18cf2cd76abad0b71828b3e56b6ec70. Copiar los bytes actuales
+  de los archivos versionados y el dictamen recibido, sin copiar la pregunta
+  posterior a la verificación ni los entornos o datos ignorados.
+- Evidence: El control existente require_active comprobó HEAD, índice
+  53ff964cee93b9d445bc695aac5ca8104f302482bd6e4addab9a9a93fd0584ed y producto
+  f72c33ce44f0ae3a4c1b0c296d783809798e804a3658c36b12d4f3431418f4ef iguales
+  al recibo M006-S00_r1_verification.json. Dos archivos de infraestructura con
+  CRLF produjeron inicialmente avisos de estado: se refrescaron sus entradas
+  mediante git add exclusivamente en la copia; el diff staged quedó vacío y
+  la identidad del índice siguió coincidiendo con el recibo. No se alteraron
+  los bytes del producto ni el verificador.
+- Result: ledger.py record registró el informe recibido con pass y cero
+  hallazgos abiertos; ledger.py accept registró M006-S00 ronda 1 aceptada, sin
+  --commit. Se trasladaron únicamente los dos eventos generados y la proyección
+  del backlog al checkout principal. Se comprobó que el ledger anterior era
+  un prefijo exacto, SHA-256 bruto
+  69f0544d7f4461edac0a7908b6c011ba77964f73e36fcf5cbb52170f4a5ee816.
+  M005-S02-H1-F1 y M005-S03-H1-F1 quedan closed_by_review por el dictamen
+  05_governance/reviews/m006/M006-S00_r1_review.md. El worktree de recuperación
+  se conserva como evidencia local; su ubicación se consulta con git worktree list.
+- Boundary: Sin reset, force-push, nuevos commits, modificación de recibos o
+  eventos previos, reejecución de pruebas, fits ni nueva revisión. No se invoca
+  ledger.py resolve porque no existía un evento blocked: era un rechazo de
+  integridad en estado reviewing. M006-S01 sigue sin emitir. Esta recuperación
+  no autoriza omitir los controles de identidad en futuras rondas.
+- Prevention: Registrar revisión y aceptación antes de cambiar HEAD o índice;
+  si se solicita commit durante reviewing, resolver primero la secuencia de
+  cierre o preservar explícitamente el contexto verificable.
+
+## D018 — Primera integración Snakemake acotada a Windows D014
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario solicita concretar alcance, lecturas, verificación y
+  presupuestos, validar, previsualizar y emitir M006-S01. El arquitecto admite
+  esta entrega dentro del horizonte v0.1, sin admitir M006-S02 ni cerrar M006.
+- Decision: Implementar el primer camino de producción con RF fijo y las API
+  públicas actuales en Windows D014. La consulta local confirmó Python 3.11.16,
+  Snakemake 9.27.0 y Pytest 9.1.1; no se modificó el entorno. M001 continúa
+  pendiente: la reproducción Linux de M006-S02 exige cualificarlo primero.
+  Esta integración no equivale a cualificación integral Windows M008.
+- Scope: El roadmap fija los archivos, CLI, fixture analítica, IDs de pruebas,
+  presupuestos y scope de encabezados. Se delega al coder únicamente materializar
+  las cuatro adiciones exactas al scope mantenido al crear los nuevos Python.
+  Los scripts de plantilla y la API científica permanecen fuera de escritura.
+- Sequencing: M006-S01 entrega production, estructura validated y comprobación
+  de sus dependencias/recibos. El full sólo ejecuta production desde el smoke.
+  Ejecución integral validated y reanudación/invalidación selectiva pertenecen
+  a M006-S02; mientras tanto un cambio/corrupción en un run existente puede
+  rechazarse explícitamente solicitando otro directorio, sin pérdida de datos.
+- API compatibility: evaluate recibe particiones aportadas mediante fold_config;
+  el wrapper reconstruye los índices desde los IDs persistidos. save_run precede
+  a predict_raster porque éste necesita un expediente confiable. El inventario
+  final del workflow enlaza ambos productos sin extender roles de auditoría ni
+  modificar manifiestos existentes. No introducir APIs o serializaciones
+  inseguras nuevas para resolver la orquestación.
+- Verification: Reutilizar el full mantenido y la infraestructura cualificada;
+  M005-S03 ronda 2 acredita 243 pruebas de paquete y 16 de infraestructura,
+  y M006-S00 sólo alteró documentación. La suite nueva debe incorporarse al
+  descubrimiento obligatorio; su ejecución y la del full corresponden al coder
+  y al recibo posterior, no se declaran ya aprobadas. Sin nuevas pruebas
+  científicas ni canaries arquitectónicos durante esta preparación.
+- Baseline: Atribuir mediante --allow-dirty únicamente los archivos concretos
+  de gobernanza de la recuperación/aceptación D017 y de esta preparación,
+  después de inspeccionar el diff y la vista previa. No modificar HEAD o índice
+  durante la ronda hasta registrar revisión y aceptación.

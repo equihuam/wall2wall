@@ -11,7 +11,8 @@ portable con procedencia e integridad comprobadas. `wall2wall.prediction.predict
 produce mapas GeoTIFF por ventanas desde ese expediente y predictores alineados.
 El modo opcional `quality=True` añade validez y alerta univariada min/max ligada
 al ajuste final. Hay un protocolo técnico de escala 1024×1024×8 y 2048×2048×8;
-la CLI y el workflow de producción siguen pendientes. La cualificación Linux M001 y la
+la CLI y el primer workflow RF fijo Windows se describen en [workflow.md](docs/workflow.md).
+La ejecución integral validated y la reanudación quedan para M006-S02. La cualificación Linux M001 y la
 cualificación integral Windows M008 siguen pendientes; la comprobación corresponde
 al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -34,7 +35,7 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 243 IDs: los 221 previos (188 más 33 de inferencia), 21 de
+El lanzador exige 251 IDs: ocho de workflow y los 243 previos: 221 (188 más 33 de inferencia), 21 de
 calidad y uno que ejecuta ambos tamaños de escala. Los 188 incluyen 151 previos
 y 37 de auditoría. Los primeros 151 son
 once de distribución, veintiuno del generador, veinticuatro
