@@ -1,0 +1,86 @@
+[
+  {
+    "slice": "M003-S01",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "e6325d44040f4a917f82e0e5450e41f19ebfe76ff01ea220543cc4e58f0282eb",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S01",
+    "path": "08_pkg/README.md",
+    "sha": "fab347b968f672396ae5935fab3b1fdec415dc7a009a243ce54ebd216e605f94",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S01",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "b9a2018badb3e8e48b7e363ca4923da7347303316c610c1d48a108b17c17bd04",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S01",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "8eed420d63a29d3149a9507b3f6b00fef8ada9062d41d300d6d6a47fb9427e61",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S01",
+    "path": "08_pkg/src/wall2wall/validation.py",
+    "sha": "a3f84b6e0a7cd16ebcb1489f73ba708f050bfc3ca8c410eb34acdcb8380aa2e4",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M003-S01",
+    "path": "08_pkg/tests/test_validation.py",
+    "sha": "4e86cebda925610ca29829ad0fdf701133ac59bf60261ce2984bc2b4af812e03",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "4527c2dcc14bcd0c7d5ac367763e772d9dd8a6ae176f420549f1aa9db2978f89",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "08_pkg/README.md",
+    "sha": "ad3ffae86d1f714a45e49b1be8d33f99991992e2e37dc2986cb3e809588a8954",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "08_pkg/src/wall2wall/validation.py",
+    "sha": "155e15717e5604d340b759787f4e8e89e8b66328711dd195ff44f8a1fb3c6fb8",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "7d2965b3f582c1dc81ede7ef2b1475022ee0f7c369d4186bae7944e5fc251a22",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "aa65451c4ffd9c18054905f31c006d846f799c51b7cd67d0fa68b4b46409a412",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M003-S02",
+    "path": "08_pkg/tests/test_buffer.py",
+    "sha": "d74a49db723855229e7a42d8f80a826a7cdeaf7c6a636f690c976936623047ad",
+    "kind": "added",
+    "round": 1
+  }
+]
