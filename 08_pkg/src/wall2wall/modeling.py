@@ -21,6 +21,8 @@ archivos ni realizar evaluación. El RF predeterminado usa configuración fija.
 Selección finita opt-in, sin early stopping, modelos persistidos ni mapas. Cada fold ajusta
 clones nuevos y usa sólo train, incluido el preprocesamiento de Pipeline.
 Tablas en memoria, un ajuste concurrente y n_jobs=1; RAM nativa no medida.
+Los motores opcionales se validan para CPU sin parada temprana; sus versiones
+se registran sólo cuando participan, también como componentes de Pipeline.
 =============================================================================
 """
 import copy
@@ -31,6 +33,7 @@ from numbers import Integral, Real
 import os
 from pathlib import Path, PurePosixPath, PureWindowsPath
 import platform
+import sys
 
 import numpy as np
 import pandas as pd
@@ -98,8 +101,46 @@ def _table_data(table, schema):
     return X, y, metadata, response
 
 
-def _control(name, value):
+def _engine(estimator):
+    """Recognize actual loaded engine base classes without importing optional modules."""
+    for cls in type(estimator).__mro__:
+        engine = cls.__module__.split(".")[0]
+        module = sys.modules.get(cls.__module__)
+        if engine in {"lightgbm", "xgboost"} and getattr(module, cls.__name__, None) is cls:
+            return engine
+    return None
+
+
+def _control(name, value, engine=None):
     name = name.rsplit("__", 1)[-1]
+    if engine:
+        if name in {"early_stopping_rounds", "early_stopping_round", "early_stopping", "n_iter_no_change"}:
+            inactive = (isinstance(value, Integral) and not isinstance(value, (bool, np.bool_)) and value <= 0
+                        if engine == "lightgbm" else value is None)
+            if not inactive:
+                raise ValueError(f"{name} must be inactive for {engine}")
+            return
+        if name in {"nthread", "num_threads", "num_thread", "nthreads"}:
+            if isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or value != 1:
+                raise ValueError(f"{name} must be 1")
+        if name in {"device", "device_type"} and value != "cpu":
+            raise ValueError(f"{name} must be cpu")
+        if name == "gpu_id" and value is not None and (isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or value != -1):
+            raise ValueError("gpu_id must be None or -1")
+        if name == "predictor" and value not in (None, "cpu_predictor"):
+            raise ValueError("predictor must be CPU")
+        if name == "updater" and value is not None:
+            raise ValueError("custom updater is not supported")
+        if name == "tree_method" and value not in (None, "auto", "hist", "exact", "approx"):
+            raise ValueError("tree_method must be CPU")
+        if name in {"objective", "application", "app", "loss"}:
+            allowed = (None, "regression") if engine == "lightgbm" else ("reg:squarederror",)
+            if not isinstance(value, (str, type(None))) or value not in allowed:
+                raise ValueError("only the fixed regression objective is supported")
+        if name in {"boosting_type", "boosting", "boost", "booster"}:
+            allowed = ("gbdt",) if engine == "lightgbm" else (None, "gbtree")
+            if value not in allowed:
+                raise ValueError("only the fixed tree booster is supported")
     if name == "random_state" and (isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or value < 0):
         raise ValueError("exposed random_state must be a nonnegative integer")
     if name == "n_jobs" and (isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or value != 1):
@@ -134,10 +175,18 @@ def _describe(value, active=None):
             if is_classifier(value):
                 raise ValueError("classifiers are not supported")
             parameters = value.get_params(deep=False)
-            for name, parameter in value.get_params(deep=True).items():
-                _control(name, parameter)
-            return {"class": type(value).__module__ + "." + type(value).__qualname__,
-                    "parameters": {name: _describe(parameter, active) for name, parameter in parameters.items()}}
+            # Each nested estimator is visited recursively with its own engine context.
+            for name, parameter in parameters.items():
+                _control(name, parameter, _engine(value))
+            encoded = {}
+            for name, parameter in parameters.items():
+                # XGBoost's constructor uses NaN as its native missing-value sentinel.
+                # Inputs remain finite; encode this one parameter without JSON NaN.
+                if _engine(value) == "xgboost" and name == "missing" and isinstance(parameter, Real) and math.isnan(parameter):
+                    encoded[name] = {"sentinel": "NaN"}
+                else:
+                    encoded[name] = _describe(parameter, active)
+            return {"class": type(value).__module__ + "." + type(value).__qualname__, "parameters": encoded}
         if isinstance(value, (list, tuple, np.ndarray)):
             return [_describe(item, active) for item in value]
         if isinstance(value, dict) and all(isinstance(key, str) for key in value):
@@ -162,6 +211,26 @@ def _model(estimator):
     except Exception as error:
         raise ValueError("unsupported estimator configuration: " + str(error)) from error
     return estimator, description
+
+
+def _versions(estimators):
+    names = {"numpy", "pandas", "rasterio", "scikit-learn", "joblib"}
+    pending, seen = list(estimators), set()
+    while pending:
+        value = pending.pop()
+        if id(value) in seen:
+            continue
+        seen.add(id(value))
+        if hasattr(value, "get_params"):
+            engine = _engine(value)
+            if engine:
+                names.add(engine)
+            pending.extend(value.get_params(deep=False).values())
+        elif isinstance(value, (list, tuple)):
+            pending.extend(value)
+        elif isinstance(value, dict):
+            pending.extend(value.values())
+    return {"python": platform.python_version(), **{name: importlib.metadata.version(name) for name in sorted(names)}}
 
 
 def _metrics(observed, predicted):
@@ -447,8 +516,7 @@ def evaluate(table, schema, output_dir, *, fold_config, estimator=None, candidat
     manifest = {"schema": "wall2wall.evaluation/1", "predictors": predictors, "response": response,
                 "estimator": description, "dummy": {"class": "sklearn.dummy.DummyRegressor", "parameters": _describe(dummy.get_params(deep=False))},
                 "fold_config": config_description, "samples": len(table), "fit_counts": {**fit_counts, "total": sum(fit_counts.values())},
-                "versions": {"python": platform.python_version(), **{name: importlib.metadata.version(name)
-                              for name in ("numpy", "pandas", "rasterio", "scikit-learn", "joblib")}},
+                "versions": _versions(models if nested else [model]),
                 "columns": [{"name": name, "dtype": str(oof[name].dtype)} for name in oof.columns],
                 "products": {"oof": "oof_predictions.csv", "metrics": "metrics.json", "folds": "folds/manifest.json"},
                 "resources": {"concurrent_fits": 1, "native_peak_memory": "unknown", "tables": "in memory"}}
@@ -490,6 +558,7 @@ def select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fi
     name = descriptions[winner]["name"]
     fitted = _budgeted_fit(models[winner], X.copy(), y.copy(), f"select_and_fit refit candidate={name}", output, budget)
     manifest = {"schema": "wall2wall.selection_fit/1", "predictors": predictors, "response": response,
+                "versions": _versions(models),
                 "candidates": descriptions, "fold_config": _describe(config), "selected_candidate": name,
                 "criterion": "minimum pooled inner OOF RMSE; exact ties use candidate order",
                 "interpretation": "internal selection only; no external generalization estimate",

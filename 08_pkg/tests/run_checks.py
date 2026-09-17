@@ -10,9 +10,9 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 138 pruebas: las 127 previas y once del contrato de motores.
+Sin argumentos exige 151 pruebas: las 138 previas y trece de motores reales.
 --synthetic-only, --spatial-only, --sampling-only, --validation-only, --buffer-only
-y --modeling-only, --selection-only y --engines-only seleccionan sus grupos
+y --modeling-only, --selection-only, --engines-only y --engine-integration-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
@@ -119,6 +119,15 @@ ENGINES_REQUIRED = {
       for engine in ("lightgbm", "xgboost")},
 }
 
+ENGINE_INTEGRATION_REQUIRED = {
+    *{f"tests/test_engine_integration.py::{name}" for name in (
+        "test_profile", "test_nested_two_families", "test_select_pipeline_versions",
+        "test_version_discovery_without_optional_imports", "test_z_fit_plan")},
+    *{f"tests/test_engine_integration.py::{name}[{engine}]"
+      for name in ("test_direct_real_split", "test_fixed_repeat_and_permutation", "test_final_fixed", "test_unsafe_controls_before_fit")
+      for engine in ("lightgbm", "xgboost")},
+}
+
 # Reuse the maintained infrastructure guard, including its zero/missing-ID check.
 _RequiredTests = runpy.run_path(str(ROOT / "06_infra/run_checks.py"))["RequiredTests"]
 
@@ -142,8 +151,9 @@ def main():
     group.add_argument("--modeling-only", action="store_true")
     group.add_argument("--selection-only", action="store_true")
     group.add_argument("--engines-only", action="store_true")
+    group.add_argument("--engine-integration-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
@@ -160,6 +170,8 @@ def main():
         target, required = "tests/test_selection.py", SELECTION_REQUIRED
     elif args.engines_only:
         target, required = "tests/test_engines.py", ENGINES_REQUIRED
+    elif args.engine_integration_only:
+        target, required = "tests/test_engine_integration.py", ENGINE_INTEGRATION_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)
@@ -184,7 +196,7 @@ def main():
             target,
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
-            *(["-rP"] if args.modeling_only or args.selection_only else []),
+            *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only else []),
             "--junitxml", str(scratch / "package.xml"),
         ], plugins=[RequiredTests(required)])
         size = sum(path.stat().st_size for path in scratch.rglob("*") if path.is_file())

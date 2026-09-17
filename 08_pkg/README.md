@@ -15,8 +15,9 @@ El núcleo declarado es NumPy, pandas, Rasterio, scikit-learn y joblib. Importar
 `wall2wall` no carga Snakemake, LightGBM ni XGBoost. Pytest, build, setuptools,
 wheel y Snakemake son herramientas del entorno fijo, separadas del núcleo.
 Los extras separados son `lightgbm` (lightgbm>=4) y `xgboost` (xgboost>=2).
-Estas cotas expresan API requerida; no acreditan todas las versiones ni soporte
-real de motores en Windows/Linux. La cualificación real está pendiente de M004-S04.
+Estas cotas expresan API requerida, no compatibilidad de todas las versiones.
+La suite real exige LightGBM 4.6.0 y XGBoost 3.1.3 en Windows D014/Python 3.11;
+no acredita Linux ni cualificación integral Windows M008.
 No se añaden ni resuelven dependencias durante estas pruebas.
 
 ## Verificación Windows
@@ -28,10 +29,10 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 138 IDs: once de distribución, veintiuno del generador, veinticuatro
+El lanzador exige 151 IDs: once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
 de buffer/particiones aportadas, doce de modelado fijo, diez de selección/permutación
-y once del contrato offline de motores.
+y once del contrato offline de motores y trece de integración con motores reales.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -461,7 +462,7 @@ tree_method="hist", device="cpu" y n_jobs=1; profundidad None se traduce a 0.
 Ambos reciben árboles, semilla y tasa explícitos. La fábrica no llama fit ni
 activa early stopping, callbacks o eval_set; no añade wrappers ni registros.
 
-La integración prevista es por objetos: entregar el resultado como `estimator`
+La integración es por objetos: entregar el resultado como `estimator`
 a evaluate/fit_final o como `candidates[i]["estimator"]` a evaluate/select_and_fit,
 respetando sus validaciones existentes. Ejemplo de construcción, sólo cuando el
 motor esté disponible en un entorno cualificado:
@@ -481,17 +482,81 @@ no hay fallback ni se presentan como motor ausente.
 
 Las pruebas offline usan imports bloqueados y dobles mínimos de constructor:
 acreditan parámetros, identidad del retorno, cero fits e importación ligera en
-proceso fresco. El wheel comprueba API instalada y marcadores de extras sin
-añadir ajustes. Los dobles no acreditan clone/fit/predict ni compatibilidad real.
-M004-S04 debe cualificar ambos motores; este contrato no cierra ese trabajo ni
-promete soporte Windows/Linux. No se instalan extras desde las pruebas.
+proceso fresco. Los dobles no acreditan clone/fit/predict ni compatibilidad real.
+La suite real separada descrita abajo ejecuta esas operaciones con las versiones
+exactas preparadas. El wheel conserva el contrato de importación ligera y añade
+dos fits mínimos reales, uno por motor. No se instalan extras desde las pruebas.
 
 ```powershell
 .\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--engines-only')
 ```
 
 Este modo es mutuamente excluyente con los focused anteriores. El full conserva
-las 127 pruebas previas, sus ajustes y las 16 pruebas de infraestructura.
+las pruebas previas, sus ajustes y las 16 pruebas de infraestructura.
+
+### Perfil real de motores en Windows
+
+La preparación arquitectónica está documentada en
+[ENGINES-WINDOWS.md](../06_infra/ENGINES-WINDOWS.md) y
+[engines-windows-validation.json](../06_infra/engines-windows-validation.json).
+Para recrear un entorno nuevo se aplican los locks core Conda/pip de D014 y
+después el overlay con hashes `06_infra/pip-engines-win-64.lock.txt`, sin actualizar
+dependencias. El procedimiento completo está en [WINDOWS.md](../06_infra/WINDOWS.md).
+Las pruebas no preparan ni reparan el entorno: ausencia de motor, versión distinta,
+error nativo o skip falla. La distribución mantiene ambos motores como extras.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--engine-integration-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+El focused real exige trece pruebas con versiones exactas 4.6.0/3.1.3, CPU y un
+hilo. La fixture tiene 128 filas, p01=i/127, p02=i módulo 2 y respuesta=3*p01+p02;
+coordenadas (i+0.5,0.5), celdas de 1 m en EPSG:32630. Cuatro árboles, profundidad
+dos, tasa 0.1 y semilla 17 quedan fijados. El ajuste directo exige divisiones y
+predicciones no constantes; no hay umbral de precisión ni comparación de habilidad.
+Los dos folds externos son mitades contiguas aportadas, bloques de 16 m y buffer
+1.1 m: la exclusión del grupo fronterizo deja 48 filas de entrenamiento por fold.
+Los internos se generan con bloques de 8 m, dos folds, semilla 17 y buffer 0.5 m.
+
+Plan por invocación: 47 llamadas fit (2 directas, 16 en evaluaciones fijas y sus
+repeticiones, 12 en evaluación anidada, 2 fit_final y 15 en select_and_fit contando
+Pipeline/StandardScaler/motor). Corte antes de 64, sin reintentos automáticos.
+La repetición exige iguales particiones y predicciones con atol=rtol=1e-6 en este
+mismo entorno. Permutación de una repetición no añade fits. El wheel agrega dos
+ajustes mínimos sobre su fixture existente y conserva el ajuste dummy anterior.
+Las suites previas mantienen sus presupuestos de 45 y 78 por separado.
+
+Observado en el focused real de esta entrega: 13 pruebas aprobadas, 47 fits,
+divisiones y predicciones no constantes de ambos motores en el ajuste directo.
+Las particiones internas pequeñas pueden producir árboles constantes en LightGBM;
+es un resultado permitido, sin retocar mínimos de hoja. Pipeline puede emitir el
+aviso de nombres de columnas de LightGBM al recibir arrays de StandardScaler.
+Esta evidencia técnica no afirma utilidad predictiva, causalidad, compatibilidad
+de todas las versiones de extras, Linux ni M008. RAM nativa y scratch pico unknown.
+
+La validación de modeling se aplica también a motores aportados directamente y
+dentro de Pipeline. n_jobs y aliases nthread/num_threads/num_thread/nthreads,
+cuando aparecen, deben ser enteros exactamente 1, sin booleanos. device/device_type
+deben ser "cpu"; se rechazan GPU, tree_method GPU, predictor GPU y updater explícito.
+gpu_id sólo admite None o -1. No se reciben kwargs de fit, callbacks ni eval_set;
+estos últimos parámetros de constructor sólo admiten None.
+
+Para LightGBM, early_stopping_rounds/early_stopping_round/early_stopping/
+n_iter_no_change explícitos sólo admiten enteros <=0, sin booleanos. Para XGBoost
+sólo se admite None: cero no se trata como desactivación segura de su callback.
+Se conserva la regla previa de warm_start inactivo y la configuración RF fija.
+Los objetivos admitidos son regression o None (predeterminado) en LightGBM y
+reg:squarederror en XGBoost; aliases de objetivo también se validan. Se excluyen
+ranking, clasificación, funciones objetivo y boosters distintos de gbdt/gbtree.
+
+Los manifiestos de evaluate y select_and_fit incluyen versiones core y sólo las
+versiones de motores presentes en los estimadores utilizados, también anidados
+en Pipeline. La inspección no importa motores no utilizados ni infiere pertenencia
+de texto en parámetros. XGBoost usa NaN como valor nativo del parámetro missing:
+se representa como `{"sentinel": "NaN"}` en JSON estricto; las entradas siguen
+exigiendo valores finitos y otros parámetros no finitos continúan rechazándose.
+El alcance D016 conserva veinte entradas y añade test_engine_integration.py.
 
 ### Evaluación y ajuste con configuración fija
 
@@ -526,7 +591,7 @@ con rutas absolutas. No se promete soporte universal de estimadores.
 
 random_state expuesto debe ser entero >=0 y n_jobs expuesto debe ser 1, también
 en componentes anidados; no booleanos. warm_start y early_stopping deben estar
-inactivos. No admite fit kwargs, callbacks, eval_set ni extras. La selección
+inactivos. No admite fit kwargs, callbacks ni eval_set. La selección
 opt-in se limita a los candidatos explícitos descritos más abajo.
 Cada fold usa clones nuevos. Pipeline ajusta su preprocesamiento sólo con train;
 los originales permanecen sin ajustar y nunca se ajusta globalmente antes de CV.
@@ -587,7 +652,8 @@ científico R4 ni prueba de utilidad ecológica.
 La suite modeling planifica 45 llamadas fit por invocación: 12 RF, 19 dummy,
 12 espías de regresor (incluidos cuatro intentos de fallo controlado) y 2 de
 transformador. Un contador impide superar 64 antes de ajustar y contrasta el
-total al terminar el protocolo. El wheel añade sólo un ajuste dummy mínimo.
+total al terminar el protocolo. El wheel conserva el ajuste dummy mínimo y añade
+dos ajustes de motores reales en el perfil ampliado.
 Después de un fallo de prueba se detienen los casos modeling siguientes.
 Un hilo y un ajuste concurrente; tablas en memoria, RAM nativa y scratch pico
 `unknown`. No cualifica Linux ni escala de producción.
@@ -696,8 +762,8 @@ variables con estas importancias y reclamar el mismo OOF como independiente.
 La suite selection planifica 78 llamadas fit por invocación, incluyendo Pipeline,
 regresores, transformadores, dummy e intento fallido. Su contador corta antes de
 superar 80; las pruebas se detienen tras un fallo. La suite previa conserva sus
-45 ajustes y el wheel su único ajuste mínimo: comprueba la nueva API sin fits
-adicionales. Fixtures analíticas, sin nuevos lotes científicos; un hilo y un
+45 ajustes; el wheel conserva el ajuste mínimo previo y añade los dos motores
+reales descritos arriba. Fixtures analíticas, sin nuevos lotes científicos; un hilo y un
 ajuste concurrente. RAM nativa y scratch pico: unknown; el lanzador informa
 scratch final. Se conservan los diecisiete encabezados previos y se añade el de
 test_selection.py al alcance explícito.

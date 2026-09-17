@@ -99,6 +99,52 @@ ni `pip install -U` dentro del entorno utilizado para producción.
 
 ## Uso cotidiano
 
+### Perfil ampliado M004-S04
+
+Además del core D014, la verificación del producto exige LightGBM 4.6.0 y XGBoost
+3.1.3, Windows x64/Python 3.11.16. Los extras de la distribución siguen siendo
+opcionales. La preparación del arquitecto, pip check, conservación de dependencias
+y full anterior están registrados en [ENGINES-WINDOWS.md](ENGINES-WINDOWS.md) y
+[engines-windows-validation.json](engines-windows-validation.json).
+
+Reproducción en un prefijo nuevo: completar primero los locks
+`conda-win-64.lock.txt` y `pip-win-64.lock.txt` mediante el procedimiento anterior;
+después aplicar `pip-engines-win-64.lock.txt` con hashes, sin resolver dependencias:
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('-m', 'pip', '--isolated', 'install', '--require-hashes', '--no-deps', '--only-binary=:all:', '--disable-pip-version-check', '--no-cache-dir', '-r', '06_infra/pip-engines-win-64.lock.txt')
+.\06_infra\windows.ps1 -PythonArgs @('-m', 'pip', 'check')
+```
+
+Son instrucciones de preparación para el propietario; el coder y las pruebas
+no ejecutan instalación ni cambian el entorno preparado. Los locks históricos
+permanecen separados e intactos. Un motor ausente, versión distinta, fallo nativo
+o skip provoca fallo, sin fallback ni reparación automática.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--engine-integration-only')
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--engines-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+El focused real de M004-S04 pasó trece pruebas y 47 llamadas fit: motores nativos,
+clones, divisiones sobre 128 filas, predicciones no constantes, evaluación espacial
+fija repetida, selección anidada, fit_final, select_and_fit con Pipeline y
+permutación sin fits extra. Protocolo fijo: cuatro árboles, profundidad dos,
+tasa 0.1, semilla 17 y dos predictores. Los detalles están en `08_pkg/README.md`.
+No exige superioridad de precisión. El focused offline conserva once pruebas
+sin entrenamientos y no sustituye la evidencia nativa.
+
+La suite real corta antes de 64 fits, incluidos Pipeline/pasos y dummy; el wheel
+añade dos fits reales mínimos a su ajuste dummy previo. Full exige 151 pruebas
+del paquete y 16 de infraestructura, conserva presupuestos anteriores y se limita
+a 1200 s y 512 MiB de scratch externo. Un hilo y un fit concurrente; RAM nativa
+y scratch máximos unknown. No hay modelos persistidos, datos reales ni GPU.
+Esta comprobación de versiones concretas no cualifica Linux, todas las versiones
+admitidas por extras ni la integración integral de Windows M008.
+
+### Comandos generales
+
 D015 habilita el full oficial de la baseline y el primer ejercicio M002-S01:
 
 ```powershell

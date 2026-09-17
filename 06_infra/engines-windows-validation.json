@@ -1,0 +1,65 @@
+{
+  "schema": "wall2wall.engines-preparation/1",
+  "date": "2026-09-17",
+  "platform": "Windows x64",
+  "python": "3.11.16",
+  "versions": {
+    "lightgbm": "4.6.0",
+    "xgboost": "3.1.3"
+  },
+  "pip_check": "pass",
+  "previous_distributions_preserved": 86,
+  "installation": "hash-checked wheels, no dependencies, no cache",
+  "installed_engine_bytes": 113758661,
+  "wheel_bytes": 73463502,
+  "canary": {
+    "python": "3.11.16",
+    "engines": [
+      {
+        "engine": "lightgbm",
+        "version": "4.6.0",
+        "fits": 1,
+        "finite_predictions": 32,
+        "class": "LGBMRegressor"
+      },
+      {
+        "engine": "xgboost",
+        "version": "3.1.3",
+        "fits": 1,
+        "finite_predictions": 32,
+        "class": "XGBRegressor"
+      }
+    ],
+    "seconds": 2.577999999994063,
+    "total_fits": 2
+  },
+  "full": {
+    "exit": 0,
+    "seconds": 117.2067093,
+    "package_tests": 138,
+    "infrastructure_tests": 16,
+    "warnings": 18,
+    "scratch_final_bytes": 20238841
+  },
+  "product_stable": true,
+  "witness_files": 38,
+  "product_witness_sha256": "b3e05aec0889d4a2ea9781bc59da9c20e70c3117d36ef107a93e239d6e30dbbd",
+  "lock_sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c",
+  "limits": {
+    "installation_seconds": 1200,
+    "additional_disk_bytes": 536870912,
+    "fits": 2,
+    "full_seconds": 1200,
+    "full_scratch_bytes": 536870912
+  },
+  "unknown": [
+    "peak_rss",
+    "peak_disk",
+    "peak_scratch",
+    "tokens"
+  ],
+  "limitations": [
+    "LightGBM 32-row canary built no splits; nonconstant native tree test required in M004-S04",
+    "No Linux or integral Windows M008 qualification"
+  ]
+}

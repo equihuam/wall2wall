@@ -16,7 +16,8 @@ ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en 
 Comprueba además particiones aportadas con exclusiones por buffer positivo.
 Verifica fit_final y predicción desde el wheel con un único ajuste dummy mínimo.
 Comprueba disponibilidad de select_and_fit y opciones de evaluate sin fits extra.
-Verifica engines instalado, import ligero y metadatos de extras sin importarlos.
+Verifica engines instalado, import ligero y metadatos antes de importar extras.
+Después ajusta una vez cada motor real CPU del perfil fijo y predice desde el wheel.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -179,6 +180,20 @@ final_model = wall2wall.modeling.fit_final(
 assert final_model["predictors"] == ["p01"]
 np.testing.assert_array_equal(final_model["estimator"].predict(sampled["table"][["p01"]]), [2.5, 2.5])
 assert final_model["response"]["name"] == "response"
+forbidden.remove("lightgbm")
+forbidden.remove("xgboost")
+engine_fits = 0
+for engine, version in (("lightgbm", "4.6.0"), ("xgboost", "3.1.3")):
+    assert importlib.metadata.version(engine) == version
+    original = wall2wall.engines.make_regressor(engine, n_estimators=4, random_state=17,
+                                               max_depth=2, learning_rate=.1)
+    assert engine_fits < 2
+    engine_fits += 1
+    fitted = wall2wall.modeling.fit_final(sampled["table"], sampled["schema"], estimator=original)
+    assert fitted["estimator"] is not original
+    prediction = fitted["estimator"].predict(sampled["table"][["p01"]])
+    assert prediction.shape == (2,) and np.isfinite(prediction).all()
+assert engine_fits == 2
 '''
     result = subprocess.run(
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],

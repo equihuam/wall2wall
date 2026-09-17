@@ -1,0 +1,5 @@
+# Optional engines for the existing Windows D014 / Python 3.11 profile.
+# Windows wheels only; install with --require-hashes --no-deps --only-binary=:all:.
+# Candidate pins; qualification status is recorded separately.
+lightgbm==4.6.0 --hash=sha256:37089ee95664b6550a7189d887dbf098e3eadab03537e411f52c63c121e3ba4b
+xgboost==3.1.3 --hash=sha256:3fe349b4c6030f0d66e166a3a6b7d470e776d530ea240d77335e36144cbe132a

@@ -264,17 +264,26 @@ Non-goals:
 
 ### M004-S04 — Cualificación real de LightGBM y XGBoost
 
-Soportar ambos motores con el mismo contrato de evaluación.
+Verificar ambos motores CPU reales con las APIs públicas de evaluación y ajuste, en Windows Python 3.11 fijo.
 
 Acceptance:
-- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
-- Extras separados e imports perezosos; core funciona sin ellos y elección sin extra produce error accionable.
-- Perfil extras instala y prueba ambos en entorno exacto; clone/fit/predict, CV espacial, semillas e hilos satisfacen V4 con datos pequeños.
-- Desactivar/rechazar early stopping y eval_set/callbacks incompatibles con CV; n_estimators explícito. Actualizar full con perfil extras obligatorio para aceptar esta tarea.
-- Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+- El arquitecto prepara antes de emitir el perfil Windows D014 más lightgbm==4.6.0 y xgboost==3.1.3, mediante pip-engines-win-64.lock.txt con hashes y sin actualizar dependencias existentes. Se requiere evidencia de instalación, pip check, dos ajustes técnicos y full previo estable. Si falta esta preparación no emitir; las pruebas del coder nunca instalan paquetes.
+- Mantener el core importable sin motores. Perfil de verificación Windows de esta entrega exige ambos motores y versiones exactas del lock; ausencia, versión distinta, error nativo o skip falla. Distribución core conserva extras opcionales; no convertirlos en dependencias obligatorias ni modificar locks históricos.
+- Crear test_engine_integration.py con motores reales construidos por make_regressor. Verificar clase, clon nuevo, get_params, fit/predict finitos, semilla explícita, CPU y un hilo. Conservar originales sin ajustar y tablas/esquema inmutables; no usar mocks para acreditar ejecución nativa.
+- Usar fixtures analíticas pequeñas propias, <=128 filas, dos predictores, bloques explícitos, semilla 17, n_estimators=4, max_depth=2 y learning_rate=0.1. Sin umbral de superioridad, optimización del protocolo ni lotes científicos nuevos. Conservar los protocolos de las 138 pruebas previas. Para el fit directo de cada motor usar 128 filas y relación no constante; exigir al menos una división de árbol y predicciones no constantes, sin buscar un umbral de precisión. La prueba de preparación de 32 filas no acredita divisiones LightGBM.
+- Cada motor pasa evaluate fijo con dos folds espaciales y buffer positivo viable; comprobar cobertura OOF por ID, predicciones finitas y métricas CSV/JSON coherentes, sin reutilizar estimadores ajustados. Repetir una vez por motor en destino nuevo y exigir mismas particiones y predicciones dentro de atol=1e-6, rtol=1e-6 sólo en el mismo entorno.
+- evaluate anidado usa exactamente dos candidatos, uno por familia, dos folds externos y dos internos, con elección interna y exportación del ganador por fold. Probar fit_final para ambos motores y select_and_fit con ambos candidatos sobre dos folds; no escoger ganador global con métricas externas. Una permutación externa mínima verifica diagnóstico finito sin fits adicionales, sin afirmar importancia causal.
+- Revisar y cerrar de forma acotada en modeling.py la validación de parámetros que puedan activar early stopping, callbacks, eval_set, GPU o hilos no acotados en estimadores de estos motores aportados directamente o dentro de Pipeline. Rechazar early_stopping_rounds activo y aliases LightGBM early_stopping_round/early_stopping/n_iter_no_change activos. Considerar aliases nthread/num_threads/num_thread/nthreads y device/device_type; no permitir que anulen un hilo y CPU. Documentar valores inactivos aceptados según contrato real. Pruebas negativas demuestran rechazo antes del primer fit, conservando configuración fija RF y validación existente.
+- La API no recibe fit kwargs, eval_set ni callbacks; no añadir soporte de early stopping, warm starts, GPU, ranking, clasificación o funciones objetivo personalizadas. Reutilizar helpers locales y validación existente; evitar wrapper o duplicación del flujo. Los cambios permitidos son compatibilidad/validación, no fórmulas ni selección.
+- Manifiestos de evaluate/select_and_fit registran versiones de motores efectivamente utilizados junto con versiones core y parámetros, incluso dentro de Pipeline, sin importar motores no utilizados. Comprobar JSON estricto y ausencia de rutas locales. No falsificar versión cuando un estimador no pertenece a esos motores.
+- Añadir --engine-integration-only al lanzador, mutuamente excluyente con modos previos, con IDs explícitos nuevos. Full exige suite real y las 138 pruebas previas más 16 de infraestructura. Ningún importorskip, skip o omisión condicional si faltan extras. El focused offline --engines-only mantiene sus once pruebas sin ajustes nuevos.
+- Ampliar test_installed_wheel con dos fits mínimos reales, uno por motor, y predicción en proceso fresco usando el wheel instalado y dependencias del prefijo. Conserva todos sus chequeos anteriores, no instala extras ni descarga, y comprueba origen fuera del checkout. No persistir modelos ni alterar el entorno.
+- Suite nueva <=64 llamadas fit por invocación, incluidos clones, refits, dummy, Pipeline/pasos e intentos fallidos; declarar plan e instrumentar corte antes del límite. Wheel hasta dos ajustes adicionales. Full mantiene los presupuestos de suites anteriores por separado. Sin reintentos automáticos ni experimentos auxiliares tras resultados.
+- D016 aplica a Python propios nuevos/modificados. Añadir test_engine_integration.py al alcance de encabezados conservando las veinte entradas previas. README y WINDOWS.md documentan perfil exacto, reproducción con locks core más overlay, comandos, límites y evidencia real, sin extrapolar a Linux/M008 ni todas las versiones admitidas por extras.
+- R2/R3 — hasta 60 minutos, 20000 tokens medidos o unknown, dos correcciones técnicas, full una vez <=1200 s, scratch <=512 MiB, un hilo y un fit concurrente. RAM y scratch máximos medidos o unknown. Sin instalaciones del coder, red, datos reales, cambios de entorno, commit o push.
 
 Non-goals:
-- GPU, formatos nativos adicionales ni afirmar equivalencia numérica entre motores.
+- Rehacer instalación, cambiar selección científica, añadir parámetros a la fábrica, probar todas las versiones, comparar precisión entre familias, GPU, early stopping, persistencia, inferencia raster o compatibilidad Linux.
 
 ## M005 — Mapas y expediente auditable
 
