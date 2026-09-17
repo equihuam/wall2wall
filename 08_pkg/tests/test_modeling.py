@@ -10,6 +10,7 @@ Dependencias core y Pytest del entorno fijo. Scratch externo y un hilo provistos
 por el lanzador. Protocolo: semilla 17, cuatro bloques-folds y RF predeterminado.
 
 ## Resultados
+Verifica también rangos físicos del ajuste final sin llamadas fit adicionales.
 La suite planifica 45 llamadas fit, incluidos dos fits de transformador y cuatro
 intentos fallidos, con corte antes de superar 64. El wheel usa un fit adicional.
 Afirma predicciones, métricas, tipos CSV y ausencia de mutación de entradas.
@@ -237,7 +238,9 @@ def test_fit_final_separate(tmp_path, monkeypatch):
     monkeypatch.setattr(modeling, "evaluate", lambda *a, **k: pytest.fail("fit_final must not evaluate"))
     monkeypatch.setattr(modeling, "make_spatial_folds", lambda *a, **k: pytest.fail("fit_final must not make folds"))
     result = modeling.fit_final(table, schema, estimator=estimator)
-    assert set(result) == {"estimator", "predictors", "response"}
+    assert set(result) == {"estimator", "predictors", "response", "training_ranges"}
+    assert result["training_ranges"] == [{"name": n, "min": float(table[n].min()), "max": float(table[n].max())}
+                                         for n in ("p02", "p01")]
     assert result["estimator"] is not estimator
     assert result["estimator"].mean_ == 4.
     assert result["predictors"] == ["p02", "p01"]

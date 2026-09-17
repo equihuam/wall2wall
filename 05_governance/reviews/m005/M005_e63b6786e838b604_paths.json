@@ -1,0 +1,212 @@
+[
+  {
+    "slice": "M005-S00",
+    "path": "08_pkg/CONTEXT.md",
+    "sha": "ab96b408450474413081e52189ba210f7852a454e9fa8f2bb294fe69ced17dc5",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S00",
+    "path": "08_pkg/src/wall2wall/engines.py",
+    "sha": "45daa2922fb8a4be711ca0d3438e7e5f137aa915d7927c2312d731346f6b5c13",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "7520be204eca6ca6f4bf0a706434ca7fedb20de7691cfb763b7e693d1c01ecb3",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/README.md",
+    "sha": "24497c582df0233f5421d0f37d33a6e77ced38971e4d35e4b527e10b3096da90",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "037933bdc2f6d62eb9dc6d1e2384903d8ceeff66fd46fb8f4a417857918d85f7",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "49903c5031c81fbc637654bae309abcd7920d79b51d2b753c2838ca974495cc0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/docs/audit.md",
+    "sha": "8af69013e42135b9bb50bc6082b274252fe8d292ed07f094141a106fb4b0be68",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/src/wall2wall/audit.py",
+    "sha": "735d9c3ce93642918764622a42f10c885e513a7c87a94488d091e7fa41a2da2a",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S01",
+    "path": "08_pkg/tests/test_audit.py",
+    "sha": "a52e0cbf1103977cc7acb0aa45a1b5649a38ff5d9514322c7200afdc18ad2da0",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "95f75b2264218f13ba1b942ab82999505dd3a8b1f16b6e746973f91c05e40786",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/README.md",
+    "sha": "20c892bdacb36ea2c98affa2b4f2afc190f39a3ff41005105302285a1b5abd28",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "32a653c46172da3f61403e5c6d4a06e8378d5c21519c5449b2f6b4a5d74d8806",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "446dbc3169b602d3eb8b4dfdf893d1167fc4f08cc551e7a98dba8248642ebcf3",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/docs/prediction.md",
+    "sha": "5b38f6abe607eac32162642f7c802f6b07169d0b4694e7d9a5fc3f8e06f93b16",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/src/wall2wall/prediction.py",
+    "sha": "944dcc32002e8080ed9d840de74b5623161c1c0aee64485307fcb2e29b4ff758",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S02",
+    "path": "08_pkg/tests/test_prediction.py",
+    "sha": "2176eb6be596d78191246e1f5a495046af5171db1acb203019197af3625bcd1f",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "1cfb12ef2bbf94d27f83740672bb2d137523a2b0cea4f2354763f70600776df2",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/README.md",
+    "sha": "8fd9394027792d955d58750325ba07200eb5af4074a80c85e341e7eeea1555db",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/docs/audit.md",
+    "sha": "ae1dbb59253e6780962626ae74df81c2fe41c5420fb1277124f7fd7cdd9f7465",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/docs/prediction.md",
+    "sha": "47b4c27d02da997a4bb73db16c87c083563100a3af164d4c5b215f1238dd2075",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/src/wall2wall/audit.py",
+    "sha": "25c22dfcd7ba7d131efb0a9517ae39aa43716e7379b3680782daed1ac6293e43",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/src/wall2wall/modeling.py",
+    "sha": "a6126fa204644b06729e1a6a157f773b6a936c6913302045729e754b18d6bfa2",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/src/wall2wall/prediction.py",
+    "sha": "11ba5a57cf01335294c26000af0afa4365d827ecaf324c7d3213cb6dc3704b64",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "491b3c9a4e59332468217ccae3f60683dce634d4b3dce41326d5585a8dabc725",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/test_modeling.py",
+    "sha": "7d611fee15c42416ca2a54d9e8541199ab52eede4072468dbf2939bd4bc17aef",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "2e79196c1fcbf6e2b063a9fce1f5578198efe3a04168c3f26df4776f2f3fe571",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/test_selection.py",
+    "sha": "187cc2f844cdaca1f6941cee3374d1a7d929f4b541db0033c2e984f90fd20e10",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/docs/scale-validation.json",
+    "sha": "3e060e06a71a2b0a59fcf2e13c7935f43fc70a4723d024ed8fce3b00df72866a",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/test_quality.py",
+    "sha": "7b13f6925cdb096f59e223eceefc11a8b3bf0a064e705fabcec914688b8a1bcd",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M005-S03",
+    "path": "08_pkg/tests/test_scale.py",
+    "sha": "afa0dd702a2875617e706e3394240e80bf0e0a410ad910c56e00b32349d633e2",
+    "kind": "added",
+    "round": 2
+  }
+]

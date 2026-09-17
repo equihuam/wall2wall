@@ -9,8 +9,9 @@ OOF fija o con selección espacial anidada, permutación externa opt-in y ajuste
 final separado. `wall2wall.audit` guarda y carga el ajuste final en un expediente
 portable con procedencia e integridad comprobadas. `wall2wall.prediction.predict_raster`
 produce mapas GeoTIFF por ventanas desde ese expediente y predictores alineados.
-Las alertas min/max, la prueba de escala, la CLI y el workflow de producción siguen
-pendientes. La cualificación Linux M001 y la
+El modo opcional `quality=True` añade validez y alerta univariada min/max ligada
+al ajuste final. Hay un protocolo técnico de escala 1024×1024×8 y 2048×2048×8;
+la CLI y el workflow de producción siguen pendientes. La cualificación Linux M001 y la
 cualificación integral Windows M008 siguen pendientes; la comprobación corresponde
 al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -33,8 +34,9 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 221 IDs: los 188 previos (151 más 37 de auditoría) y 33 de
-inferencia por ventanas. Los primeros 151 son
+El lanzador exige 243 IDs: los 221 previos (188 más 33 de inferencia), 21 de
+calidad y uno que ejecuta ambos tamaños de escala. Los 188 incluyen 151 previos
+y 37 de auditoría. Los primeros 151 son
 once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
 de buffer/particiones aportadas, doce de modelado fijo, diez de selección/permutación
@@ -58,6 +60,7 @@ el ajuste dummy mínimo existente; después de terminar, otro proceso carga con
 `audit.load_run(..., trusted=True)` y predice desde el wheel fuera del checkout,
 sin ajustes adicionales. Ese segundo proceso también genera un GeoTIFF mediante
 `prediction.predict_raster` reutilizando el expediente guardado, sin nuevos fits.
+Comprueba también los rangos guardados y los productos validity/out_of_range.
 Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
@@ -649,7 +652,8 @@ por sí solo no lo indica. Las entradas se mantienen inmutables.
 
 `fit_final(table, schema, *, estimator=None)` comparte validación tabular y del
 estimador, clona y ajusta exactamente una vez sobre todos los casos completos.
-Devuelve estimator ajustado, predictors (nombres ordenados) y response (metadatos).
+Devuelve estimator ajustado, predictors (nombres ordenados), response (metadatos)
+y training_ranges (name/min/max por columna física antes del Pipeline).
 No llama evaluate ni crea folds/OOF/métricas/archivos. No ajusta dummy adicional.
 evaluate tampoco llama fit_final. El resultado ya ajustado puede pasarse a
 `audit.save_run` junto con el esquema completo y la procedencia explícita;
@@ -735,7 +739,8 @@ local_position, original_position y sample_id; leer IDs como str, sin NA implíc
 `select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fits=128)`
 usa el mismo criterio interno sobre todos los casos y hasta tres folds; reajusta
 el ganador una vez con todos los casos. Retorna estimator, predictors, response,
-selected_candidate y selection. Guarda selection.csv/JSON, folds/ con su mapa de
+selected_candidate, selection y training_ranges del ajuste final en unidades
+físicas anteriores al Pipeline. Guarda selection.csv/JSON, folds/ con su mapa de
 índices y manifiesto `wall2wall.selection_fit/1`. Es selección para ajuste final,
 sin OOF externo ni estimación de generalización; no reutiliza un ranking externo.
 `select_and_fit` no serializa por sí solo el modelo binario; su resultado puede
@@ -875,6 +880,12 @@ La [guía de inferencia por ventanas](docs/prediction.md) documenta `predict_ras
 la transferencia a otra malla, nodata y máscaras, límites de buffers/lotes y
 publicación protegida ante fallos. El modo `--prediction-only` ejecuta sus 33
 pruebas obligatorias, con cuatro llamadas fit planificadas y límite de ocho.
+`--quality-only` exige 21 pruebas y cuatro fit con límite doce. `--scale-only`
+ejecuta un único fit dummy y ambos tamaños en procesos frescos; el full ya incluye
+ese protocolo y no necesita un benchmark adicional. El
+[reporte de escala observado](docs/scale-validation.json) conserva tiempos,
+versiones, hashes de código, buffers e instrumentación y memoria Windows.
+La alerta min/max no es AOA, incertidumbre ni evidencia de utilidad predictiva.
 
 La [guía de persistencia y manifiestos](docs/audit.md) documenta `save_run`,
 `load_run`, la procedencia explícita y la carga de modelos confiables con

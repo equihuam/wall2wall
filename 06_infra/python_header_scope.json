@@ -23,5 +23,7 @@
   "08_pkg/src/wall2wall/audit.py",
   "08_pkg/tests/test_audit.py",
   "08_pkg/src/wall2wall/prediction.py",
-  "08_pkg/tests/test_prediction.py"
+  "08_pkg/tests/test_prediction.py",
+  "08_pkg/tests/test_quality.py",
+  "08_pkg/tests/test_scale.py"
 ]

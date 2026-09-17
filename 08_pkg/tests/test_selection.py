@@ -10,6 +10,7 @@ Entorno core Windows D014, Pytest y scratch externo preparado por run_checks.py.
 Se usan regresores simples y folds públicos; no hay datos reales ni búsqueda científica.
 
 ## Resultados
+Comprueba rangos físicos del refit final, incluidos extremos y columna constante.
 Comprueba aislamiento, criterio OOF agrupado, desempates, refit final, productos
 CSV/JSON y fallos previos. Plan: 78 llamadas fit, contando Pipeline y sus pasos;
 un contador corta antes de superar 80 intentos por invocación.
@@ -238,7 +239,9 @@ def test_pooled_selection_two_families_and_final_refit(tmp_path, monkeypatch):
     assert sum(len(call[1]) == len(table) for call in Memorizer.calls) == 1
     assert result["estimator"] is Memorizer.calls[-1][0]
     assert not hasattr(choices[1]["estimator"], "seen_")
-    assert set(result) == {"estimator", "predictors", "response", "selected_candidate", "selection"}
+    assert set(result) == {"estimator", "predictors", "response", "selected_candidate", "selection", "training_ranges"}
+    assert result["training_ranges"] == [{"name": "p01", "min": -1.00001, "max": 4.},
+                                         {"name": "p02", "min": 0., "max": 0.}]
     assert result["predictors"] == ["p01", "p02"] and result["response"] == schema["response"]
     manifest = load(tmp_path / "final/manifest.json")
     assert manifest["fit_budget"]["planned"] == manifest["fit_budget"]["completed"] == 5

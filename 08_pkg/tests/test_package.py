@@ -20,6 +20,7 @@ Verifica engines instalado, import ligero y metadatos antes de importar extras.
 Después ajusta una vez cada motor real CPU del perfil fijo y predice desde el wheel.
 Guarda el ajuste dummy existente con audit y lo carga en otro proceso sin fits extra.
 Ese segundo proceso produce también un mapa mediante prediction desde el wheel.
+Comprueba calidad min/max desde rangos guardados, sin nuevos ajustes.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -236,10 +237,15 @@ import rasterio
 import wall2wall.prediction
 assert Path(wall2wall.prediction.__file__).resolve() == Path(sys.argv[1]) / "wall2wall/prediction.py"
 mapped = wall2wall.prediction.predict_raster("audit-run", "aligned/manifest.json", "predicted",
-                                            trusted=True, window_size=1, batch_size=1)
+                                            trusted=True, window_size=1, batch_size=1, quality=True)
 with rasterio.open(mapped["prediction_path"]) as ds:
     np.testing.assert_allclose(ds.read(1), np.full((2, 2), 2.5), rtol=1e-5, atol=1e-5)
     np.testing.assert_array_equal(ds.read_masks(1), np.full((2, 2), 255, dtype="uint8"))
+assert loaded["training_ranges"] == [{"name": "p01", "min": 7., "max": 7.}]
+with rasterio.open(mapped["validity_path"]) as ds:
+    np.testing.assert_array_equal(ds.read(1), np.full((2, 2), 255, dtype="uint8"))
+with rasterio.open(mapped["out_of_range_path"]) as ds:
+    np.testing.assert_array_equal(ds.read(1), np.zeros((2, 2), dtype="uint32"))
 '''
     result = subprocess.run([sys.executable, "-I", "-B", "-c", load_code, str(target)],
                             cwd=outside, capture_output=True, text=True, timeout=60)

@@ -14,6 +14,7 @@ El destino de guardado debe ser nuevo; load_run exige trusted=True literal.
 save_run escribe modelo, copias de artefactos y manifest.json final versionado.
 load_run devuelve estimator, predictors, response, schema, manifest y artifacts.
 Los hashes se calculan por bloques; guardar o cargar nunca ajusta modelos.
+Conserva training_ranges opcional en audit/1 y lo valida antes de deserializar.
 
 ## Notas relevantes
 Hash comprueba integridad, no autenticidad: joblib puede ejecutar código.
@@ -331,14 +332,31 @@ def _artifacts(products, provenance, selection):
         raise ValueError("selection artifacts require selected result")
 
 
+def _ranges(value, names):
+    if not isinstance(value, list) or len(value) != len(names):
+        raise ValueError("ordered training_ranges required")
+    for item, name in zip(value, names):
+        if not isinstance(item, dict) or set(item) != {"name", "min", "max"} or item["name"] != name:
+            raise ValueError("training_ranges names/order mismatch")
+        for key in ("min", "max"):
+            v = item[key]
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+                raise ValueError("finite training_ranges required")
+        if item["min"] > item["max"]:
+            raise ValueError("training_ranges min exceeds max")
+
+
 def _manifest(manifest):
     required = {"schema", "run_id", "sampling_schema", "predictors", "response", "estimator", "selection",
                 "provenance", "versions", "engines", "products"}
-    if not isinstance(manifest, dict) or set(manifest) != required or manifest["schema"] != "wall2wall.audit/1":
+    if (not isinstance(manifest, dict) or not required <= manifest.keys()
+            or set(manifest) - required - {"training_ranges"} or manifest["schema"] != "wall2wall.audit/1"):
         raise ValueError("unsupported or incomplete audit manifest")
     if str(uuid.UUID(manifest["run_id"])) != manifest["run_id"]:
         raise ValueError("invalid run identity")
     names, response = _schema(manifest["sampling_schema"])
+    if "training_ranges" in manifest:
+        _ranges(manifest["training_ranges"], names)
     if manifest["predictors"] != names or manifest["response"] != response:
         raise ValueError("model metadata contradicts schema")
     description = manifest["estimator"]
@@ -406,6 +424,10 @@ def save_run(result, schema, output_dir, *, provenance, artifacts=()):
     if hasattr(model, "feature_names_in_") and list(model.feature_names_in_) != names:
         raise ValueError("fitted feature order mismatch")
     _provenance(provenance, schema)
+    optional = {}
+    if "training_ranges" in result:
+        optional["training_ranges"] = _json_value(result["training_ranges"])
+        _ranges(optional["training_ranges"], names)
     if not isinstance(artifacts, (list, tuple)):
         raise ValueError("explicit artifact list required")
     declarations = []
@@ -448,7 +470,8 @@ def save_run(result, schema, output_dir, *, provenance, artifacts=()):
     products.insert(0, {"path": "model.joblib", "stage": "final_fit", "role": "model", **_stream(model_path)})
     manifest = {"schema": "wall2wall.audit/1", "run_id": str(uuid.uuid4()), "sampling_schema": schema,
                 "predictors": names, "response": response, "estimator": description, "selection": selection,
-                "provenance": portable_provenance, "versions": versions, "engines": participants, "products": products}
+                "provenance": portable_provenance, "versions": versions, "engines": participants, "products": products,
+                **optional}
     _manifest(manifest)
     _verify_products(output, products)
     _write_json(_inside(output, "manifest.pending"), manifest)
@@ -486,4 +509,5 @@ def load_run(output_dir, *, trusted=False):
         raise ValueError("loaded feature order mismatch")
     return {"estimator": model, "predictors": list(manifest["predictors"]), "response": manifest["response"],
             "schema": manifest["sampling_schema"], "manifest": manifest,
+            **({"training_ranges": manifest["training_ranges"]} if "training_ranges" in manifest else {}),
             "artifacts": [{**p, "local_path": _inside(root, p["path"])} for p in manifest["products"] if p["role"] != "model" ]}

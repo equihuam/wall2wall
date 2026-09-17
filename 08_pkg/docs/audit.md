@@ -33,6 +33,19 @@ Para predecir, seleccionar siempre `table[loaded["predictors"]]` y llamar a
 `loaded["estimator"].predict(...)`. Con un Pipeline, sus transformaciones se
 conservan dentro del modelo; no deben aplicarse otra vez por fuera.
 
+`training_ranges` es una extensión aditiva opcional de `wall2wall.audit/1`.
+Los resultados actuales de `fit_final` y `select_and_fit` incluyen una lista
+ordenada de `{name, min, max}` calculada por columna sobre los casos completos
+del ajuste final, en unidades físicas antes del Pipeline. `save_run` la conserva
+cuando existe; `load_run` comprueba nombres/orden exactos, campos, finitud y
+`min <= max` antes de deserializar, y la devuelve. El rango cero es válido.
+No se admiten otras claves desconocidas en el manifiesto.
+
+Resultados y expedientes históricos sin ese campo siguen permitiendo carga e
+inferencia ordinaria. No se inventan rangos ni se migran expedientes. Solicitar
+calidad min/max requiere rangos presentes; no se promete compatibilidad de esta
+extensión con lectores antiguos que exigían el conjunto anterior de claves.
+
 ## Procedencia obligatoria
 
 `provenance` tiene exactamente los siguientes campos:

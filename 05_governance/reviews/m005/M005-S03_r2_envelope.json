@@ -1,0 +1,97 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M005-S03",
+  "round": 2,
+  "title": "Calidad y prueba de escala",
+  "objective": "Entregar validez y alerta univariada min/max ligada al ajuste final, y medir inferencia por ventanas en 2048x2048x8 sin cargar el cubo completo.",
+  "acceptance": [
+    "D014/D015: Windows nativo, Conda fijo y Python 3.11 mediante 06_infra/windows.ps1 -PythonArgs. Sin dependencias nuevas, instalaciones ni cambios del entorno. Mantener confianza, integridad, compatibilidad y contratos de M005-S01/S02; Linux M001 y cualificación integral Windows M008 pendientes.",
+    "fit_final y select_and_fit añaden training_ranges al resultado: lista ordenada de name/min/max por predictor, calculada con los casos completos usados por el ajuste final, en unidades físicas antes del Pipeline. No calcular rangos desde inferencia, folds externos ni datos transformados; no añadir fits ni alterar selección/OOF. Extensión mínima de modeling, sin refactor general. Rangos finitos, nombres/orden exactos y min<=max, incluido rango cero; reducir por columna sin copiar de nuevo toda la tabla.",
+    "audit.save_run conserva training_ranges cuando está presente; load_run lo valida antes de deserializar y lo devuelve. Extensión aditiva opcional documentada de wall2wall.audit/1, validación estricta del campo y sin admitir otras claves desconocidas. Expedientes/resultados históricos sin rangos conservan carga e inferencia ordinaria; no inventar rangos, modificar expedientes ni afirmar compatibilidad con lectores antiguos. Probar ida/vuelta entre procesos y rechazo de rangos corruptos.",
+    "predict_raster añade quality=False booleano estricto; modo previo conserva productos/retorno y predicciones. quality=True exige rangos presentes/válidos antes de crear salidas y genera además validity.tif uint8 (0 inválido, 255 válido) y out_of_range.tif uint32 (0..P en celdas válidas, nodata=4294967295); rechazar P incompatible con el sentinel. GeoTIFF tiled/DEFLATE con CRS/afín/dimensiones del mapa y máscara interna coherente donde corresponda. Retorno/manifiesto identifican rutas, tamaños/hashes, dtype/nodata, rangos y conteos. Manifiesto final sólo tras cerrar/publicar todos los productos completos.",
+    "Alerta = número de predictores físicos x<min o x>max por celda válida; igualdad en extremos no alerta. Con min=max sólo valores distintos alertan, sin división. Celda inválida conserva nodata en alerta/predicción; cero válido se conserva. Reutilizar intersección de validez, sin segunda lectura de bandas ni doble escala/Pipeline. Conservar predicciones con alerta, sin clipping. Declarar limitación univariada: no es AOA, incertidumbre, probabilidad, causalidad ni utilidad predictiva acreditada.",
+    "Actualizar cota de buffers para calidad, incluidos temporales, sin acumulación global: <=128 MiB y caché GDAL <=128 MiB. Conservar ventana/lote, fuentes inmutables, destino exclusivo y preflight. Fallos en cualquier salida no publican mapa parcial ni manifiesto de éxito y preservan resultados ajenos. Pruebas analíticas de extremos, rango cero, varias variables, máscaras/NaN/Inf/nodata, ventana vacía/todo inválido, rangos/esquema corruptos y fallo tras una ventana; comparar predicciones con quality=False a rtol=atol=1e-5. Parametrizar casos afines y reutilizar fixtures sin ejecutar sus suites ni multiplicar fits.",
+    "Protocolo de escala previo a resultados: generar por ventanas GeoTIFF float32 de ocho predictores con fórmulas analíticas deterministas y regiones de validez/extrapolación conocidas; semilla 17 si se necesita RNG. Ejecutar 1024x1024x8 y 2048x2048x8 en procesos frescos separados, mismo expediente, quality=True, window_size=256 y batch_size=8192. Ajuste único DummyRegressor mean con 32 filas/ocho predictores. Medición de ingeniería, no calidad predictiva. Generación y comprobación sin cubo completo; valores/conteos esperados analíticamente por ventanas. Una ejecución de cada tamaño por invocación scale/full; no buscar parámetros tras resultados.",
+    "Instrumentar generación/inferencia/verificación de escala: rechazar reads/writes de ráster sin window y predict con más de 8192 filas. Registrar máximos observados y cota de buffers idéntica para ambos tamaños, independiente del área. Medir tiempo, tamaños y scratch; intentar pico RSS/working set por proceso mediante stdlib/OS Windows sin instalar herramientas. Objetivo <=1 GiB: si se supera, informar y volver al arquitecto sin ampliar límites. Si no puede medirse, unknown con causa y contabilidad explícita; tracemalloc no sustituye RSS. Cada caso <=180 s, full <=1200 s conservando timeout menor del lanzador de paquete. Scratch total <=512 MiB, cota conservadora dentro de R3; no ampliar límites del lanzador.",
+    "Crear test_quality.py y test_scale.py. --quality-only ejecuta casos pequeños; --scale-only reproduce ambos tamaños. Full exige ambos grupos y conserva 221 pruebas previas y 16 de infraestructura; sin skips/IDs ausentes/cero descubrimiento. Focused sólo quality; escala dentro del full una vez antes de finalizar, no además como benchmark. Quality hasta 12 llamadas fit nuevas incluyendo Pipeline/pasos/procesos hijos, plan explícito y corte previo; scale un único fit dummy. Negativos reutilizan modelos y suites previas conservan presupuestos. Wheel acredita calidad desde modelo audit guardado con rangos, sin nuevos fits.",
+    "Reporte reproducible en 08_pkg/docs/scale-validation.json <=1 MiB: protocolo, identidad de código/entorno, versiones, tamaños, ventana/lote, tiempos observados, buffers/caché, memoria o unknown razonado, scratch y resultados de instrumentación. Pruebas sólo escriben scratch y emiten reporte saneado; coder conserva copia observada sin rutas locales/datos privados/números inventados. No binarios grandes en Git. Documentar reproducción, memoria de puntos/modelo y límites min/max; actualizar README, audit.md y prediction.md para API, estado, conteos e inventario coherentes.",
+    "D016 según AGENTS.md: scope Python modeling.py, audit.py, prediction.py, tests/test_modeling.py, tests/test_selection.py, tests/test_audit.py, tests/test_prediction.py, tests/run_checks.py, tests/test_package.py y nuevos tests/test_quality.py y tests/test_scale.py. Conservar scope previo y añadir sólo los dos nuevos; encabezados actualizados en cada Python tocado. Full python scripts/hermetic_verification.py; focused python 08_pkg/tests/run_checks.py --quality-only. R2/R3: <=60 min, <=20000 tokens medidos o unknown, dos correcciones conservadas; fallo común de infraestructura detiene intentos posteriores. Sin lotes científicos, nuevos motores, red, GPU, datos reales, commit ni push. Después de aceptación corresponde revisión holística M005 antes de M006."
+  ],
+  "non_goals": [
+    "AOA multivariante, intervalos calibrados, clipping, rangos inferidos de mapas nuevos, migración masiva, refactor general, workflow/reanudación M006, piloto real o cualificación entre plataformas."
+  ],
+  "read_first": [
+    "00_brief/CONTEXT.md",
+    "00_brief/architecture.md",
+    "00_brief/validation.md",
+    "08_pkg/CONTEXT.md",
+    "00_brief/decisions.md",
+    "00_brief/orchestration.md",
+    "08_pkg/README.md",
+    "08_pkg/docs/audit.md",
+    "08_pkg/docs/prediction.md",
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/src/wall2wall/audit.py",
+    "08_pkg/src/wall2wall/prediction.py",
+    "08_pkg/src/wall2wall/spatial.py",
+    "08_pkg/tests/test_modeling.py",
+    "08_pkg/tests/test_selection.py",
+    "08_pkg/tests/test_audit.py",
+    "08_pkg/tests/test_prediction.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/tests/run_checks.py",
+    "06_infra/windows.ps1",
+    "06_infra/python_header_scope.json",
+    "06_infra/run_checks.py"
+  ],
+  "allowed_prefixes": [
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/src/wall2wall/audit.py",
+    "08_pkg/src/wall2wall/prediction.py",
+    "08_pkg/tests/test_modeling.py",
+    "08_pkg/tests/test_selection.py",
+    "08_pkg/tests/test_audit.py",
+    "08_pkg/tests/test_prediction.py",
+    "08_pkg/tests/test_quality.py",
+    "08_pkg/tests/test_scale.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/README.md",
+    "08_pkg/docs/audit.md",
+    "08_pkg/docs/prediction.md",
+    "08_pkg/docs/scale-validation.json",
+    "06_infra/python_header_scope.json"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [
+    [
+      "python",
+      "08_pkg/tests/run_checks.py",
+      "--quality-only"
+    ]
+  ],
+  "full": [
+    "python",
+    "scripts/hermetic_verification.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 1200,
+  "observation": "process",
+  "notes": "M005-S02 aceptado y publicado en el commit previo. El propietario solicita continuar el ciclo manual. Baseline arquitectónica formada por roadmap, vista generada y contexto actualizado; test_quality.py, test_scale.py y scale-validation.json son salidas nuevas. Escala técnica con protocolo congelado, sin nuevo lote científico.",
+  "findings": "Source review: `05_governance/reviews/m005/M005-S03_r1_review.md` (sha256 `7a974910abdc7ecc0ba4867c62bf90a406e1deacc9c06034ebdaf84d14a814f0`)\n| M005-S03-F1 | P2 | open | test_scale.py importa fixture y provenance de test_audit.py, pero omite ese archivo de la identidad de código registrada en scale-validation.json; el reporte reproducible no identifica todos los insumos ejecutables del protocolo. |",
+  "memory": ""
+}

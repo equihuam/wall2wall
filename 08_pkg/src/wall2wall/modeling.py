@@ -16,6 +16,7 @@ select_and_fit selecciona internamente y devuelve un único estimador reajustado
 persiste selección y folds, sin métricas de generalización ni modelo binario.
 fit_final devuelve estimator ajustado, predictors ordenados y response sin escribir
 archivos ni realizar evaluación. El RF predeterminado usa configuración fija.
+Ambos ajustes finales devuelven training_ranges físicos anteriores al Pipeline.
 
 ## Notas relevantes
 Selección finita opt-in, sin early stopping, modelos persistidos ni mapas. Cada fold ajusta
@@ -542,12 +543,17 @@ def evaluate(table, schema, output_dir, *, fold_config, estimator=None, candidat
     return result
 
 
+def _training_ranges(X):
+    return [{"name": name, "min": float(X[name].min()), "max": float(X[name].max())} for name in X]
+
+
 def select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fits=128):
     """Select using internal spatial OOF, then refit once; not external evaluation."""
     output = Path(output_dir).resolve()
     if os.path.lexists(output_dir) or output.exists():
         raise FileExistsError("output_dir already exists")
     X, y, predictors, response = _table_data(table, schema)
+    training_ranges = _training_ranges(X)
     maximum = _integer(max_fits, 1, 128, "max_fits")
     models, descriptions = _candidates(candidates)
     config = _config(fold_config, inner=True)
@@ -568,12 +574,14 @@ def select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fi
                              "folds": "folds/manifest.json", "index_map": "folds/index_map.csv", "fit_budget": "fit_budget.json"}}
     _json(output / "manifest.json", manifest, final=True)
     return {"estimator": fitted, "predictors": [item["name"] for item in predictors], "response": response,
-            "selected_candidate": name, "selection": pd.DataFrame(rows)}
+            "selected_candidate": name, "selection": pd.DataFrame(rows), "training_ranges": training_ranges}
 
 
 def fit_final(table, schema, *, estimator=None):
     """Fit one fresh clone on all validated complete cases, with no CV or output files."""
     X, y, predictors, response = _table_data(table, schema)
     model, _ = _model(estimator)
+    training_ranges = _training_ranges(X)
     fitted = _fit(model, X, y, "fit_final")
-    return {"estimator": fitted, "predictors": [item["name"] for item in predictors], "response": response}
+    return {"estimator": fitted, "predictors": [item["name"] for item in predictors], "response": response,
+            "training_ranges": training_ranges}

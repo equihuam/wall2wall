@@ -12,7 +12,7 @@ from wall2wall.prediction import predict_raster
 
 result = predict_raster(
     "runs/final-fit", "runs/new-alignment/manifest.json", "runs/new-prediction",
-    trusted=True, window_size=512, batch_size=65536,
+    trusted=True, window_size=512, batch_size=65536, quality=True,
 )
 map_path = result["prediction_path"]
 manifest_path = result["manifest_path"]
@@ -20,7 +20,7 @@ counts = result["manifest"]["counts"]
 ```
 
 Firma: `predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False,
-window_size=512, batch_size=65536)`. Las rutas se interpretan respecto al cwd.
+window_size=512, batch_size=65536, quality=False)`. Las rutas se interpretan respecto al cwd.
 `run_dir` debe ser un expediente propio/confiable compatible con `audit.load_run`;
 `alignment_manifest` debe ser el `wall2wall.alignment/1` producido por
 `align_predictors`. La función devuelve `prediction_path`, `manifest_path` y
@@ -70,6 +70,7 @@ N = window_size²
 P = número de predictores
 B = batch_size
 buffers = (24*P + 96)*N + (32*P + 128)*B + 2 MiB
+si quality=True: buffers += 32*N
 buffers <= 128 MiB
 ```
 
@@ -84,15 +85,50 @@ cada `predict` recibe como máximo `batch_size` filas.
 La caché GDAL se fija a 32 MiB y se usa un hilo. El expediente y modelo cargados
 siguen en memoria: la cota no incluye sus tamaños ni asignaciones internas del
 estimador. RAM nativa y scratch pico se declaran `unknown`, no como una medición
-de 128 MiB. La prueba de escala 2048×2048×8 pertenece a M005-S03.
+de 128 MiB. El protocolo de escala descrito abajo mide el pico del proceso Windows
+por separado; ese dato no transforma la estimación de buffers en una cota del modelo.
 
 ## Productos, identidades y fallos
 
 `prediction.tif` tiene una banda float32, nodata NaN, bloques 256×256, compresión
 DEFLATE y máscara de validez interna. Se solicita BigTIFF `YES` si la estimación
 `width*height*5 + 1 MiB` alcanza 4 GiB; en los demás casos se usa `IF_SAFER`.
-La banda conserva nombre y unidad de respuesta. No hay máscaras de calidad
-separadas, alertas min/max, AOA ni intervalos de incertidumbre.
+La banda conserva nombre y unidad de respuesta. Con `quality=False` se conservan
+los productos y el retorno ordinarios. No hay AOA ni intervalos de incertidumbre.
+
+## Calidad min/max opcional
+
+`quality` exige un booleano literal; no acepta `1`, cadenas o booleanos NumPy.
+Con `True`, el expediente debe contener `training_ranges` válidos antes de crear
+salidas. Son los mínimos/máximos físicos de cada predictor sobre los casos del
+ajuste final, anteriores al Pipeline. No se obtienen de la malla nueva ni de folds.
+Un expediente histórico sin rangos admite la inferencia ordinaria, pero no calidad.
+
+Se añaden `validity_path` y `out_of_range_path` al retorno:
+
+| Archivo | Tipo y significado | Nodata |
+| --- | --- | --- |
+| `validity.tif` | uint8: 0 inválido, 255 válido | 0 |
+| `out_of_range.tif` | uint32: número de predictores fuera del rango, 0..P | 4294967295 |
+
+Ambos son tiled/DEFLATE, con malla idéntica y máscara interna de validez. Se
+rechaza un número de predictores que colisione con el sentinel. Sólo alerta
+`x < min` o `x > max`; igualdad no alerta. Para rango cero sólo valores distintos
+alertan, sin divisiones. Las celdas inválidas conservan nodata en predicción/alerta;
+cero físico válido se conserva. No se recortan predicciones con alerta.
+
+El cálculo reutiliza cada banda leída y la intersección de máscaras. No aplica
+otra vez escala/Pipeline ni lee bandas por segunda vez. El manifiesto añade
+`quality` con rangos, rutas/tamaños/SHA-256, dtype/nodata, conteos de celdas con y
+sin alerta y suma de excedencias por predictor. Los productos se cierran antes
+de publicarse; `manifest.json` se publica después de todos los archivos completos.
+Un fallo al escribir cualquier producto deja sólo temporales, sin mapa parcial
+final. No se garantiza publicación atómica del conjunto ante un fallo del sistema
+durante los renombrados; sin manifiesto final, el directorio está incompleto.
+
+Esta alerta univariada no es AOA, incertidumbre, probabilidad, causalidad ni
+evidencia de utilidad predictiva. Estar dentro de todos los rangos no garantiza
+que una combinación multivariada haya aparecido en entrenamiento.
 
 Se escribe `prediction.pending.tif` en un destino creado exclusivamente. Tras
 cerrar los handles y completar el mapa se publica `prediction.tif`; el último
@@ -139,3 +175,51 @@ Pipeline. Hay cuatro llamadas fit por invocación de la suite, incluidos los pas
 con corte antes de superar ocho. Los negativos reutilizan modelos. El wheel
 predice fuera del checkout con el modelo audit existente, sin nuevos fits. Esto
 es evidencia técnica con fixtures analíticas, no una evaluación científica.
+
+## Protocolo reproducible de escala
+
+`--quality-only` exige 21 pruebas pequeñas y cuatro fit incluidos Pipeline/pasos,
+con corte antes de doce; los negativos reutilizan modelos. `--scale-only` exige
+el protocolo completo siguiente. El full conserva las 221 pruebas previas e
+incorpora esos dos grupos, además de las 16 pruebas de infraestructura.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--quality-only')
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--scale-only')
+```
+
+En una verificación de entrega se ejecuta sólo quality como focused y escala
+dentro del full una vez; no se duplica como benchmark. Para reproducir la medición
+aislada, `--scale-only` ejecuta una vez cada tamaño en procesos frescos separados:
+1024×1024×8 y 2048×2048×8, mismo expediente, `quality=True`, ventana 256, lote 8192.
+Sólo se ajusta un DummyRegressor mean con 32 filas; respuesta constante 2.5.
+No se usa RNG ni se buscan parámetros después de observar resultados.
+
+Para tamaño N y predictor j (base cero), el entrenamiento abarca [j,j+1] para
+j<7 y [7,7] para j=7. Las fórmulas float32 de inferencia son:
+
+- j<7: `j + (col % 4)/3 + 2*(col >= 3*N/4)`.
+- j=7: `7 + (row >= N/2)`.
+- Inválido cuando `row < N/4` y `col < N/4`, codificado como nodata -9999.
+
+Se esperan 15N²/16 celdas válidas, 5N²/8 con alerta y 9N²/4 excedencias de
+predictores. Generación y comprobación siguen ventanas, sin cubo completo. Los
+espías rechazan toda lectura/escritura sin window y predict con más de 8192 filas;
+registran máximos por fase. La cota de buffers debe ser idéntica para ambos tamaños.
+
+Cada proceso intenta medir `PeakWorkingSetSize` con GetProcessMemoryInfo mediante
+ctypes/Windows, sin herramientas adicionales; si falla declara unknown con causa.
+No se sustituye por tracemalloc. El objetivo es <=1 GiB y cada caso tiene timeout
+180 s. Superar el objetivo falla y requiere volver al arquitecto. Se mantiene el
+timeout de paquete de 900 s, full 1200 s y scratch total <=512 MiB. La cota
+conservadora de archivos de este protocolo es 320 MiB, incluidos ambos tamaños;
+se mide el tamaño final, mientras el scratch pico queda unknown. Las tablas del
+ajuste y el modelo siguen en memoria y no se cualifica entrenamiento fuera de RAM.
+
+El lanzador emite el reporte saneado entre `SCALE_VALIDATION_JSON_BEGIN/END` antes
+de limpiar scratch. La copia observada se conserva en
+[scale-validation.json](scale-validation.json): protocolo, hashes de código,
+perfil/versiones, tiempos, tamaños, contabilidad, pico del proceso e instrumentación.
+Es una medición de ingeniería en D014, no calidad predictiva ni cualificación
+integral Windows M008 o Linux M001. El wheel comprueba calidad con el modelo audit
+ya guardado y sus rangos, sin fits nuevos.
