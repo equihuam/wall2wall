@@ -1,0 +1,184 @@
+[
+  {
+    "slice": "M004-S01",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "7c98769c0d70d5bd36a70c4c00ec02b65731b9909fdbd1c2d70d7b8de28069dc",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S01",
+    "path": "08_pkg/README.md",
+    "sha": "b33a29539f3bdce3ce4a2d63877756dec4ffbb98d07a56d52eab61ac3aaa5ab5",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S01",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "87e1f11ee7b1283dd4a4a6c1bb56f0cfc50edce1a8144796b4a93584d98cd0f0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S01",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "3111cf756a58d2f53745b453a9de19a067c4076e003a8e6ca68190720ac0de74",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S01",
+    "path": "08_pkg/src/wall2wall/modeling.py",
+    "sha": "fbc551cdf8e3ecdc04851e2f35dbae933805a5fffbae8288d7298d90dba517cd",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M004-S01",
+    "path": "08_pkg/tests/test_modeling.py",
+    "sha": "ce74e40db0cacd5e3e271e60d1b6c6691cceb22e25a7a40dda1a3679a32f3739",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "dbd2647044342cdda2fa04ff3f1a01bd90eea66a6b5cb8e726b6f9900b76a49f",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "08_pkg/README.md",
+    "sha": "29e1c5c3cf207bf773199b9bf8b660f6812f7320e4eba5ef2472dc75a75afe37",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "08_pkg/src/wall2wall/modeling.py",
+    "sha": "f5ef59ff62bac8c7bfab7b2a9f8473cf109a0d7d428ba7a72e9efe82d80c1679",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "2024b3a85eb268405f532371107582906800386d5a184866846822655396b6e0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "1abe1235631d5aa73b6af4a2a3eefcce66ca5138d974faa7cf7affa434900e3b",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S02",
+    "path": "08_pkg/tests/test_selection.py",
+    "sha": "b00d5ace1019bb321273ef119373f570cb341ff638c8a610814080bbf81619f2",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "1c4ed492d9786c092dbdba60c6f739f022a146b068e29a9423ebf71c07abe101",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/README.md",
+    "sha": "edc842223b20b1ddcff7b3eceef1eb986ff7f7d3a22762aecfabfcb27a55ace7",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/pyproject.toml",
+    "sha": "51d59c3c6dac3f128df701fe8ed4448b0ac7ffc03e04d79cc5cc5ad8cddfeb20",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "f0b4846098d7f80888b63a1126595e519cd5b7c143aebac280fab9c967425364",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "f1b5187f5bc1d2ecd8da263166374060359e93cb61024fb14c5652fe79de444f",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/src/wall2wall/engines.py",
+    "sha": "da42c40ba777ecbcc6cb7d9f0ea12ebab19e05f7250091db2805b71c15bc0423",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M004-S03",
+    "path": "08_pkg/tests/test_engines.py",
+    "sha": "b41b8ad9b9844a689d79918fd2589ba1bc8d3e00a249742a6caa03bd4a75f0f3",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "06_infra/WINDOWS.md",
+    "sha": "0f96da66e1a9dceb367f893c47b188c654d87a2cb2868ae4fd636e1d98351ed0",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "1d731564dda2683fc7b7e34ac01d3ada84aa54eb9c991354ae8735f7751ec736",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "08_pkg/README.md",
+    "sha": "44c8aa568b28f92dd1178ac59800bbad407036d757f8b7f5e79a34f622c7fdbd",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "08_pkg/src/wall2wall/modeling.py",
+    "sha": "242a2164dc4271d70ec61d30c3b96670f85cf6ea5fe16d7dc2433b9f4d357ce5",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "f0c2e02b0151fb206862303365c779e6a83424f90e9612844fa833f8a3207250",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "08_pkg/tests/test_package.py",
+    "sha": "418e71651257290f1280b7057e5d4972f9543d3e0ed846c0b90ecee58e302afc",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M004-S04",
+    "path": "08_pkg/tests/test_engine_integration.py",
+    "sha": "e8f3430eb93257965d2ffa1b3b20e5eb961bece39fead4d2456076ae40bc6476",
+    "kind": "added",
+    "round": 1
+  }
+]

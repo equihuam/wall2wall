@@ -12,11 +12,14 @@ Existen la distribución instalable, fixtures sintéticas, la API de armonizaci�
 construye particiones por bloques/grupos, admite particiones aportadas y aplica
 buffer al entrenamiento. wall2wall.modeling entrega evaluate con evaluación fija o
 selección espacial anidada y permutación externa, fit_final para configuración fija
-y select_and_fit para selección interna y ajuste final. M004-S01/S02 están aceptados.
-Motores opcionales, mapas predictivos y workflow de producción siguen pendientes.
-M004-S03 prepara el contrato opcional sin instalaciones; M004-S04 debe cualificar
-ambos motores reales antes de anunciar soporte. La evidencia y aceptación viven
-en el ledger.
+y select_and_fit para selección interna y ajuste final. M004 está cerrado y sus
+cuatro entregas M004-S01, M004-S02, M004-S03 y M004-S04 están aceptadas. La fábrica
+opcional wall2wall.engines.make_regressor está disponible; la cualificación real
+comprende LightGBM 4.6.0 y XGBoost 3.1.3 con Python 3.11.16 en el perfil Windows
+del proyecto. No implica soporte universal ni equivalencia entre plataformas.
+Persistencia, mapas predictivos y workflow de producción siguen pendientes,
+al igual que Linux M001 y la cualificación integral Windows M008.
+El registro autoritativo de evidencia y aceptación sigue siendo el ledger.
 Contratos en 00_brief/architecture.md y 00_brief/validation.md; alcance en roadmap.yaml.
 El pyproject y tests de la raíz pertenecen a la plantilla, no al producto.
 Antes de emitir cada tarea, el arquitecto añade sus lecturas concretas de código

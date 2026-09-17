@@ -14,9 +14,11 @@ make_regressor devuelve intacto el estimador sklearn construido. No ejecuta fit,
 instala dependencias ni escribe archivos; importar este módulo sólo usa stdlib.
 
 ## Notas relevantes
-Las cotas de extras expresan API requerida, no compatibilidad real cualificada.
+Las cotas de extras expresan requisitos de API, no garantizan compatibilidad
+con todas las versiones. Consultar 06_infra/ENGINES-WINDOWS.md y las evidencias
+referenciadas para las versiones y plataformas comprobadas.
 Sólo la ausencia exacta del motor recibe un diagnóstico del extra; errores
-transitivos o nativos se propagan. La cualificación real queda para M004-S04.
+transitivos o nativos se propagan.
 =============================================================================
 """
 import math

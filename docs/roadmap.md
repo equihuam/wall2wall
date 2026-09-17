@@ -188,7 +188,7 @@ Non-goals:
 
 ## M004 — Regresión, evaluación y motores opcionales
 
-Status: active
+Status: done
 Risk: high
 Holistic review: true
 
@@ -287,9 +287,25 @@ Non-goals:
 
 ## M005 — Mapas y expediente auditable
 
-Status: planned
+Status: active
 Risk: high
 Holistic review: true
+
+### M005-S00 — Sincronización documental tras el cierre de M004
+
+Corregir los textos obsoletos de M004-S04-H1-F1 antes de trabajar en persistencia, sin cambiar lógica ni ejecutar ajustes.
+
+Acceptance:
+- Alcance de dos archivos exclusivamente. En engines.py modificar sólo el docstring inicial; en 08_pkg/CONTEXT.md corregir el estado vigente sin reescribir historia. No modificar imports, firma, validación, parámetros, tests, versiones ni entorno.
+- CONTEXT.md debe indicar M004 cerrado y sus cuatro entregas aceptadas, fábrica opcional disponible y cualificación real de LightGBM 4.6.0/XGBoost 3.1.3 con Python 3.11.16 en el perfil Windows del proyecto. Conservar Linux M001 y cualificación integral Windows M008 como pendientes, junto con persistencia, mapas y workflow. El registro autoritativo sigue siendo el ledger; no afirmar soporte universal ni equivalencia entre plataformas.
+- En Notas relevantes de engines.py eliminar que la cualificación real queda pendiente de M004-S04. Usar texto duradero que remita a 06_infra/ENGINES-WINDOWS.md y sus evidencias para versiones/plataformas comprobadas. Conservar que las cotas de extras expresan requisitos de API y no garantizan compatibilidad con todas las versiones; conservar semántica de errores transitivos/nativos. No convertir el encabezado en historial de entregas.
+- D016 aplica al encabezado, conforme a AGENTS.md. El scope existente ya incluye engines.py y se conserva intacto. Verificar que el AST de engines.py excluyendo únicamente el primer docstring no cambió; SHA-256 de ast.dump(module, include_attributes=False), UTF-8, tras quitar module.body[0], debe ser 0e040c5a5c19d8235af628e2f8a9b4a4b4c4eb3185b2c2ab87fe85cadf66df1e en Python 3.11. Revisar además que el diff Python sólo toca el docstring.
+- Verificación específica de esta tarea documental mediante windows.ps1 -PythonArgs. Focused usa check_python_headers.py con su scope mantenido; full de esta tarea es 06_infra/run_checks.py --headers-only, una vez, que exige el gate y siete pruebas de encabezados. No ejecutar hermetic_verification.py, suites científicas, fits, canaries ni benchmarks. El verificador general de futuras tareas conserva su full habitual.
+- git diff --check sobre los dos archivos pasa. Informe declara comandos observados, igualdad AST y ausencia de cambios de lógica; no inventa aprobación del reviewer. Sin nuevas pruebas, dependencias, red, instalaciones, commit ni push. Hasta 20 minutos, 5000 tokens medidos o unknown, dos correcciones técnicas, scratch externo <=512 MiB; cero fits.
+- Mantener M004-S04-H1-F1 carried hasta que un reviewer lo cierre con referencia a 05_governance/reviews/m004/M004_holistic_review.md y SHA-256 419e3c82f5fc9fc40da7fbc8aa86381194d0a277c3d1c22ae73176a609f115d0. Coder no edita reportes, backlog ni ledger. Esta tarea no reabre M004 ni implementa M005-S01.
+
+Non-goals:
+- Cambios de comportamiento, entrenamiento, pruebas de motores, persistencia o ampliación de soporte. No actualizar masivamente documentación ni aceptar el hallazgo por cuenta del coder.
 
 ### M005-S01 — Persistencia y manifiestos
 
