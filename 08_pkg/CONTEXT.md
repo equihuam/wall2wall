@@ -8,8 +8,10 @@ Las pruebas de M002 acreditan ese entorno; la cualificación integral Windows M0
 y la cualificación Linux M001 siguen siendo tareas independientes.
 Existen la distribución instalable, fixtures sintéticas, la API de armonización
 `wall2wall.spatial.align_predictors` y la de muestreo
-`wall2wall.sampling.sample_points`. Folds, modelos, mapas predictivos y workflow
-de producción siguen pendientes. La evidencia y aceptación viven en el ledger.
+`wall2wall.sampling.sample_points`. La API `wall2wall.validation.make_spatial_folds`
+construye particiones por bloques/grupos, admite particiones aportadas y aplica
+buffer al entrenamiento. Modelos, mapas predictivos y workflow de producción
+siguen pendientes. La evidencia y aceptación viven en el ledger.
 Contratos en 00_brief/architecture.md y 00_brief/validation.md; alcance en roadmap.yaml.
 El pyproject y tests de la raíz pertenecen a la plantilla, no al producto.
 Antes de emitir cada tarea, el arquitecto añade sus lecturas concretas de código

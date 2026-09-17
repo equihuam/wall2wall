@@ -13,5 +13,7 @@
   "08_pkg/tests/test_sampling.py",
   "08_pkg/src/wall2wall/validation.py",
   "08_pkg/tests/test_validation.py",
-  "08_pkg/tests/test_buffer.py"
+  "08_pkg/tests/test_buffer.py",
+  "08_pkg/src/wall2wall/modeling.py",
+  "08_pkg/tests/test_modeling.py"
 ]

@@ -4,8 +4,9 @@ Paquete local `wall2wall`, versión `0.1.0.dev0`, Python >=3.11.
 `wall2wall.spatial.align_predictors` armoniza predictores ráster; examples/synthetic.py
 genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extrae
 casos completos desde el manifiesto de armonización. `wall2wall.validation.make_spatial_folds`
-crea folds por bloques y grupos indivisibles. Todavía no hay modelos,
-mapas predictivos, CLI ni workflow de producción. No cualifica Linux ni soporte
+crea folds por bloques y grupos indivisibles. `wall2wall.modeling` ofrece evaluación
+OOF fija y ajuste final separado. Todavía no hay mapas predictivos, persistencia
+de modelos, CLI de producción ni workflow de producción. No cualifica Linux ni soporte
 Windows completo; la comprobación corresponde al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
 
@@ -24,9 +25,9 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 105 IDs: once de distribución, veintiuno del generador, veinticuatro
+El lanzador exige 117 IDs: once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
-de buffer/particiones aportadas.
+de buffer/particiones aportadas y doce de modelado fijo.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -36,11 +37,11 @@ El lanzador crea un directorio temporal exclusivo bajo `VERIFICATION_SCRATCH`
 terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no se
 generan caches o metadatos en el producto. El build copia pyproject, README,
 `src/wall2wall/__init__.py`, `src/wall2wall/spatial.py`, `src/wall2wall/sampling.py`
-y `src/wall2wall/validation.py`;
+y `src/wall2wall/validation.py` y `src/wall2wall/modeling.py`;
 usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
-el origen de los imports, los metadatos instalados y alineación/muestreo/folds mínimos desde
-el wheel. Importar sólo wall2wall sigue sin cargar dependencias científicas.
+el origen de los imports, los metadatos instalados, alineación/muestreo/folds y
+fit_final/predicción mínimos desde el wheel. Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
 Ejecución secuencial y un hilo numérico; ningún ajuste científico. Presupuesto
@@ -432,6 +433,111 @@ buffered = make_spatial_folds(
 Las diecinueve pruebas adicionales cubren ambos modos, límites exactos del radio,
 expansión a grupos, mínimos, rechazos, RNG/entradas inmutables, lotes acotados,
 reconstrucción CSV y fallo de escritura. Las 86 pruebas previas se conservan.
+
+## Evaluación OOF fija y ajuste final
+
+```python
+from wall2wall.modeling import evaluate, fit_final
+
+evaluation = evaluate(
+    sampled["table"], sampled["schema"], "runs/evaluation-new",
+    fold_config={"block_size": 320, "origin": (500000, 4498720),
+                 "n_splits": 4, "seed": 17, "buffer_distance": 0.0},
+)
+final = fit_final(sampled["table"], sampled["schema"])
+# final["estimator"] está ajustado; final no contiene métricas OOF.
+```
+
+`evaluate(table, schema, output_dir, *, fold_config, estimator=None)` acepta las
+salidas de sample_points. fold_config exige block_size/origin/n_splits/seed y
+sólo admite además buffer_distance/min_train_samples/provided_splits. Llama una
+vez a la API pública make_spatial_folds para construir/validar y guardar folds/.
+No acepta un dict de splits supuestamente validados. Modelo y DummyRegressor
+de media usan exactamente los mismos train/test finales, incluido el buffer.
+
+El RF por defecto está fijado a n_estimators=100, max_depth=None,
+min_samples_leaf=2, max_features=1.0, bootstrap=True, random_state=17, n_jobs=1.
+No se elige configuración según el resultado. Se admite un regresor sklearn o
+Pipeline clonable con fit/predict y parámetros describibles en JSON estricto:
+clases por módulo/nombre y parámetros de constructor, componentes anidados,
+valores escalares finitos, listas y diccionarios. Sin repr ni pickle. Se rechazan
+clasificadores, callables como parámetros, caché memory de Pipeline y parámetros
+con rutas absolutas. No se promete soporte universal de estimadores.
+
+random_state expuesto debe ser entero >=0 y n_jobs expuesto debe ser 1, también
+en componentes anidados; no booleanos. warm_start y early_stopping deben estar
+inactivos. No admite fit kwargs, callbacks, eval_set, extras, búsqueda ni tuning.
+Cada fold usa clones nuevos. Pipeline ajusta su preprocesamiento sólo con train;
+los originales permanecen sin ajustar y nunca se ajusta globalmente antes de CV.
+Errores de fit/predict se propagan con fold_id y modelo, conservando la causa;
+no se sustituyen por dummy ni se reintentan candidatos. Resultados pobres válidos
+se conservan como resultados, sin ocultarlos.
+
+schema.predictors debe contener nombres únicos existentes, unidades y períodos
+no vacíos. Sólo esas columnas, en ese orden, forman X; se rechazan colisiones
+con respuesta, IDs, coordenadas y auxiliares. X debe ser numérico finito, sin
+categorías, booleanos o conversión de texto a predictor. La respuesta nombrada
+en schema debe ser numérica finita; textos numéricos de respuesta se validan
+sin modificar la tabla original. sample_id debe ser único, no nulo/vacío.
+La validación espacial adicional pertenece a make_spatial_folds. Se preservan
+table/schema/IDs; iloc rige posiciones independientemente del índice o input_row.
+
+El retorno tiene `oof` (DataFrame), `metrics` (dict) y `folds` (resultado espacial).
+oof conserva orden y sample_id, con position, fold_id, observed, predicted y
+dummy_predicted. Cada posición recibe una predicción OOF por modelo. Predicciones
+deben tener shape (n_test,) y valores numéricos finitos. Escribe oof_predictions.csv,
+metrics.json, manifest.json y folds/. Leer IDs CSV como str con
+keep_default_na=False conserva `001` y `NA`; convertir columnas numéricas con
+tipos explícitos. IDs mixtos conservan tipos en memoria, no por sí solos en CSV.
+
+Las métricas de modelo y dummy incluyen n, RMSE, MAE, sesgo=media(predicho-observado)
+y R²=1-SSE/SST, por fold y sobre OOF agrupado (`pooled_oof`). `fold_summary`
+registra medias y desviaciones poblacionales no ponderadas de cada métrica; no
+son las métricas OOF agrupadas. R² es null con r2_reason para n<2 o respuesta
+constante; no se fuerza 0/1. Su resumen usa sólo folds definidos y registra
+n_defined, con media/desviación null si ninguno. Desbordamientos que produzcan
+métricas o resúmenes no finitos fallan explícitamente antes del manifiesto.
+
+Manifest registra esquema ordenado, respuesta, clases/parámetros efectivos,
+versiones Python/core, fold_config, conteos de llamadas fit de modelo/dummy y
+productos relativos. Esos conteos son llamadas a estimadores completos, no
+árboles internos ni pasos internos de Pipeline. No persiste modelos de folds
+ni implementa el expediente M005. Destino existente incluso vacío se rechaza.
+Se valida tabla/estimador/configuración antes de crear salida cuando es posible;
+folds, fit o escritura pueden dejar parciales. Sólo el manifiesto raíz final
+publicado mediante renombrado indica evaluación completa; folds/manifest.json
+por sí solo no lo indica. Las entradas se mantienen inmutables.
+
+`fit_final(table, schema, *, estimator=None)` comparte validación tabular y del
+estimador, clona y ajusta exactamente una vez sobre todos los casos completos.
+Devuelve estimator ajustado, predictors (nombres ordenados) y response (metadatos).
+No llama evaluate ni crea folds/OOF/métricas/archivos. No ajusta dummy adicional.
+evaluate tampoco llama fit_final. Persistencia y carga quedan para M005.
+
+Protocolo técnico congelado: generate signal semilla 17, align/sample, seis
+predictores p01..p06, cuatro folds generados, bloques 320 m, origen
+(500000,4498720), seed=17, buffer=0 y RF predeterminado. Se exige RMSE OOF RF
+<=0.9*RMSE OOF dummy y se repite el mismo caso con rtol/atol=1e-10. no_signal
+semilla 17 usa idéntica configuración, sin umbral de superioridad. Si falla el
+umbral, se conserva el resultado y se informa al arquitecto; no se buscan otras
+semillas, ruidos o parámetros. Son pruebas técnicas deterministas V4, no un lote
+científico R4 ni prueba de utilidad ecológica.
+
+La suite modeling planifica 45 llamadas fit por invocación: 12 RF, 19 dummy,
+12 espías de regresor (incluidos cuatro intentos de fallo controlado) y 2 de
+transformador. Un contador impide superar 64 antes de ajustar y contrasta el
+total al terminar el protocolo. El wheel añade sólo un ajuste dummy mínimo.
+Después de un fallo de prueba se detienen los casos modeling siguientes.
+Un hilo y un ajuste concurrente; tablas en memoria, RAM nativa y scratch pico
+`unknown`. No cualifica Linux ni escala de producción.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--modeling-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
+
+El focused muestra el resultado del protocolo y el contador de ajustes. Los
+modos focused son mutuamente excluyentes y el full conserva todas las suites.
 
 ## Fixtures sintéticas de desarrollo
 

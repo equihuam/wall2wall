@@ -14,6 +14,7 @@ Once pruebas deben pasar. Copias de fuentes, wheel e instalación de prueba se
 crean bajo tmp_path; otro proceso confirma origen del import y metadatos, y
 ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en el wheel.
 Comprueba además particiones aportadas con exclusiones por buffer positivo.
+Verifica fit_final y predicción desde el wheel con un único ajuste dummy mínimo.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -45,7 +46,8 @@ def test_installed_wheel(tmp_path):
     assert not scratch.is_relative_to(PACKAGE.parent)
     source = tmp_path / "source"
     for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py",
-                     "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py"):
+                     "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py",
+                     "src/wall2wall/modeling.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -158,6 +160,14 @@ assert buffered["exclusions"].reason.tolist() == ["buffer_distance", "buffer_dis
 assert buffered["diagnostics"]["split_origin"] == "provided"
 assert buffered["diagnostics"]["seed_used"] is False
 assert (Path.cwd() / "buffered-folds/manifest.json").is_file()
+import wall2wall.modeling
+from sklearn.dummy import DummyRegressor
+assert Path(wall2wall.modeling.__file__).resolve() == target / "wall2wall" / "modeling.py"
+final_model = wall2wall.modeling.fit_final(
+    sampled["table"], sampled["schema"], estimator=DummyRegressor(strategy="mean"))
+assert final_model["predictors"] == ["p01"]
+np.testing.assert_array_equal(final_model["estimator"].predict(sampled["table"][["p01"]]), [2.5, 2.5])
+assert final_model["response"]["name"] == "response"
 '''
     result = subprocess.run(
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],
