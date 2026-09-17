@@ -6,7 +6,7 @@ Cualifica motores CPU reales mediante clonación, evaluación espacial fija y
 anidada, ajuste final y selección interna con Pipeline, sin optimizar precisión.
 
 ## Precondiciones
-Windows D014/Python 3.11 con LightGBM 4.6.0 y XGBoost 3.1.3 instalados por el
+Linux D020 o Windows D014/Python 3.11 con LightGBM 4.6.0 y XGBoost 3.1.3 instalados por el
 arquitecto. Scratch externo, un hilo, dos predictores y hasta 128 filas sintéticas.
 
 ## Resultados
@@ -17,7 +17,7 @@ reproducibilidad, JSON/CSV coherentes y rechazos anteriores al primer ajuste.
 ## Notas relevantes
 Semilla 17, cuatro árboles, profundidad dos y tasa 0.1. No instala paquetes ni
 usa dobles para acreditar ejecución nativa. Sin umbral de precisión, reintentos
-o cualificación Linux/M008; RAM nativa y scratch pico no medidos.
+o cualificación M008; RAM nativa y scratch pico no medidos.
 =============================================================================
 """
 import copy
@@ -50,7 +50,7 @@ def estimator(engine):
 
 @pytest.fixture(scope="module", autouse=True)
 def fit_budget():
-    assert sys.platform == "win32" and sys.version_info[:2] == (3, 11)
+    assert sys.platform in ("linux", "win32") and sys.version_info[:2] == (3, 11)
     for name, version in VERSIONS.items():
         assert importlib.metadata.version(name) == version
     # Mandatory real imports: absent packages or native failures abort, never skip.
@@ -118,7 +118,7 @@ def unchanged(table, schema, before, metadata, models):
 
 
 def test_profile():
-    lock = (PACKAGE.parent / "06_infra/pip-engines-win-64.lock.txt").read_text(encoding="utf-8")
+    lock = (PACKAGE.parent / ("06_infra/pip-engines-linux-64.lock.txt" if sys.platform == "linux" else "06_infra/pip-engines-win-64.lock.txt")).read_text(encoding="utf-8")
     for name, version in VERSIONS.items():
         assert f"{name}=={version} --hash=sha256:" in lock
         assert importlib.metadata.version(name) == version

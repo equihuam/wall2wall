@@ -6,7 +6,7 @@ Prueba el camino CLI production y sus identidades con una fixture analítica nue
 Contrasta folds, métricas y mapas con llamadas públicas directas independientes.
 
 ## Precondiciones
-Windows D014, Snakemake y Pytest fijos; scratch externo del lanzador mantenido.
+Linux D020 o Windows D014, Snakemake y Pytest fijos; scratch externo del lanzador mantenido.
 Fixture 16x16, dos predictores, 16 puntos, semilla 17 y dos folds sin buffer.
 
 ## Resultados
@@ -44,12 +44,13 @@ sys.path.pop(0)
 sys.path.pop(0)
 
 
-def invoke(config, run, target="production", dry=False):
+def invoke(config, run, target="production", dry=False, extra=(), env=None):
     command = [sys.executable, "-B", str(PACKAGE / "workflow/run.py"), "--config", str(config),
                "--run-dir", str(run), "--target", target]
+    command.extend(extra)
     if dry:
         command.append("--dry-run")
-    return subprocess.run(command, cwd=config.parent, capture_output=True, text=True, encoding="utf-8", timeout=180)
+    return subprocess.run(command, cwd=config.parent, capture_output=True, text=True, encoding="utf-8", timeout=180, env=env)
 
 
 def success(result):
@@ -63,6 +64,8 @@ def rejected(result, text):
 
 def fixture_files(root):
     config = stages.read_json(PACKAGE / "examples/workflow.json")
+    config["profile"] = stages.PROFILE
+    config["locks"] = {}
     rows, cols = np.indices((16, 16))
     values = np.stack((cols / 15., rows / 15.)).astype("float32")
     values[:, 0, 0] = -9999

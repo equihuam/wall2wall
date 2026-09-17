@@ -419,3 +419,114 @@ rewrite history when a decision changes.
 - Default temporal de verificación del checkout Linux: comprobación D020 sin fits,
   timeout 120 s. Antes de otra entrega funcional el arquitecto fijará su propio
   full y presupuesto; no heredar por accidente el full Windows.
+
+## D022 — M006-S02: integración Linux con evidencia histórica preservada
+
+- Status: accepted
+- Date: 2026-09-17
+- Authority: El propietario solicita preparar y emitir M006-S02 desde Linux,
+  concretando cualificación adicional, alcance y presupuestos; prohíbe fits
+  durante preparación y commit/push. La autorización previa D020 permite
+  preparar dependencias aisladas necesarias para operar en WSL2.
+- Boundary: M001 cerrado y publicado en 864b7ea; horizonte v0.1. Se admite
+  exclusivamente M006-S02; M006-S03, piloto y M008 no se ejecutan. El cierre
+  acotado M001 no acredita extras, réplica ni workflow de producción Linux.
+- Preparation: LightGBM 4.6.0 y XGBoost 3.1.3 faltaban. Se instalaron en el
+  prefijo dedicado con lock suplementario pip-engines-linux-64.lock.txt,
+  sin cambiar los locks D020. XGBoost declara nvidia-nccl-cu12 (2.31.2 fijado)
+  como dependencia transitiva de su wheel Linux; su presencia no autoriza GPU.
+  Descarga previa de 51 artefactos pip con hashes para instalación offline;
+  wheelhouse 489079426 bytes, archivos instalados de extras 705689360 bytes,
+  contados por manifiestos de distribución sin recorrer entornos. Logs y
+  rutas concretas permanecen ignorados. Base/qgis_env y servicios no cambiaron.
+- Observed: imports core/extras y pip check pasan; el lanzador Linux recoge
+  251 pruebas y sus cinco pruebas de guardia de descubrimiento pasan.
+  Micromamba dry-run offline del lock base: 115 paquetes, cero descarga.
+  Cero fits y cero canaries D020 repetidos. Estos controles no acreditan
+  ejecución del full, recreación real, validated ni desempeño de modelos.
+- Verification: run_linux_checks.py es el nuevo full Linux y no llama
+  al canary ni a infraestructura Windows. Conserva 251 IDs y exige siete
+  nuevos en el full final. Protocolo M006-S02 separa validated/réplica
+  de Pytest/full para evitar recursión. Qualify_linux se ejecutará una vez
+  por el coder y emitirá informe con identidades actuales; reviewer no repite.
+- Scope: Adaptar perfil/identidades por etapa, reutilización y reparación
+  explícitas, reanudación y pruebas; preservar resultados previos y fallos.
+  Única extensión científica de interfaz: compression DEFLATE/LZW en
+  predict_raster, default compatible, sin cambios de valores/algoritmo.
+  Réplica offline del entorno desde locks más wheel fuera del checkout,
+  incluyendo ejecución real CPU de extras, es puerta de aceptación.
+- Budget: Protocolo previo obligatorio en 03_experiments/M006-S02_protocol.md.
+  Preparación cero fits; coder 60min/20000tokens o unknown, comandos1200s,
+  workflow plan37/cota60 fits por invocación, dos focused como máximo,
+  un full coder y un full oficial posterior; cualificación separada una vez
+  con planes previos por grupo, réplica/cache <=6GiB, scratch por suite512MiB.
+  No nuevos intentos científicos, red durante verificación ni GPU.
+- Preservation: linux-validation.json y nueve identidades D020 inmutables;
+  nuevo scope de encabezados independiente. El coder sólo agrega al scope
+  dos archivos Python nuevos nombrados en el roadmap. Los informes anteriores
+  y ledger no se reescriben. Baseline exacta se fija al emitir --allow-dirty.
+
+## D023 — Corrección M006-S02 r2 con conservación de evidencia r1
+
+- Status: accepted
+- Date: 2026-09-18
+- Authority: Dictamen aportado por el propietario M006-S02 r1: needs_work,
+  dos P2 abiertos F1/F2; solicita corrección acotada con presupuesto explícito.
+- Decision: Proteger todos los caminos escritores con el mismo bloqueo antes
+  de mutar runs; documentar las variables de matriz y validar sus precondiciones
+  antes de crear salidas. Dos pruebas de control sin fits, sin rediseñar ciencia.
+- Evidence: Guardar y registrar el informe r1 sin alterarlo. Mantener inmutable
+  m006-s02-validation.json y los recibos anteriores. Los cambios de fuentes
+  requieren nueva evidencia en m006-s02-r2-validation.json; no actualizar hashes
+  del informe viejo para aparentar vigencia. Sólo reviewer cierra F1/F2.
+- Budget: Protocolo M006-S02_r2_protocol.md obligatorio. Hasta dos focused de
+  control cero fits, un focused workflow37/cota60, una cualificación separada
+  nueva con validated/no-op/réplica offline/wheel/extras y planes r1, un full
+  coder y uno oficial. 60min/20000tokens o unknown,1200s/comando; mismos límites
+  R3 y réplica6GiB. Fallo caro o cambio posterior: parar, no reintentar.
+- Boundary: Checkout Linux único propietario. Sin commit/push, canary D020,
+  cambios de dependencias ni instalación en entorno primario. No ejecutar
+  producto durante esta preparación. Baseline exacta arquitectónica al emitir.
+
+## D024 — Resolución operativa del full M006-S02 r2
+
+- Status: accepted
+- Date: 2026-09-18
+- Authority: El propietario solicita diagnosticar y resolver el bloqueo r2,
+  preservar evidencia y concretar presupuesto antes de la resolución, sin
+  ejecutar fits/full/validated/réplicas durante el diagnóstico.
+- Evidence: full.log conservado SHA-256
+  a1e26d3b72874fe9d6321b0945d8bfff11ecba1be1617656de8429a1766696f0:
+  260 passed, 27 warnings, 1 error, 156.04s. FileNotFoundError en teardown
+  de test_failure_resume_preserves_history al crear workflow-matrix.json.pending
+  porque el destino de WALL2WALL_TEST_EVIDENCE no existía. No declarar full PASS.
+  JUnit conservado SHA-256
+  5251bbbdace29c77abdbf6fb909ee78da01e85da3ed5175b642249d183e8a4c4.
+  Punteros locales exactos ignorados en local_state/m006-s02-preparation/r2-recovery.json.
+- Identity: Las 26 fuentes coinciden con m006-s02-r2-validation.json,
+  SHA-256 1bec22cd1f6c080f0bdcc65c9f0a4d244f613903b6b6518af57a91d9b8f7ef32.
+  Informe r1 intacto SHA-256
+  42cae6664043d2a002ea1417980c28432e1be6c2217b46b353fe7f1e45d934a8.
+  No modificar fuentes ni informes para recuperar la invocación.
+- Resolution: El actor arquitecto puede consumir únicamente el full oficial
+  ya reservado por D023, mediante scripts/verify.py M006-S02, después de crear
+  un directorio externo exclusivo vacío con tempfile.mkdtemp y seleccionar
+  WALL2WALL_TEST_EVIDENCE para ese proceso. Confirmar previamente que ni
+  workflow-matrix.json ni su .pending existen. No reutilizar focused ni
+  full-evidence del intento fallido. Conservar el directorio nuevo y su JUnit.
+  No se autoriza otro full coder ni se emite nueva ronda o cambia el envelope.
+- Budget: Una sola invocación oficial, 1200s, misma suite260 y presupuestos
+  D023: workflow37/cota60, restantes planes por módulo, un fit concurrente,
+  n_jobs1/cores1/retries0, scratch512MiB por suite/escala1GiB. Cero nueva
+  cualificación, réplica, canary, instalación o experimento científico.
+  Si falla o deriva una identidad, detenerse sin reemplazos.
+- Remaining defect: workflow.md conserva WALL2WALL_TEST_EVIDENCE del focused
+  para el full. Ese directorio ya contiene workflow-matrix.json y write_json
+  rechaza sobrescribirlo: la secuencia publicada también necesita seleccionar
+  un directorio nuevo existente antes del full. La resolución operativa NO
+  corrige ese documento ni cierra F2. Entregar este diagnóstico al reviewer
+  junto con el recibo futuro. Sólo reviewer decide F1/F2; no aceptar la entrega
+  por un full satisfactorio aislado. Si exige corrección documental, preparar
+  después una ronda acotada con tratamiento explícito de identidad/evidencia.
+- Result of this session: sólo inspección/hash/gobernanza; cero fits o pruebas.
+  Sin commit/push. Preservar informes r1/r2 y el intento fallido.

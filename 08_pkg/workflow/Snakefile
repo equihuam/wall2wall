@@ -21,56 +21,56 @@ rule validated:
     input: "production.json", expand("pytest-{group}.json", group=GROUPS)
 
 rule preflight:
-    input: "preflight.json", SOURCES, INPUTS
+    input: "preflight.json"
     output: "preflight.checked"
     threads: 1
     resources: mem_mb=128
     shell: "{PYTHON:q} {WORKER:q} preflight {RUN:q}"
 
 rule align_predictors:
-    input: "preflight.checked", "preflight.json", SOURCES
+    input: "align.key.json"
     output: "align.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} align {RUN:q}"
 
 rule sample_points:
-    input: "align.json", "preflight.json", SOURCES
+    input: "sample.key.json", "align.json"
     output: "sample.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} sample {RUN:q}"
 
 rule make_spatial_folds:
-    input: "sample.json", "preflight.json", SOURCES
+    input: "folds.key.json", "sample.json"
     output: "folds.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} folds {RUN:q}"
 
 rule evaluate:
-    input: "sample.json", "folds.json", "preflight.json", SOURCES
+    input: "evaluate.key.json", "sample.json", "folds.json"
     output: "evaluate.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} evaluate {RUN:q}"
 
 rule fit_final:
-    input: "align.json", "sample.json", "evaluate.json", "preflight.json", SOURCES
+    input: "fit.key.json", "align.json", "sample.json", "evaluate.json"
     output: "fit.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} fit {RUN:q}"
 
 rule predict_raster:
-    input: "align.json", "fit.json", "preflight.json", SOURCES
+    input: "predict.key.json", "align.json", "fit.json"
     output: "predict.json"
     threads: 1
     resources: mem_mb=1024
     shell: "{PYTHON:q} {WORKER:q} predict {RUN:q}"
 
 rule audit_workflow:
-    input: expand("{stage}.json", stage=["align", "sample", "folds", "evaluate", "fit", "predict"]), SOURCES
+    input: expand("{stage}.json", stage=["align", "sample", "folds", "evaluate", "fit", "predict"]), "preflight.checked"
     output: "production.json"
     threads: 1
     resources: mem_mb=128

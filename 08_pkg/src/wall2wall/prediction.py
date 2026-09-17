@@ -12,7 +12,7 @@ al ajuste, encoding físico identidad y destino inexistente. Confianza explícit
 
 ## Resultados
 predict_raster devuelve prediction_path, manifest_path y manifest. Publica un mapa
-float32 tiled/DEFLATE con nodata NaN y máscara interna, seguido del manifiesto.
+float32 tiled con compression DEFLATE (defecto) o LZW y nodata NaN y máscara interna, seguido del manifiesto.
 Valida buffers propios de hasta 128 MiB, ventanas hasta 1024 y lotes hasta 65536.
 quality=True añade validity.tif y conteo univariado min/max out_of_range.tif,
 usando rangos físicos del ajuste final, sin releer bandas ni alterar predicciones.
@@ -126,8 +126,10 @@ def _inputs(path, manifest, schema, stack):
     return grid, prepared, joint, joint_path, references, datasets
 
 
-def predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False, window_size=512, batch_size=65536, quality=False):
+def predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False, window_size=512, batch_size=65536, quality=False, compression="DEFLATE"):
     """Predict a new inference grid from a trusted final fit; never refit or align."""
+    if not isinstance(compression, str) or compression not in ("DEFLATE", "LZW"):
+        raise ValueError("compression must be DEFLATE or LZW")
     started = time.perf_counter()
     if type(quality) is not bool:
         raise ValueError("quality must be a boolean")
@@ -191,7 +193,7 @@ def predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False, wi
                     path, "w", driver="GTiff", width=grid["width"], height=grid["height"],
                     count=1, dtype=dtype, nodata=nodata, crs=grid["crs"],
                     transform=Affine(*grid["transform"]), tiled=True, blockxsize=256, blockysize=256,
-                    compress="DEFLATE", BIGTIFF=bigtiff, NUM_THREADS="1"))
+                    compress=compression, BIGTIFF=bigtiff, NUM_THREADS="1"))
             dest = writer(pending, "float32", float("nan"))
             if quality:
                 validity = writer(quality_paths["validity"], "uint8", 0)
@@ -244,7 +246,7 @@ def predict_raster(run_dir, alignment_manifest, output_dir, *, trusted=False, wi
                     "alignment_manifest": identities[path], "inputs": list(identities.values()), "dataset_files": files,
                     "grid": grid, "predictors": references, "response": loaded["response"],
                     "training_predictors": loaded["schema"]["predictors"], "joint_mask": paths[joint_path],
-                    "parameters": {"window_size": size, "batch_size": batch, "bigtiff": bigtiff},
+                    "parameters": {"window_size": size, "batch_size": batch, "bigtiff": bigtiff, "compression": compression},
                     "counts": {"valid": valid_count, "invalid": pixels - valid_count, "windows": windows, "predict_calls": calls},
                     "resources": {"buffer_bound_bytes": estimated, "buffer_limit_bytes": BUFFER_LIMIT,
                                   "gdal_cache_bytes": CACHE_BYTES, "threads": 1,

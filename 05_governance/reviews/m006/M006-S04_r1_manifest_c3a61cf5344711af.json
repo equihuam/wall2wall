@@ -1,0 +1,1 @@
+{"changed":[{"kind":"added","path":"06_infra/m006-s02-docs-bridge.json","round":1,"sha":"bc3d82209a4c6fd1e87d0e01690c36256a1f9f6fdac159edb1321d8ff709dc53"},{"kind":"modified","path":"08_pkg/docs/workflow.md","round":1,"sha":"79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6"}],"round":1,"schema":"frutlups.manifest/2","slice":"M006-S04"}

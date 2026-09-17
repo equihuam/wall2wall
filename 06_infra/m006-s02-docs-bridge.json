@@ -1,0 +1,9 @@
+{
+  "schema": "wall2wall.docs-bridge/1",
+  "historical_report_sha256": "1bec22cd1f6c080f0bdcc65c9f0a4d244f613903b6b6518af57a91d9b8f7ef32",
+  "document": "08_pkg/docs/workflow.md",
+  "before_sha256": "76f5ce82f394c74e405e18586a34166245b1018be55a617dc29bd573d65b9517",
+  "after_sha256": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6",
+  "unchanged_sources": 25,
+  "new_scientific_execution": false
+}

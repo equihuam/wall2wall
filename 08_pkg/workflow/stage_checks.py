@@ -6,7 +6,7 @@ Ejecuta selectores Pytest mantenidos por etapa y sella recibos sólo tras éxito
 Verifica identidad de producción, código, pruebas, fixtures, locks e intérprete.
 
 ## Precondiciones
-Producción íntegra del mismo JSON y entorno Windows D014, suites presentes.
+Producción íntegra del mismo JSON y perfil fijo Linux/Windows, suites presentes.
 Los selectores existentes conservan sus gates de IDs, cero pruebas y skips.
 
 ## Resultados
@@ -15,7 +15,7 @@ verify_receipt rechaza recibos obsoletos sin entrenar ni ejecutar otras suites.
 
 ## Notas relevantes
 No incluye test_workflow ni ejecuta validated desde pruebas del workflow.
-Cada selector usa scratch externo; ejecución integral de validated diferida.
+Cada selector usa scratch externo y puede conservar JUnit mediante configuración local.
 =============================================================================
 """
 import argparse
@@ -40,7 +40,7 @@ def suite_contract(group):
         raise ValueError("invalid stage suite")
     # Include every maintained suite source: selectors import shared fixture modules.
     files = {PACKAGE / node.split("::")[0] for key, value in definitions.items()
-             if (key == "REQUIRED" or key.endswith("_REQUIRED")) and key != "WORKFLOW_REQUIRED"
+             if (key == "REQUIRED" or key.endswith("_REQUIRED")) and key not in {"WORKFLOW_REQUIRED", "RESUME_REQUIRED"}
              and isinstance(value, set) for node in value}
     files |= {launcher, ROOT / "06_infra/run_checks.py", PACKAGE / "examples/synthetic.py", PACKAGE / "pyproject.toml"}
     return required, files

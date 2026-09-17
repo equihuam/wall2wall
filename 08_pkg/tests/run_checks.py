@@ -10,22 +10,24 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 251 pruebas: las 243 previas y ocho del workflow Windows.
+Sin argumentos exige 260 pruebas: las 258 previas y dos controles sin fits de M006-S02 r2.
 --synthetic-only, --spatial-only, --sampling-only, --validation-only, --buffer-only
 y --modeling-only, --selection-only, --engines-only, --engine-integration-only,
 --audit-only, --prediction-only, --quality-only, --scale-only y --workflow-only seleccionan sus grupos
-respectivos, manteniendo IDs obligatorios. Devuelve 0 si pasan las
+respectivos, manteniendo IDs obligatorios. --workflow-control-only exige los dos controles sin fits. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
 ## Notas relevantes
 No instala en el prefijo fijo ni realiza evaluaciones científicas. El tamaño
 informado corresponde al scratch final, no a su máximo durante la ejecución.
-Emite el reporte saneado de escala desde scratch cuando esa prueba lo produce.
+Emite el reporte saneado de escala; WALL2WALL_TEST_EVIDENCE conserva JUnit externo.
 =============================================================================
 """
 from pathlib import Path
 import argparse
 import os
+import shutil
+import uuid
 import runpy
 import sys
 import tempfile
@@ -164,6 +166,12 @@ QUALITY_REQUIRED = {
         "none", "empty", "order", "duplicate", "nan", "reverse", "boolean", "missing", "extra", "unknown")},
     *{f"tests/test_quality.py::test_quality_write_failure[{role}]" for role in ("validity", "out_of_range")},
 }
+PREDICTION_REQUIRED.add("tests/test_prediction.py::test_compression_contract")
+RESUME_REQUIRED = {"tests/test_workflow_resume.py::" + name for name in (
+    "test_selective_inference_reuse", "test_same_mtime_data_invalidation", "test_stage_code_invalidation",
+    "test_environment_change_refused", "test_missing_corrupt_repair", "test_failure_resume_preserves_history")}
+CONTROL_REQUIRED = {"tests/test_workflow_control.py::" + name for name in (
+    "test_shared_writer_lock", "test_qualification_preconditions")}
 SCALE_REQUIRED = {"tests/test_scale.py::test_scale_protocol"}
 WORKFLOW_REQUIRED = {"tests/test_workflow.py::" + name for name in (
     "test_production_processes_and_reference", "test_noop", "test_content_change_same_mtime",
@@ -199,8 +207,9 @@ def main():
     group.add_argument("--quality-only", action="store_true")
     group.add_argument("--scale-only", action="store_true")
     group.add_argument("--workflow-only", action="store_true")
+    group.add_argument("--workflow-control-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED | WORKFLOW_REQUIRED
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED | WORKFLOW_REQUIRED | RESUME_REQUIRED | CONTROL_REQUIRED
     if args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
@@ -227,8 +236,10 @@ def main():
         target, required = "tests/test_quality.py", QUALITY_REQUIRED
     elif args.scale_only:
         target, required = "tests/test_scale.py", SCALE_REQUIRED
+    elif args.workflow_control_only:
+        target, required = "tests/test_workflow_control.py", CONTROL_REQUIRED
     elif args.workflow_only:
-        target, required = "tests/test_workflow.py", WORKFLOW_REQUIRED
+        target, required = ["tests/test_workflow.py", "tests/test_workflow_resume.py"], WORKFLOW_REQUIRED | RESUME_REQUIRED
     package = ROOT / "08_pkg"
     if not (package / "pyproject.toml").is_file():
         print("Required package pyproject.toml is missing", file=sys.stderr)
@@ -250,12 +261,19 @@ def main():
         sys.dont_write_bytecode = True
         os.chdir(package)
         result = pytest.main([
-            target,
+            *([target] if isinstance(target, str) else target),
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
             *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only or args.prediction_only or args.quality_only or args.workflow_only else []),
             "--junitxml", str(scratch / "package.xml"),
         ], plugins=[RequiredTests(required)])
+        evidence = os.environ.get("WALL2WALL_TEST_EVIDENCE")
+        if evidence:
+            destination = Path(evidence).resolve()
+            if destination.is_relative_to(ROOT):
+                raise ValueError("test evidence must be external")
+            destination.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(scratch / "package.xml", destination / ("pytest-" + uuid.uuid4().hex + ".xml"))
         report = scratch / "scale-validation.json"
         if report.is_file():
             print("SCALE_VALIDATION_JSON_BEGIN\n" + report.read_text(encoding="utf-8") + "SCALE_VALIDATION_JSON_END")

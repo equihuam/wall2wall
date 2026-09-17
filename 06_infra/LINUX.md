@@ -162,3 +162,16 @@ reanudación/invalidación selectiva corresponden a M006-S02, pendiente.
 M008 también sigue pendiente: esta cualificación no satisface sus puertas ni
 cierra M006. M001 requiere dictamen y registro; después mantiene su revisión
 holística. Las aceptaciones pertenecen al ledger, no a esta guía.
+
+
+## Estado actual bajo D022: integración M006-S02
+
+M001 está cerrado; las declaraciones de estado anteriores describen la preparación
+D020/D021 y se conservan como historia. M006-S02 añade workflow Linux con perfil
+explícito, tres locks (base más extras), recuperación y reutilización por etapa.
+La evidencia de ejecución se consulta en 06_infra/m006-s02-validation.json cuando
+exista y en el recibo del full Linux; esta descripción no declara aceptación.
+El full actual es bash 06_infra/linux.sh 06_infra/run_linux_checks.py y no ejecuta
+el canary histórico ni el full Windows. La cualificación validated/réplica se
+separa del full; comandos y límites en 08_pkg/docs/workflow.md y protocolo M006-S02.
+No se modifican locks ni linux-validation.json. M006 y M008 no quedan cerrados.

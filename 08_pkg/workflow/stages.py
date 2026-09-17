@@ -2,11 +2,12 @@
 ## stages.py
 
 ## Descripción
-Adapta las API públicas a etapas persistidas del DAG Windows y comprueba sus
+Adapta las API públicas a etapas persistidas del DAG Linux/Windows y comprueba sus
 identidades antes de consumir productos o cerrar el inventario de producción.
 
 ## Precondiciones
-Windows D014 fijo, JSON declarativo y entradas locales, directorio externo nuevo.
+Perfil Linux D020 o Windows D014 fijo, JSON declarativo y entradas locales, directorio externo nuevo.
+La CLI mantiene el bloqueo exclusivo antes de preparar el directorio o ejecutar etapas.
 Los datos geométricos y estadísticos se validan en las API públicas respectivas.
 
 ## Resultados
@@ -14,7 +15,7 @@ La CLI interna recibe una etapa y un directorio; guarda productos y un sello JSO
 por etapa. El cierre enlaza productos con rutas relativas, tamaños y SHA-256.
 
 ## Notas relevantes
-No repara ni reanuda parciales. Los hashes no autentican escritores hostiles.
+Reutilización y recuperación requieren opciones explícitas de la CLI. Los hashes no autentican escritores hostiles.
 Un proceso por etapa, un hilo y RF fijo; tablas/modelo en memoria, RSS no medido.
 =============================================================================
 """
@@ -29,21 +30,36 @@ from pathlib import Path
 import platform
 import subprocess
 import sys
+import shutil
+import uuid
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(os.environ.get("WALL2WALL_SOURCE_ROOT", Path(__file__).resolve().parents[2])).resolve()
 PACKAGE = ROOT / "08_pkg"
+PRODUCT = Path(os.environ.get("WALL2WALL_PRODUCT_SOURCE", PACKAGE / "src/wall2wall")).resolve()
 LOCKS = {
     "conda": ("06_infra/conda-win-64.lock.txt", "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"),
     "pip": ("06_infra/pip-win-64.lock.txt", "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"),
 }
+WINDOWS_LOCKS = LOCKS
+LINUX_LOCKS = {
+    "conda": ("06_infra/conda-linux-64.lock.txt", "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"),
+    "pip": ("06_infra/pip-linux-64.lock.txt", "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"),
+    "engines": ("06_infra/pip-engines-linux-64.lock.txt", "50cf6f3ce38d73c2d2c59fa89a493d7b6eecadd3430e79b2d661b258cad5e7de"),
+}
+LOCKS = LINUX_LOCKS if sys.platform == "linux" else WINDOWS_LOCKS
+PROFILE = "Linux D020" if sys.platform == "linux" else "Windows D014"
 CODE = [PACKAGE / "workflow" / name for name in ("Snakefile", "run.py", "stages.py", "stage_checks.py")]
-CODE += [PACKAGE / "src/wall2wall" / (name + ".py") for name in
+CODE += [PRODUCT / (name + ".py") for name in
          ("__init__", "spatial", "sampling", "validation", "modeling", "audit", "prediction")]
 CODE += [PACKAGE / "pyproject.toml"]
 STAGES = ("align", "sample", "folds", "evaluate", "fit", "predict")
 PARENTS = {"align": (), "sample": ("align",), "folds": ("sample",),
            "evaluate": ("sample", "folds"), "fit": ("align", "sample", "evaluate"),
            "predict": ("align", "fit"), "close": STAGES}
+
+
+def code_name(path):
+    return "08_pkg/src/wall2wall/" + path.name if path.parent == PRODUCT else path.relative_to(ROOT).as_posix()
 
 
 def identity(path):
@@ -107,7 +123,9 @@ def local_path(base, value):
 def configuration(path):
     path = Path(path).resolve(strict=True)
     config = read_json(path)
-    keys(config, ("alignment", "sampling", "folds", "model", "prediction", "locks"))
+    keys(config, ("alignment", "sampling", "folds", "model", "prediction", "locks"), ("profile",))
+    if config.get("profile", "Windows D014") != PROFILE:
+        raise ValueError("configuration profile differs from runtime")
     a, s, f, m, p = [config[k] for k in ("alignment", "sampling", "folds", "model", "prediction")]
     keys(a, ("layers", "grid", "allow_reprojection", "window_size"))
     if type(a["allow_reprojection"]) is not bool or not isinstance(a["layers"], list) or not a["layers"]:
@@ -161,26 +179,37 @@ def configuration(path):
     keys(m, ("n_estimators", "max_depth", "random_state", "n_jobs"))
     for key, value in {"n_estimators": 4, "max_depth": 2, "random_state": 17, "n_jobs": 1}.items():
         integer(m[key], value, value, "fixed RF " + key)
-    keys(p, ("window_size", "batch_size", "quality"))
+    keys(p, ("window_size", "batch_size", "quality"), ("compression",))
+    if p.get("compression", "DEFLATE") not in ("DEFLATE", "LZW"):
+        raise ValueError("invalid compression")
     integer(p["window_size"], 1, 1024, "prediction window")
     integer(p["batch_size"], 1, 65536, "prediction batch")
     if type(p["quality"]) is not bool:
         raise ValueError("quality must be boolean")
-    keys(config["locks"], ("conda", "pip"))
+    keys(config["locks"], tuple(LOCKS))
     for name in LOCKS:
         inputs["lock/" + name] = local_path(path.parent, config["locks"][name])
     return config, resolved, inputs
 
 
 def environment(inputs):
-    prefix = ROOT / "local_state/envs/wall2wall-win"
-    if sys.platform != "win32" or platform.python_version() != "3.11.16" or Path(sys.prefix).resolve() != prefix.resolve():
-        raise ValueError("requires fixed Windows D014 Python 3.11.16 prefix")
-    if not Path(sys.executable).samefile(prefix / "python.exe"):
+    primary = ROOT / ("local_state/envs/wall2wall-linux" if sys.platform == "linux" else "local_state/envs/wall2wall-win")
+    prefix = primary
+    replica_file = os.environ.get("WALL2WALL_REPLICA")
+    if replica_file:
+        certificate = read_json(replica_file)
+        prefix = Path(certificate["prefix"]).resolve()
+        if certificate["schema"] != "wall2wall.replica/1" or certificate["locks"] != {k: v[1] for k, v in LOCKS.items()}:
+            raise ValueError("replica certificate differs from fixed locks")
+        if certificate["interpreter"] != identity(prefix / "bin/python"):
+            raise ValueError("replica interpreter changed")
+    if sys.platform not in ("linux", "win32") or platform.python_version() != "3.11.16" or Path(sys.prefix).resolve() != prefix.resolve():
+        raise ValueError("requires explicitly qualified fixed prefix Python 3.11.16")
+    if not Path(sys.executable).samefile(prefix / ("bin/python" if sys.platform == "linux" else "python.exe")):
         raise ValueError("interpreter differs from fixed prefix")
     for name, (relative, digest) in LOCKS.items():
         if identity(inputs["lock/" + name])["sha256"] != digest or identity(ROOT / relative)["sha256"] != digest:
-            raise ValueError("lock differs from fixed D014: " + name)
+            raise ValueError("lock differs from fixed profile: " + name)
     # Named records from the explicit lock, without enumerating the environment.
     for line in inputs["lock/conda"].read_text().splitlines():
         if not line.startswith("https://"):
@@ -189,10 +218,15 @@ def environment(inputs):
         stem = archive.removesuffix(".conda").removesuffix(".tar.bz2")
         name, version, build = stem.rsplit("-", 2)
         record = read_json(prefix / "conda-meta" / (stem + ".json"))
+        if sys.platform == "linux" and record.get("sha256") != line.split("#")[1]:
+            raise ValueError("Conda archive hash differs: " + name)
         if (record["name"], record["version"], record["build"]) != (name, version, build):
             raise ValueError("Conda record differs: " + name)
     versions = {}
-    for line in inputs["lock/pip"].read_text().splitlines():
+    pip_lines = inputs["lock/pip"].read_text().splitlines()
+    if "lock/engines" in inputs:
+        pip_lines += inputs["lock/engines"].read_text().splitlines()
+    for line in pip_lines:
         if line and not line.startswith("#"):
             name, expected = line.split()[0].split("==")
             versions[name] = importlib.metadata.version(name)
@@ -205,7 +239,7 @@ def environment(inputs):
             raise ValueError("runtime version differs: " + name)
     bash = Path(os.environ["WALL2WALL_BASH"])
     bash_version = subprocess.check_output([str(bash), "--version"], text=True, timeout=15).splitlines()[0]
-    return {"python": platform.python_version(), "versions": versions, "interpreter": identity(sys.executable),
+    return {"profile": PROFILE, "python": platform.python_version(), "versions": versions, "interpreter": identity(sys.executable),
             "prefix_identity": fingerprint(str(prefix.resolve())), "bash": {**identity(bash), "version": bash_version}}
 
 
@@ -225,9 +259,26 @@ def preflight(config_path, run):
         return cache[path]
     state = {"schema": "wall2wall.workflow.preflight/1", "environment": runtime,
              "inputs": {key: hashed(path) for key, path in inputs.items()},
-             "code": {p.relative_to(ROOT).as_posix(): hashed(p) for p in CODE},
+             "code": {code_name(p): hashed(p) for p in CODE},
              "configuration": {key: fingerprint(value) for key, value in config.items()},
              "fit_plan": {"evaluate": 4, "fit_final": 1, "total": 5}}
+    modules = {
+        "align": ("spatial",), "sample": ("sampling", "spatial"), "folds": ("validation",),
+        "evaluate": ("modeling", "validation"), "fit": ("modeling", "validation", "audit", "sampling", "spatial"),
+        "predict": ("prediction", "audit", "sampling", "spatial"),
+    }
+    sections = {"align": ("alignment",), "sample": ("sampling",), "folds": ("folds",),
+                "evaluate": ("folds", "model"), "fit": ("model",), "predict": ("prediction",)}
+    state["stages"] = {}
+    for stage in STAGES:
+        data = {k: v for k, v in state["inputs"].items() if
+                (stage == "align" and k.startswith("layer/")) or (stage == "sample" and k == "observations")}
+        relevant = {p: v for p, v in state["code"].items() if p.startswith("08_pkg/workflow/") or
+                    p == "08_pkg/pyproject.toml" or p.endswith("/__init__.py") or
+                    any(p.endswith("/" + module + ".py") for module in modules[stage])}
+        state["stages"][stage] = fingerprint({"environment": runtime, "data": data, "code": relevant,
+            "configuration": {k: state["configuration"][k] for k in sections[stage]},
+            "parents": {k: state["stages"][k] for k in PARENTS[stage]}})
     return state, resolved, inputs
 
 
@@ -243,13 +294,13 @@ def checked_products(run, products):
 
 def seal(run, stage, paths, state):
     products = [{"path": p.relative_to(run).as_posix(), **identity(p)} for p in sorted(set(paths))]
-    write_json(run / (stage + ".json"), {"stage": stage, "preflight": fingerprint(state),
+    write_json(run / (stage + ".json"), {"stage": stage, "identity": state["stages"][stage],
                "process": os.getpid(), "interpreter": state["environment"]["interpreter"], "products": products})
 
 
 def verify_stage(run, stage, state):
     record = read_json(run / (stage + ".json"))
-    if record["stage"] != stage or record["preflight"] != fingerprint(state):
+    if record["stage"] != stage or record["identity"] != state["stages"][stage]:
         raise ValueError("obsolete stage: " + stage)
     checked_products(run, record["products"])
     return record["products"]
@@ -288,9 +339,9 @@ def provenance(run, config, inputs, state):
     aligned = read_json(run / "align/manifest.json")
     declared = [{"name": "input/" + key + ".input", "role": "lock" if key.startswith("lock/") else "data", "path": value}
                 for key, value in inputs.items()]
-    declared += [{"name": p.relative_to(ROOT).as_posix(), "role": "code", "path": p} for p in CODE]
-    return {"profile": "Windows D014", "manager": {"name": "Conda", "version": {"status": "unknown", "reason": "launcher-managed"}},
-            "bash": {"provider": "Git Bash", "version": state["environment"]["bash"]["version"]},
+    declared += [{"name": code_name(p), "role": "code", "path": p} for p in CODE]
+    return {"profile": PROFILE, "manager": {"name": "Micromamba" if sys.platform == "linux" else "Conda", "version": {"status": "unknown", "reason": "launcher-managed"}},
+            "bash": {"provider": "Bash Linux" if sys.platform == "linux" else "Git Bash", "version": state["environment"]["bash"]["version"]},
             "workflow": {"status": "used", "snakemake_version": "9.27.0", "revision": fingerprint(state["code"])},
             "configuration": {"stages": state["configuration"], "unknown_period_reason": "explicitly declared by configuration"},
             "preprocessing": {"scales": [{"name": p["name"], "scale": p["effective_source_encoding"]["scale"],
@@ -310,8 +361,13 @@ def execute(stage, run, config_path):
         verify_stage(run, parent, state)
     if (run / (stage + ".json")).exists():
         raise FileExistsError("stage already exists")
-    sys.path.insert(0, str(PACKAGE / "src"))
+    if not os.environ.get("WALL2WALL_REPLICA"):
+        sys.path.insert(0, str(PRODUCT.parent))
     from wall2wall import audit, modeling, prediction, sampling, spatial, validation
+    if os.environ.get("WALL2WALL_REPLICA"):
+        import wall2wall
+        if not Path(wall2wall.__file__).resolve().is_relative_to(Path(sys.prefix).resolve()):
+            raise ValueError("replica must import installed wheel")
     from sklearn.ensemble import RandomForestRegressor
     output = run / stage
     if stage == "align":
@@ -319,6 +375,8 @@ def execute(stage, run, config_path):
         paths = [result["manifest_path"], result["mask_path"], *result["mask_paths"]]
         paths += [p["path"] for p in result["layers"] if p["path"].is_relative_to(output)]
     elif stage == "sample":
+        if os.environ.get("WALL2WALL_TEST_FAIL_AFTER_ALIGN") == "1":
+            raise RuntimeError("controlled failure after align")
         options = dict(config["sampling"])
         source = options.pop("csv")
         sampling.sample_points(source, run / "align/manifest.json", output, **options)
@@ -364,6 +422,76 @@ def execute(stage, run, config_path):
                    "products": products})
         return
     seal(run, stage, paths, state)
+
+
+def prepare_run(run, state, source=None, resume=False):
+    """Caller holds the run lock; verify reuse and archive only named owned outputs."""
+    if source is not None:
+        source = source.resolve()
+        if source == run or source.is_relative_to(run) or run.is_relative_to(source):
+            raise ValueError("reuse source and destination must be disjoint")
+    previous = run if resume else source
+    valid = set()
+    if previous is not None:
+        owner = read_json(previous / "owner.json")
+        if owner != {"schema": "wall2wall.workflow.owner/1"}:
+            raise ValueError("foreign run")
+        old = read_json(previous / "preflight.json")
+        if old["environment"] != state["environment"]:
+            raise ValueError("environment changed; no reuse or resume")
+        for stage in STAGES:
+            try:
+                verify_stage(previous, stage, old)
+                if old["stages"][stage] == state["stages"][stage] and all(parent in valid for parent in PARENTS[stage]):
+                    valid.add(stage)
+            except (OSError, ValueError, KeyError, TypeError):
+                pass
+        if source is not None and "align" in valid:
+            manifest = read_json(source / "align/manifest.json")
+            for layer in manifest["layers"]:
+                relative = layer["path"]
+                old_path = (source / "align" / relative).resolve()
+                if not old_path.is_relative_to(source) and old_path != (run / "align" / relative).resolve():
+                    raise ValueError("reuse requires compatible relative input layout; choose a sibling run-dir")
+    if resume:
+        history = run / "history" / uuid.uuid4().hex
+        history.mkdir(parents=True)
+        names = ["preflight.json", "preflight.checked", "preflight.checked.pending", "production.json", "production.json.pending", "reuse.json"]
+        names += ["pytest-" + group + ".json" for group in ("spatial", "sampling", "validation", "modeling", "audit", "prediction")]
+        for stage in STAGES:
+            if stage not in valid:
+                names += [stage, stage + ".json", stage + ".json.pending", stage + ".key.json"]
+                if stage == "fit":
+                    names += ["final_fit_plan.json", "final_fit_plan.json.pending"]
+        for name in names:
+            path = run / name
+            if path.exists() or path.is_symlink():
+                if path.is_symlink() or not path.resolve().is_relative_to(run):
+                    raise ValueError("unsafe owned product")
+                path.rename(history / name)
+    else:
+        if set(run.iterdir()) != {run / ".workflow.lock"}:
+            raise ValueError("new run must contain only the acquired workflow lock")
+        write_json(run / "owner.json", {"schema": "wall2wall.workflow.owner/1"})
+        if source is not None:
+            for stage in STAGES:
+                if stage in valid:
+                    products = verify_stage(source, stage, read_json(source / "preflight.json"))
+                    for item in products + [{"path": stage + ".json"}]:
+                        destination = run / item["path"]
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(source / item["path"], destination)
+    write_json(run / "preflight.json", state)
+    write_json(run / "reuse.json", {"reused": [s for s in STAGES if s in valid],
+                                    "recompute": [s for s in STAGES if s not in valid]})
+    for stage in STAGES:
+        path = run / (stage + ".key.json")
+        if not path.exists():
+            write_json(path, {"identity": state["stages"][stage]})
+            if stage in valid:
+                stamp = (run / (stage + ".json")).stat().st_mtime_ns
+                os.utime(path, ns=(stamp, stamp))
+    return valid
 
 
 if __name__ == "__main__":

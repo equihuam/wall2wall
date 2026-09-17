@@ -1,19 +1,73 @@
 {
   "alignment": {
     "layers": [
-      {"path": "predictors.tif", "band": 1, "name": "p01", "unit": "u", "period": "fixture"},
-      {"path": "predictors.tif", "band": 2, "name": "p02", "unit": "u", "period": "fixture"}
+      {
+        "path": "predictors.tif",
+        "band": 1,
+        "name": "p01",
+        "unit": "u",
+        "period": "fixture"
+      },
+      {
+        "path": "predictors.tif",
+        "band": 2,
+        "name": "p02",
+        "unit": "u",
+        "period": "fixture"
+      }
     ],
-    "grid": {"crs": "EPSG:32630", "transform": [1, 0, 0, 0, -1, 16], "width": 16, "height": 16},
+    "grid": {
+      "crs": "EPSG:32630",
+      "transform": [
+        1,
+        0,
+        0,
+        0,
+        -1,
+        16
+      ],
+      "width": 16,
+      "height": 16
+    },
     "allow_reprojection": false,
     "window_size": 8
   },
   "sampling": {
-    "csv": "points.csv", "points_crs": "EPSG:32630", "response": "response",
-    "response_unit": "u", "response_support": "point", "response_period": "fixture", "window_size": 8
+    "csv": "points.csv",
+    "points_crs": "EPSG:32630",
+    "response": "response",
+    "response_unit": "u",
+    "response_support": "point",
+    "response_period": "fixture",
+    "window_size": 8
   },
-  "folds": {"block_size": 8, "origin": [0, 0], "n_splits": 2, "seed": 17, "buffer_distance": 0, "min_train_samples": 1},
-  "model": {"n_estimators": 4, "max_depth": 2, "random_state": 17, "n_jobs": 1},
-  "prediction": {"window_size": 8, "batch_size": 16, "quality": true},
-  "locks": {"conda": "../../06_infra/conda-win-64.lock.txt", "pip": "../../06_infra/pip-win-64.lock.txt"}
+  "folds": {
+    "block_size": 8,
+    "origin": [
+      0,
+      0
+    ],
+    "n_splits": 2,
+    "seed": 17,
+    "buffer_distance": 0,
+    "min_train_samples": 1
+  },
+  "model": {
+    "n_estimators": 4,
+    "max_depth": 2,
+    "random_state": 17,
+    "n_jobs": 1
+  },
+  "prediction": {
+    "window_size": 8,
+    "batch_size": 16,
+    "quality": true,
+    "compression": "DEFLATE"
+  },
+  "locks": {
+    "conda": "../../06_infra/conda-linux-64.lock.txt",
+    "pip": "../../06_infra/pip-linux-64.lock.txt",
+    "engines": "../../06_infra/pip-engines-linux-64.lock.txt"
+  },
+  "profile": "Linux D020"
 }

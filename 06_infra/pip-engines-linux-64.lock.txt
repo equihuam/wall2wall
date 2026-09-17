@@ -1,0 +1,4 @@
+# M006-S02 Linux supplemental extras; D020 base locks remain unchanged.
+lightgbm==4.6.0 --hash=sha256:cb19b5afea55b5b61cbb2131095f50538bd608a00655f23ad5d25ae3e3bf1c8d
+xgboost==3.1.3 --hash=sha256:687504d1d76dc797df08b0dbe8b83d58629cdc06df52378f617164d16142bf2c
+nvidia-nccl-cu12==2.31.2 --hash=sha256:f9b1dc3c2a7e20176054144ebb3b32fea83b40402ee5d7ac7045cd11ecc956c0

@@ -16,6 +16,7 @@ Negativos reutilizan modelos; los espías exigen lectura por ventanas y lotes.
 
 ## Notas relevantes
 La entrada interna prepare crea los modelos en un proceso que termina.
+Comprueba compresión DEFLATE/LZW y rechazos anteriores a deserializar.
 Las fixtures reutilizan metadatos analíticos de test_audit, sin ejecutar su suite.
 No hay datos reales, motores opcionales, medición de RAM nativa ni prueba de escala.
 =============================================================================
@@ -366,3 +367,23 @@ def test_source_hash_once_and_pipeline_once(models, tmp_path, monkeypatch):
 if __name__ == "__main__":
     assert sys.argv[1] == "prepare"
     prepare(Path(sys.argv[2]))
+
+
+def test_compression_contract(models, tmp_path, monkeypatch):
+    path, values, mask = aligned(tmp_path)
+    baseline = prediction.predict_raster(models / "rf", path, tmp_path / "deflate", trusted=True, quality=True)
+    result = prediction.predict_raster(models / "rf", path, tmp_path / "lzw", trusted=True, quality=True, compression="LZW")
+    for name in ("prediction", "validity", "out_of_range"):
+        with rasterio.open(tmp_path / "deflate" / (name + ".tif")) as left, rasterio.open(tmp_path / "lzw" / (name + ".tif")) as right:
+            assert left.compression.value == "DEFLATE"
+            assert right.compression.value == "LZW"
+            np.testing.assert_allclose(left.read(), right.read(), equal_nan=True, rtol=1e-5, atol=1e-5)
+            np.testing.assert_array_equal(left.read_masks(), right.read_masks())
+            assert left.crs == right.crs and left.transform == right.transform
+    def forbidden(*args, **kwargs):
+        pytest.fail("invalid compression must precede deserialization")
+    monkeypatch.setattr(audit, "load_run", forbidden)
+    for value in (None, True, 1, "lzw", "JPEG", [], {}):
+        with pytest.raises(ValueError, match="compression"):
+            prediction.predict_raster(models / "rf", path, tmp_path / "invalid", trusted=True, compression=value)
+        assert not (tmp_path / "invalid").exists()

@@ -1,0 +1,64 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M006-S04",
+  "round": 1,
+  "title": "Corrección documental de evidencia focused/full",
+  "objective": "Corregir la colisión de workflow-matrix.json sin modificar fuentes ejecutables ni reescribir evidencia r2.",
+  "acceptance": [
+    "D025: sólo corregir 08_pkg/docs/workflow.md y crear 06_infra/m006-s02-docs-bridge.json; checkout Linux único propietario. M006-S02 permanece r3 fix con contrato congelado. No alterar fuentes ejecutables, informes r1/r2, locks o ledger.",
+    "F2: conservar matriz focused para qualify_linux y cambiar WALL2WALL_TEST_EVIDENCE antes del full a otro directorio externo exclusivo previamente creado con mktemp -d; comprobar que workflow-matrix.json y .pending no existen. Mantener variable WALL2WALL_WORKFLOW_MATRIX apuntando a la matriz focused. Nunca reutilizar ni borrar evidencia anterior. La secuencia Bash publicada debe funcionar desde sesión limpia y detenerse al fallar.",
+    "No ejecutar los ejemplos durante esta ronda. Mantener instrucciones de full, sin declararlo pasado en r2: el intento original tuvo260 passed/1error; la invocación D024 fue rechazada antes de pruebas. Distinguir evidencia histórica y comprobación documental actual.",
+    "Puente JSON exacto: schema=wall2wall.docs-bridge/1; historical_report_sha256=1bec22cd1f6c080f0bdcc65c9f0a4d244f613903b6b6518af57a91d9b8f7ef32; document=08_pkg/docs/workflow.md; before_sha256 tomado de sources del informe r2; after_sha256 del documento final; unchanged_sources=25; new_scientific_execution=false. No refrescar hashes históricos.",
+    "Conservar los25 archivos restantes con hashes/tamaños r2; revisar delta documental y sintaxis de bloques Bash mediante gate sin ejecutar ejemplos. D016: ningún Python coder; verificador arquitectónico usa encabezado canónico y lo comprueba.",
+    "20min/5000tokens o unknown, hasta dos correcciones textuales,120s/comando,scratch16MiB. Full documental una vez por coder y una oficial posterior; cero fits/Pytest/full científico/validated/réplicas/canaries/instalaciones/red. Ante deriva de fuente ejecutable parar y devolver evidencia/actor/acción.",
+    "Reviewer debe evaluar la corrección de F2 citando M006-S02-F2 e informe r1 c87970d84ebd6fce8ce85180f37149ff5cf27efb6c7399c171d64815097efc22; no cerrar F1 por este trabajo ni aceptar/cerrar S02/M006."
+  ],
+  "non_goals": [
+    "Modificar contrato congelado S02, repetir experimentos o actualizar evidencia científica para aparentar vigencia."
+  ],
+  "read_first": [
+    "00_brief/D025-reconciliation.md",
+    "00_brief/decisions.md",
+    "docs/operating.md",
+    "08_pkg/docs/workflow.md",
+    "08_pkg/tests/test_workflow_resume.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/workflow/qualify_linux.py",
+    "08_pkg/workflow/stages.py",
+    "06_infra/m006-s02-r2-validation.json",
+    "06_infra/m006-s02-validation.json",
+    "06_infra/verify_m006_recovery_docs.py",
+    "05_governance/reviews/m006/M006-S02_r1_review.md",
+    "05_governance/reviews/m006/M006-S02_r2_coder_notes.md"
+  ],
+  "allowed_prefixes": [
+    "08_pkg/docs/workflow.md",
+    "06_infra/m006-s02-docs-bridge.json"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [],
+  "full": [
+    "python",
+    "06_infra/verify_m006_recovery_docs.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 120,
+  "observation": "process",
+  "notes": "D025 separa esta corrección porque resolve conserva el envelope S02. No ejecutar la secuencia científica documentada. El full de esta entrega es exclusivamente documental. El puente no sustituye las puertas de S02. Sin commit/push.",
+  "findings": "",
+  "memory": ""
+}
