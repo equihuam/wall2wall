@@ -18,6 +18,7 @@ Verifica fit_final y predicción desde el wheel con un único ajuste dummy míni
 Comprueba disponibilidad de select_and_fit y opciones de evaluate sin fits extra.
 Verifica engines instalado, import ligero y metadatos antes de importar extras.
 Después ajusta una vez cada motor real CPU del perfil fijo y predice desde el wheel.
+Guarda el ajuste dummy existente con audit y lo carga en otro proceso sin fits extra.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -50,7 +51,7 @@ def test_installed_wheel(tmp_path):
     source = tmp_path / "source"
     for relative in ("pyproject.toml", "README.md", "src/wall2wall/__init__.py",
                      "src/wall2wall/spatial.py", "src/wall2wall/sampling.py", "src/wall2wall/validation.py",
-                     "src/wall2wall/modeling.py", "src/wall2wall/engines.py"):
+                     "src/wall2wall/modeling.py", "src/wall2wall/engines.py", "src/wall2wall/audit.py"):
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(PACKAGE / relative, destination)
@@ -180,6 +181,22 @@ final_model = wall2wall.modeling.fit_final(
 assert final_model["predictors"] == ["p01"]
 np.testing.assert_array_equal(final_model["estimator"].predict(sampled["table"][["p01"]]), [2.5, 2.5])
 assert final_model["response"]["name"] == "response"
+import wall2wall.audit
+assert Path(wall2wall.audit.__file__).resolve() == target / "wall2wall" / "audit.py"
+Path("fixture.lock").write_text("synthetic wheel lock identity", encoding="utf-8")
+unknown = {"status": "unknown", "reason": "not queried in wheel fixture"}
+absent = {"status": "not_applicable", "reason": "direct Python wheel fixture"}
+wall2wall.audit.save_run(final_model, sampled["schema"], "audit-run", provenance={
+    "profile": "Windows D014 wheel fixture", "manager": {"name": "Conda", "version": unknown},
+    "bash": {"provider": absent, "version": absent}, "workflow": absent,
+    "configuration": {"fixture": "constant raster", "unknown_period_reason": "atemporal analytical fixture"},
+    "preprocessing": {"scales": [{"name": "p01", "scale": 1., "offset": 0.}],
+                      "resampling": "none; matching grid", "filters": "sampling defaults"},
+    "evaluation": {"status": "absent", "reason": "minimum distribution smoke test"},
+    "inputs": [{"name": "constant.tif", "role": "data", "path": source},
+               {"name": "audit.py", "role": "code", "path": Path(wall2wall.audit.__file__)},
+               {"name": "fixture.lock", "role": "lock", "path": Path("fixture.lock")}]
+})
 forbidden.remove("lightgbm")
 forbidden.remove("xgboost")
 engine_fits = 0
@@ -199,6 +216,23 @@ assert engine_fits == 2
         [sys.executable, "-I", "-B", "-c", code, str(target), str(PACKAGE.parent)],
         cwd=outside, capture_output=True, text=True, timeout=60,
     )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    load_code = '''
+import sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+import numpy as np
+import pandas as pd
+from wall2wall.audit import load_run
+loaded = load_run("audit-run", trusted=True)
+assert loaded["predictors"] == ["p01"]
+assert loaded["manifest"]["versions"]["wall2wall"] == "0.1.0.dev0"
+np.testing.assert_allclose(loaded["estimator"].predict(pd.DataFrame({"p01": [7., 7.]})),
+                           [2.5, 2.5], rtol=1e-10, atol=1e-10)
+'''
+    result = subprocess.run([sys.executable, "-I", "-B", "-c", load_code, str(target)],
+                            cwd=outside, capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stdout + result.stderr
 
 

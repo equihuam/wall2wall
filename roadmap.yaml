@@ -1107,18 +1107,22 @@ milestones:
     notes: El propietario pide resolver ahora el P3 documental y solicita el prompt. Se admite sólo M005-S00; M005-S01 conserva su planificación sin emitir. La baseline arquitectónica contiene exclusivamente el cierre de M004 y esta planificación, sin cambios de producto.
   - id: M005-S01
     title: Persistencia y manifiestos
-    objective: Conservar el estimador y evidencia necesaria para auditarlo.
+    objective: Guardar y cargar un expediente portable del ajuste final con integridad comprobada antes de deserializar, reutilizando los artefactos existentes sin volver a ajustar.
     acceptance:
-    - 'D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.'
-    - 'Expediente auditable: esquema, perfil/gestor/Bash/lock, Snakemake/flujo, código/configuración,
-      parámetros, variables, datos, folds, OOF y exclusiones; JSON estricto y SHA-256 incremental.'
-    - 'V5: entrenar/guardar/salir y cargar confiablemente en otro proceso conserva predicción; rechazar
-      corrupción, incompatibilidad y carga sin trusted=True.'
-    - Rutas portables; nuevos resultados con nueva identidad; no incluir rutas de máquina ni datos
-      privados en evidencia versionada.
-    - Respetar presupuestos y fronteras R1–R6 del roadmap; pruebas obligatorias sin skips silenciosos.
+    - 'Ronda correctiva 2, M005-S01-F1: modificar únicamente 08_pkg/README.md. Corregir estado de persistencia/expediente, total de 188 IDs (151 previos y 37 de auditoría), inventario del wheel con audit.py y descripción del guardado/carga entre procesos. Conservar las limitaciones de modeling (no guarda modelos de folds ni serializa por sí solo) diferenciándolas de la nueva API audit; mantener Linux M001 y cualificación integral Windows M008 pendientes. No cambiar código, pruebas, guía audit, scope de encabezados ni datos. Los requisitos funcionales de ronda 1 se conservan sobre el payload acumulado.'
+    - 'D014/D015: Windows nativo, Conda fijo y Python 3.11 mediante 06_infra/windows.ps1 -PythonArgs. Reutilizar joblib ya declarado, sin dependencias nuevas, instalaciones ni cambios del entorno. No atribuir cualificación Linux M001 ni integración Windows M008.'
+    - 'Crear wall2wall.audit con save_run y load_run. save_run recibe el resultado de fit_final o select_and_fit, el esquema completo y procedencia explícita; conserva estimator, predictors ordenados y response, comprobando su coherencia con el esquema. No ajustar, seleccionar ni modificar entradas. Retorno de load_run documentado con modelo y metadatos suficientes para predecir con ese orden. Mantener intactas las APIs y protocolos de modeling, sampling, validation y engines; reutilizar helpers existentes cuando corresponda sin generalizarlos.'
+    - 'Expediente versionado con manifest.json estricto y modelo joblib. Registrar identidad nueva, esquema, variables/unidades/escala, respuesta/soporte, malla/remuestreo/filtros, clase/parámetros/semillas, configuración, revisión o hash de código, versiones reales de wall2wall/Python/core/GDAL y motores participantes, perfil/gestor/Bash e identidad del lock. Registrar Snakemake y revisión del flujo como procedencia declarada; ejecución directa sin workflow lleva no aplica con motivo, sin inventar ejecución. Valores desconocidos descriptivos se declaran con motivo; identidades necesarias para integridad o compatibilidad no pueden omitirse ni ser unknown.'
+    - 'Conservar métricas, folds, OOF y exclusiones existentes mediante archivos explícitamente declarados, con roles y referencias inequívocos; distinguir exclusiones de muestreo y buffer. Si hubo selección, conservar sus tablas/diagnósticos y distinguir evaluación externa de ajuste final. No recorrer directorios recursivamente ni recalcular resultados. Datos/lock/código de entrada quedan identificados por nombres portables, tamaños y SHA-256; no exigir su presencia al cargar sólo para predecir. Permitir ajuste fijo sin evaluación sólo con ausencia explícita y motivo, sin fabricar métricas OOF. El expediente trasladado debe conservar sus artefactos de auditoría sin depender del checkout original.'
+    - 'SHA-256 incremental sobre bytes, con lecturas acotadas y una pasada por entrada única por guardado; no leer archivos completos para calcular hashes ni normalizar texto. Productos propios con tamaño/hash comprobables. JSON rechaza NaN/Infinity y claves duplicadas al leer; métricas indefinidas conservan null y motivo. Rutas internas relativas portables: rechazar absolutas Windows/POSIX, UNC, drive-relative, traversal, colisiones y enlaces que escapen del expediente antes de leer o escribir el destino referenciado. No registrar rutas locales resueltas, credenciales ni datos reales en Git.'
+    - 'load_run exige trusted=True literal antes de deserializar; rechazar ausencia, False y valores truthy alternativos. Validar estructura/versión de manifiesto, campos obligatorios, esquema, rutas, tamaños, hashes de todos los productos y compatibilidad antes de joblib.load. Política conservadora explícita: igualdad exacta de Python, wall2wall, numpy, pandas, rasterio/GDAL, scikit-learn, joblib y motores participantes; paquete ausente o versión distinta falla. No importar motores no participantes para descubrir versiones. Hash acredita integridad, no autenticidad: nunca presentar la carga como segura para modelos no confiables.'
+    - 'Destino nuevo exclusivo, incluso si el existente está vacío; nueva identidad por expediente, sin sobrescribir resultados anteriores. Publicar manifest.json final sólo después de cerrar y verificar productos. Fallo de serialización/copia/escritura no deja manifiesto final válido ni altera un destino previo; parciales se identifican como incompletos y load_run los rechaza. No implementar reanudación ni migraciones.'
+    - 'V5: pruebas en test_audit.py entrenan/guardan en un proceso que termina y cargan/predicen en otro, mismo intérprete fijo, con rtol=atol=1e-10. Incluir RF pequeño y Pipeline con preprocesamiento, traslado del expediente, metadatos/orden preservados y compatibilidad con retorno de select_and_fit. Espía de joblib.load prueba rechazo previo a deserializar ante confianza ausente, corrupción/truncamiento, producto faltante, incompatibilidad, manifiesto inválido o ruta fuera de alcance. Probar destino existente/fallo simulado, JSON estricto y hashing acotado, conservando bytes previos. Casos afines parametrizados; no añadir pruebas espejo de implementación.'
+    - 'Conectar --audit-only y IDs explícitos obligatorios al lanzador del paquete, también exigidos por el full; cero descubrimiento, IDs ausentes y skips deben fallar. Extender la prueba de wheel offline para incluir audit.py y guardar/cargar en procesos separados desde el wheel fuera del checkout, reutilizando su ajuste mínimo existente. Mantener las 151 pruebas previas y las 16 de infraestructura. Documentar API, esquema/procedencia requerida, ejemplo directo, confianza/compatibilidad y límites en 08_pkg/docs/audit.md; añadir enlace desde README.md.'
+    - 'D016: cumplir AGENTS.md/Python file headers. Alcance Python acumulado de ronda 1: audit.py, test_audit.py, tests/run_checks.py y tests/test_package.py, ya incluido en 06_infra/python_header_scope.json; ronda 2 lo conserva intacto. Gate estructural en full y veracidad en revisión. No crear otros Python sin volver al arquitecto.'
+    - 'Ronda 2 documental — Focused: git diff --check -- 08_pkg/README.md. No repetir audit-only por separado. Full una vez antes de finalizar: python scripts/hermetic_verification.py, mediante windows.ps1. Fixtures analíticas <=32 filas, <=2 predictores, semilla 17; RF <=4 árboles, profundidad <=2, un hilo. Planificar y contar antes de ejecutar <=24 llamadas fit nuevas por invocación audit, incluidos pasos de Pipeline y procesos hijos; pruebas negativas reutilizan modelos, sin ajustes adicionales de motores opcionales. Conservar presupuestos de suites previas. R2/R3: <=60 min, <=20000 tokens medidos o unknown, dos correcciones, <=1200 s por verificación, scratch externo <=512 MiB, un ajuste concurrente. Sin lotes científicos, red, GPU, datos reales, commit ni push; RAM/scratch pico desconocidos se declaran unknown.'
     non_goals:
-    - Carga segura de modelos no confiables ni compatibilidad entre versiones.
+    - Mapas, min/max de entrenamiento y calidad por píxel (M005-S02/S03), workflow/reanudación (M006), cualificación entre plataformas, carga no confiable, compatibilidad entre versiones, firmas criptográficas, nuevos modelos o refactor general de persistencia existente.
     read_first:
     - 00_brief/CONTEXT.md
     - 00_brief/architecture.md
@@ -1126,14 +1130,26 @@ milestones:
     - 08_pkg/CONTEXT.md
     - 00_brief/decisions.md
     - 00_brief/orchestration.md
+    - 08_pkg/README.md
+    - 08_pkg/docs/audit.md
+    - 08_pkg/pyproject.toml
+    - 08_pkg/src/wall2wall/__init__.py
+    - 08_pkg/src/wall2wall/modeling.py
+    - 08_pkg/src/wall2wall/sampling.py
+    - 08_pkg/src/wall2wall/validation.py
+    - 08_pkg/tests/test_modeling.py
+    - 08_pkg/tests/test_selection.py
+    - 08_pkg/tests/test_package.py
+    - 08_pkg/tests/run_checks.py
+    - 06_infra/windows.ps1
+    - 06_infra/python_header_scope.json
+    - 06_infra/run_checks.py
     allowed_prefixes:
-    - 08_pkg/src/wall2wall/
-    - 08_pkg/tests/
-    - 08_pkg/docs/
-    focused: []
+    - 08_pkg/README.md
+    focused:
+    - [git, diff, --check, --, 08_pkg/README.md]
     kind: code
-    notes: Plan inicial sin emisión. Antes de emitir, el arquitecto añade lecturas exactas del código/pruebas
-      existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
+    notes: 'Ronda 1 revisada needs_work por M005-S01-F1. La implementación y su recibo permanecen como evidencia histórica. La corrección documental y el payload acumulado tendrán recibo nuevo y revisión posterior.'
   - id: M005-S02
     title: Inferencia GeoTIFF por ventanas
     objective: Producir mapas completos sobre celdas válidas con RAM acotada.

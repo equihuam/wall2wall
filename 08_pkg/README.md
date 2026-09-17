@@ -6,9 +6,11 @@ genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extr
 casos completos desde el manifiesto de armonización. `wall2wall.validation.make_spatial_folds`
 crea folds por bloques y grupos indivisibles. `wall2wall.modeling` ofrece evaluación
 OOF fija o con selección espacial anidada, permutación externa opt-in y ajuste
-final separado. Todavía no hay mapas predictivos, persistencia
-de modelos, CLI de producción ni workflow de producción. No cualifica Linux ni soporte
-Windows completo; la comprobación corresponde al entorno Windows D014.
+final separado. `wall2wall.audit` guarda y carga el ajuste final en un expediente
+portable con procedencia e integridad comprobadas. Todavía no hay mapas predictivos,
+CLI de producción ni workflow de producción. La cualificación Linux M001 y la
+cualificación integral Windows M008 siguen pendientes; la comprobación corresponde
+al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
 
 El núcleo declarado es NumPy, pandas, Rasterio, scikit-learn y joblib. Importar
@@ -29,7 +31,8 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 151 IDs: once de distribución, veintiuno del generador, veinticuatro
+El lanzador exige 188 IDs: los 151 previos y 37 de auditoría. Los previos son
+once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
 de buffer/particiones aportadas, doce de modelado fijo, diez de selección/permutación
 y once del contrato offline de motores y trece de integración con motores reales.
@@ -42,11 +45,15 @@ El lanzador crea un directorio temporal exclusivo bajo `VERIFICATION_SCRATCH`
 terminar. Pytest/JUnit, copia de fuentes, build e instalación quedan allí; no se
 generan caches o metadatos en el producto. El build copia pyproject, README,
 `src/wall2wall/__init__.py`, `src/wall2wall/spatial.py`, `src/wall2wall/sampling.py`
-y `src/wall2wall/validation.py`, `src/wall2wall/modeling.py` y `src/wall2wall/engines.py`;
+y `src/wall2wall/validation.py`, `src/wall2wall/modeling.py`, `src/wall2wall/engines.py`
+y `src/wall2wall/audit.py`;
 usa `--wheel --no-isolation` y pip usa
 `--no-deps --no-index --target`. Un proceso aislado, con otro cwd externo, comprueba
 el origen de los imports, los metadatos instalados, alineación/muestreo/folds y
-fit_final/predicción mínimos desde el wheel. Importar sólo wall2wall sigue sin cargar dependencias científicas.
+fit_final/predicción mínimos desde el wheel. Ese proceso guarda con `audit.save_run`
+el ajuste dummy mínimo existente; después de terminar, otro proceso carga con
+`audit.load_run(..., trusted=True)` y predice desde el wheel fuera del checkout,
+sin ajustes adicionales. Importar sólo wall2wall sigue sin cargar dependencias científicas.
 No se instala la plantilla raíz.
 
 Ejecución secuencial y un hilo numérico; ningún ajuste científico. Presupuesto
@@ -627,8 +634,9 @@ métricas o resúmenes no finitos fallan explícitamente antes del manifiesto.
 Manifest registra esquema ordenado, respuesta, clases/parámetros efectivos,
 versiones Python/core, fold_config, conteos de llamadas fit de modelo/dummy y
 productos relativos. Esos conteos son llamadas a estimadores completos, no
-árboles internos ni pasos internos de Pipeline. No persiste modelos de folds
-ni implementa el expediente M005. Destino existente incluso vacío se rechaza.
+árboles internos ni pasos internos de Pipeline. `modeling.evaluate` no persiste
+modelos de folds ni serializa modelos por sí solo. El expediente del ajuste final
+se guarda mediante la API separada `audit.save_run`. Destino existente incluso vacío se rechaza.
 Se valida tabla/estimador/configuración antes de crear salida cuando es posible;
 folds, fit o escritura pueden dejar parciales. Sólo el manifiesto raíz final
 publicado mediante renombrado indica evaluación completa; folds/manifest.json
@@ -638,7 +646,9 @@ por sí solo no lo indica. Las entradas se mantienen inmutables.
 estimador, clona y ajusta exactamente una vez sobre todos los casos completos.
 Devuelve estimator ajustado, predictors (nombres ordenados) y response (metadatos).
 No llama evaluate ni crea folds/OOF/métricas/archivos. No ajusta dummy adicional.
-evaluate tampoco llama fit_final. Persistencia y carga quedan para M005.
+evaluate tampoco llama fit_final. El resultado ya ajustado puede pasarse a
+`audit.save_run` junto con el esquema completo y la procedencia explícita;
+`audit.load_run` permite cargarlo sin volver a ajustar.
 
 Protocolo técnico congelado: generate signal semilla 17, align/sample, seis
 predictores p01..p06, cuatro folds generados, bloques 320 m, origen
@@ -723,7 +733,9 @@ el ganador una vez con todos los casos. Retorna estimator, predictors, response,
 selected_candidate y selection. Guarda selection.csv/JSON, folds/ con su mapa de
 índices y manifiesto `wall2wall.selection_fit/1`. Es selección para ajuste final,
 sin OOF externo ni estimación de generalización; no reutiliza un ranking externo.
-No guarda pickle ni modelo binario. `fit_final` sigue siendo un ajuste fijo separado.
+`select_and_fit` no serializa por sí solo el modelo binario; su resultado puede
+guardarse con `audit.save_run`, declarando los artefactos de selección final.
+`fit_final` sigue siendo un ajuste fijo separado.
 
 `max_fits` debe ser entero 1..128, sin booleanos. Antes de ajustar se calcula
 `2*K` en evaluación fija, `sum(C*I_k+2)` en anidada y `C*I+1` en select_and_fit.
@@ -853,6 +865,10 @@ Estas pruebas inspeccionan datos con resultados conocidos: no implementan
 armonización, muestreo de producción, folds ni evaluaciones científicas.
 
 ## Instalación local desde un wheel
+
+La [guía de persistencia y manifiestos](docs/audit.md) documenta `save_run`,
+`load_run`, la procedencia explícita y la carga de modelos confiables con
+integridad y compatibilidad comprobadas.
 
 El wheel de las pruebas es desechable. Para instalar un wheel conservado y
 verificado, seleccionar un archivo y un destino nuevos fuera del checkout:
