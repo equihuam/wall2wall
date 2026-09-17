@@ -5,7 +5,8 @@ Paquete local `wall2wall`, versión `0.1.0.dev0`, Python >=3.11.
 genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extrae
 casos completos desde el manifiesto de armonización. `wall2wall.validation.make_spatial_folds`
 crea folds por bloques y grupos indivisibles. `wall2wall.modeling` ofrece evaluación
-OOF fija y ajuste final separado. Todavía no hay mapas predictivos, persistencia
+OOF fija o con selección espacial anidada, permutación externa opt-in y ajuste
+final separado. Todavía no hay mapas predictivos, persistencia
 de modelos, CLI de producción ni workflow de producción. No cualifica Linux ni soporte
 Windows completo; la comprobación corresponde al entorno Windows D014.
 Nombre público y licencia definitiva siguen pendientes; no publicar el paquete.
@@ -25,9 +26,9 @@ Desde la raíz del checkout, con el entorno D014 ya preparado:
 .\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
 ```
 
-El lanzador exige 117 IDs: once de distribución, veintiuno del generador, veinticuatro
+El lanzador exige 127 IDs: once de distribución, veintiuno del generador, veinticuatro
 de armonización espacial, quince de muestreo puntual, quince de folds y diecinueve
-de buffer/particiones aportadas y doce de modelado fijo.
+de buffer/particiones aportadas, doce de modelado fijo y diez de selección/permutación.
 Ausencias, cero pruebas y skips fallan. El full exige además dieciséis pruebas
 de infraestructura/encabezados. Todos los procesos Python
 usan el intérprete seleccionado por el lanzador, sin venv ni cambios del prefijo.
@@ -448,7 +449,8 @@ final = fit_final(sampled["table"], sampled["schema"])
 # final["estimator"] está ajustado; final no contiene métricas OOF.
 ```
 
-`evaluate(table, schema, output_dir, *, fold_config, estimator=None)` acepta las
+`evaluate(table, schema, output_dir, *, fold_config, estimator=None, candidates=None,
+inner_fold_config=None, permutation=None, max_fits=128)` acepta las
 salidas de sample_points. fold_config exige block_size/origin/n_splits/seed y
 sólo admite además buffer_distance/min_train_samples/provided_splits. Llama una
 vez a la API pública make_spatial_folds para construir/validar y guardar folds/.
@@ -466,7 +468,8 @@ con rutas absolutas. No se promete soporte universal de estimadores.
 
 random_state expuesto debe ser entero >=0 y n_jobs expuesto debe ser 1, también
 en componentes anidados; no booleanos. warm_start y early_stopping deben estar
-inactivos. No admite fit kwargs, callbacks, eval_set, extras, búsqueda ni tuning.
+inactivos. No admite fit kwargs, callbacks, eval_set ni extras. La selección
+opt-in se limita a los candidatos explícitos descritos más abajo.
 Cada fold usa clones nuevos. Pipeline ajusta su preprocesamiento sólo con train;
 los originales permanecen sin ajustar y nunca se ajusta globalmente antes de CV.
 Errores de fit/predict se propagan con fold_id y modelo, conservando la causa;
@@ -538,6 +541,113 @@ Un hilo y un ajuste concurrente; tablas en memoria, RAM nativa y scratch pico
 
 El focused muestra el resultado del protocolo y el contador de ajustes. Los
 modos focused son mutuamente excluyentes y el full conserva todas las suites.
+
+## Selección espacial interna y ajuste final seleccionado
+
+`candidates` es una lista ordenada de 1..6 diccionarios exactos con `name` único,
+no vacío, y `estimator` completamente configurado. Se aplican las mismas reglas
+de clonación, semillas, hilos y parámetros que en evaluación fija. No se combina
+con `estimator`; requiere `inner_fold_config`. Este último sin candidatos falla.
+No hay grids implícitos ni muestreo de configuraciones.
+
+```python
+from sklearn.dummy import DummyRegressor
+from sklearn.tree import DecisionTreeRegressor
+from wall2wall.modeling import evaluate, select_and_fit
+
+candidates = [
+    {"name": "tree-depth-3", "estimator": DecisionTreeRegressor(max_depth=3, random_state=17)},
+    {"name": "mean", "estimator": DummyRegressor(strategy="mean")},
+]
+inner = {"block_size": 160, "origin": (500000, 4498720), "n_splits": 2, "seed": 17}
+outer = {"block_size": 320, "origin": (500000, 4498720), "n_splits": 4, "seed": 17}
+evaluation = evaluate(sampled["table"], sampled["schema"], "runs/nested-new",
+                      fold_config=outer, candidates=candidates, inner_fold_config=inner,
+                      max_fits=24, permutation={"seed": 29, "n_repeats": 3})
+final = select_and_fit(sampled["table"], sampled["schema"], "runs/selection-final-new",
+                       candidates=candidates, fold_config=inner, max_fits=5)
+```
+
+Los tamaños son ilustrativos, no recomendaciones universales. Deben dejar grupos
+y entrenamiento suficientes después de ambos buffers; un caso inviable falla,
+sin fallback. En modo anidado hay hasta cinco folds externos y tres internos.
+La configuración interna exige block_size/origin/n_splits/seed y sólo admite además
+buffer_distance/min_train_samples; provided_splits no está admitido internamente.
+
+Los folds externos se construyen una vez. Para cada train externo posterior al
+buffer se reinicia el índice posicional de su subconjunto y se construyen folds
+internos con el mismo esquema. Todos se validan antes del primer ajuste. Cada
+candidato usa exactamente esos splits con clones nuevos, incluido Pipeline.
+Se elige el menor RMSE sobre OOF interno agrupado; no la media de RMSE por fold.
+Empates exactos favorecen el orden de candidatos. Sólo el ganador se reajusta
+con todo train externo. Test externo no selecciona familia, parámetros ni
+preprocesamiento. Dummy usa ese mismo train externo.
+
+El retorno de evaluate añade `selection` (DataFrame) y OOF añade
+`selected_candidate` por fila. No devuelve modelo final ni ganador global a partir
+de métricas externas. `selection.csv` y `selection.json` registran outer_fold_id,
+candidate, candidate_order, inner_oof_rmse, samples, inner_folds, train_sizes,
+test_sizes y winner. Los tamaños corresponden a cada split interno, después del
+buffer en train; las listas CSV se pueden leer con json.loads. El manifiesto
+registra candidatos/clases/parámetros, configuración, criterio y referencias a
+`inner_N/manifest.json` e `inner_N/index_map.csv`. Este último vincula
+local_position, original_position y sample_id; leer IDs como str, sin NA implícito.
+
+`select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fits=128)`
+usa el mismo criterio interno sobre todos los casos y hasta tres folds; reajusta
+el ganador una vez con todos los casos. Retorna estimator, predictors, response,
+selected_candidate y selection. Guarda selection.csv/JSON, folds/ con su mapa de
+índices y manifiesto `wall2wall.selection_fit/1`. Es selección para ajuste final,
+sin OOF externo ni estimación de generalización; no reutiliza un ranking externo.
+No guarda pickle ni modelo binario. `fit_final` sigue siendo un ajuste fijo separado.
+
+`max_fits` debe ser entero 1..128, sin booleanos. Antes de ajustar se calcula
+`2*K` en evaluación fija, `sum(C*I_k+2)` en anidada y `C*I+1` en select_and_fit.
+K cuenta folds externos, C candidatos e I folds internos. Superar el presupuesto
+falla sin ajustar. `fit_budget.json` registra máximo, previsto, intentado,
+completado y cada contexto/estado; también cuenta intentos fallidos, sin reposición.
+Son ajustes de estimadores completos; no cuenta por separado pasos de Pipeline.
+Errores de candidato incluyen fold/candidato y conservan parciales auditables.
+Sólo manifest.json raíz, publicado al finalizar, indica éxito de toda la operación.
+
+## Permutación en prueba externa
+
+`permutation=None` desactiva el diagnóstico. El dict opt-in contiene exactamente
+seed entero >=0 y n_repeats entero 1..5, sin booleanos. Se rechazan antes de fit
+más de `K*P*n_repeats=600` predicciones adicionales, donde P cuenta predictores.
+Para cada modelo externo ya ajustado se permuta una columna de X test crudo por
+vez y se llama a predict del Pipeline completo, sin refit. Sólo usa predictores
+del esquema; no permuta IDs, respuesta ni auxiliares, y no evalúa el dummy.
+El RNG local independiente usa PCG64, con recorrido fold/predictor/repetición;
+misma semilla reproduce el diagnóstico sin cambiar las predicciones OOF base.
+
+Importancia es RMSE permutado menos RMSE original, incluidos valores negativos.
+El retorno añade importance.records (DataFrame) e importance.summary (dict).
+Sólo al solicitarlo se escriben importance.csv (fold_id, predictor, repeat,
+samples, baseline_rmse, permuted_rmse, importance) e importance.json, referidos
+en el manifiesto. El JSON separa media/desviación poblacional de repeticiones
+dentro de cada fold y media/desviación poblacional de las medias entre folds.
+Ambas agregaciones son no ponderadas; no son una RMSE agrupada por observación.
+Para relectura exacta usar float_precision="round_trip" y tipos float explícitos
+para métricas/importancias, porque CSV no conserva tipos.
+
+Predictores correlacionados pueden repartirse o enmascarar importancia. No es
+interpretación causal ni incertidumbre por píxel. No se pueden reseleccionar
+variables con estas importancias y reclamar el mismo OOF como independiente.
+
+La suite selection planifica 78 llamadas fit por invocación, incluyendo Pipeline,
+regresores, transformadores, dummy e intento fallido. Su contador corta antes de
+superar 80; las pruebas se detienen tras un fallo. La suite previa conserva sus
+45 ajustes y el wheel su único ajuste mínimo: comprueba la nueva API sin fits
+adicionales. Fixtures analíticas, sin nuevos lotes científicos; un hilo y un
+ajuste concurrente. RAM nativa y scratch pico: unknown; el lanzador informa
+scratch final. Se conservan los diecisiete encabezados previos y se añade el de
+test_selection.py al alcance explícito.
+
+```powershell
+.\06_infra\windows.ps1 -PythonArgs @('08_pkg/tests/run_checks.py', '--selection-only')
+.\06_infra\windows.ps1 -PythonArgs @('scripts/hermetic_verification.py')
+```
 
 ## Fixtures sintéticas de desarrollo
 

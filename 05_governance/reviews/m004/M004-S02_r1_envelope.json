@@ -1,0 +1,83 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M004-S02",
+  "round": 1,
+  "title": "Selección espacial anidada y diagnóstico",
+  "objective": "Añadir búsqueda opt-in y permutación fuera de entrenamiento.",
+  "acceptance": [
+    "Windows D014/Python 3.11 mediante 06_infra/windows.ps1 -PythonArgs. Extender modeling.py y crear test_selection.py usando dependencias instaladas; sin cambios de entorno. Conservar evaluate/fit_final y las 117 pruebas previas; import wall2wall sigue ligero.",
+    "Extender evaluate con candidates=None, inner_fold_config=None, permutation=None y max_fits=128. candidates es lista ordenada de 1..6 dicts con name único no vacío y estimator clonable completamente configurado. Validar cada candidato con las mismas reglas que estimator; candidates no puede combinarse con estimator no None y requiere inner_fold_config. inner_fold_config sin candidates se rechaza. Sin candidates mantener evaluación fija; no agregar grids, muestreo aleatorio de candidatos ni extras de motores.",
+    "Con selección: construir folds externos una vez mediante make_spatial_folds. Para cada train externo posterior al buffer construir folds internos sólo sobre table.iloc[train] con índice posicional local reiniciado y schema preservado. inner_fold_config acepta parámetros espaciales públicos salvo provided_splits en esta primera versión; requiere block_size/origin/n_splits/seed explícitos. Máximo cinco folds externos y tres internos. Validar todos los folds internos antes del primer fit; pocos grupos o buffer insuficiente abortan sin fallback. Persistir mapeo de posición local a posición original y sample_id.",
+    "Usar exactamente los mismos splits internos para todos los candidatos de cada train externo. Clonar candidato y Pipeline por split; elegir menor RMSE sobre predicciones OOF internas agrupadas, no media no ponderada de RMSE de folds. Empates exactos favorecen orden de candidatos. Reajustar sólo el ganador en todo train externo y predecir test externo una vez; ajustar dummy sobre el mismo train externo. Ningún dato test externo participa en selección/preprocesamiento ni eval_set. La identidad de familia también se elige internamente.",
+    "Exportar tabla de selección por fold externo/candidato con RMSE interno, tamaños, orden y ganador; manifiesto registra candidatos/clases/parámetros, configuración, mapeos y conteos. OOF mantiene contrato anterior y añade selected_candidate por fila sólo en modo selección. No escoger ganador global a partir de métricas externas ni retornar un estimador final desde evaluate. Errores de candidato abortan con fold/candidato y conservan evidencia, sin omitirlo.",
+    "Agregar select_and_fit(table, schema, output_dir, *, candidates, fold_config, max_fits=128): selección espacial interna sobre todos los casos con el mismo criterio y hasta tres folds, seguida de un único refit ganador. Retornar estimator, predictors, response, selected_candidate y resultados de selección; persistir selección/folds/manifiesto, sin pickle ni modelo binario. No anunciar OOF externo, métricas de generalización ni reutilizar ranking externo. fit_final original permanece como ajuste de configuración fija y no llama automáticamente esta función.",
+    "permutation=None desactiva diagnóstico. Opt-in dict exacto con seed entero >=0 y n_repeats entero 1..5, sin booleanos. Por modelo ajustado en cada fold externo (fijo o ganador), permutar una columna de X test crudo a la vez, aplicar predict del Pipeline ya ajustado, sin refit. Importancia=RMSE permutado menos RMSE original; conservar valores negativos. RNG local independiente de RNG de selección/modelo, y misma semilla reproduce resultados. No permutar IDs, respuesta o auxiliares ni usar dummy para importancia. No modificar X ni OOF base.",
+    "Registrar importancia por fold/predictor/repetición, medias y desviaciones poblacionales por predictor distinguiendo variación entre repeticiones y entre folds; no mezclar tamaños sin declarar ponderación. Guardar CSV/JSON sólo cuando se solicita y añadir referencias al manifiesto. Describir correlación entre predictores, ausencia de interpretación causal y prohibición de reseleccionar variables y reclamar el mismo OOF como independiente.",
+    "Presupuesto previo a fit: max_fits entero 1..128; calcular K*(C*I+2) para nested (ganador y dummy incluidos), 2*K para fijo, C*I+1 para select_and_fit. Si folds internos varían usar suma exacta. Rechazar presupuesto insuficiente antes de fit y registrar previsto/realizado; contar intentos fallidos sin reposición automática. Permutación no añade fits, pero tiene límite K*P*n_repeats <=600 predicciones adicionales, validado antes de fit. No bucles de búsqueda abiertos ni paralelismo; publicar manifiesto de éxito sólo al terminar.",
+    "Reutilizar helpers del mismo modeling.py para esquema, clonación, métricas, folds y escritura cuando compartan invariantes; no duplicar evaluate entero, crear otro orquestador o llamar evaluate recursivamente. Mantener todas las validaciones previas, destinos nuevos, entradas y RNG global inmutables, JSON estricto/rutas relativas. Fallos no dejan manifiesto final. Mantener nombre/contrato de métricas fijas; los datos de selección se distinguen de evaluación.",
+    "Pruebas con regresores/transformadores espías y fixtures analíticas pequeñas: mapeo de índices internos a originales, cada fit sólo ve train permitido (buffers externos/internos), selección independiente de test externo, clones nuevos, Pipeline local y candidatos inmutables. Demostrar elección por OOF interno agrupado con folds desiguales y empate determinista; un candidato que memoriza no obtiene acceso al test. Probar selección de familias con dos regresores simples instalados/espías, sin LightGBM/XGBoost ni búsqueda científica.",
+    "Probar grupos insuficientes, candidatos/configuraciones inválidos, presupuesto previo sin ningún fit, conteos reales, fallo de candidato, select_and_fit separado y refit sobre todos los casos una vez. Permutación con valores calculables, columna irrelevante, reproducibilidad, OOF inmutable y cero fits adicionales; probar exportación/relectura y errores de escritura. No cambiar protocolo signal/no_signal de M004-S01 ni imponer mejoras de rendimiento por tuning.",
+    "Suite nueva: hasta 80 llamadas fit incluidas espías/transformadores/intentos fallidos por invocación; declarar plan previo e instrumentar corte antes de excederlo. Pruebas pequeñas deterministas, sin nuevos lotes científicos R4. Conservar los 45 ajustes previstos de la suite anterior; wheel hasta dos ajustes mínimos adicionales. Extender test_installed_wheel sin fits extra si basta para comprobar disponibilidad de nueva API; la suite de selección acredita ejecución científica técnica. No entrenar modelos en esta preparación del arquitecto.",
+    "Añadir --selection-only mutuamente excluyente al lanzador y nuevos IDs requeridos; full conserva 117 pruebas anteriores más nuevas y 16 de infraestructura/encabezados. D016 aplica a Python nuevos/modificados; añadir test_selection.py al scope conservando diecisiete rutas. README documenta APIs, selección interna frente a evaluación externa, presupuestos, tablas, limitaciones de permutación y comandos Windows. Cero/skip/IDs ausentes fallan; Pytest no invoca full.",
+    "R2/R3: ronda <=60 min, <=20000 tokens medidos o unknown, hasta dos correcciones técnicas, full <=1200 s, scratch <=512 MiB, un hilo y un fit concurrente. RAM/scratch máximos medidos o unknown; temporales externos. Sin red, instalaciones, datos reales, commit ni push del coder."
+  ],
+  "non_goals": [
+    "AutoML/Optuna, grids implícitos, early stopping, motores extras, CV temporal, piloto real, nuevas evaluaciones científicas, inferencia raster o persistencia de modelos.",
+    "Cambiar validation/spatial/sampling, simulador, suites anteriores salvo test_package.py, __init__, pyproject, infraestructura, locks, evidencia histórica o documentos del arquitecto."
+  ],
+  "read_first": [
+    "00_brief/architecture.md",
+    "00_brief/validation.md",
+    "08_pkg/README.md",
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/src/wall2wall/validation.py",
+    "08_pkg/tests/test_modeling.py",
+    "08_pkg/tests/test_buffer.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_package.py",
+    "06_infra/windows.ps1",
+    "06_infra/run_checks.py",
+    "06_infra/check_python_headers.py",
+    "06_infra/python_header_scope.json"
+  ],
+  "allowed_prefixes": [
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/tests/test_selection.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_package.py",
+    "08_pkg/README.md",
+    "06_infra/python_header_scope.json"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [
+    [
+      "python",
+      "08_pkg/tests/run_checks.py",
+      "--selection-only"
+    ]
+  ],
+  "full": [
+    "python",
+    "scripts/hermetic_verification.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 1200,
+  "observation": "process",
+  "notes": "M004-S01 aporta evaluación fija aceptada. Sólo M004-S02 se prepara; motores opcionales siguen diferidos. test_selection.py es salida nueva; reutilizar funciones públicas de validation y helpers locales de modeling. Las pruebas no autorizan optimizar el protocolo sintético tras observar resultados. No modificar contexto arquitectónico desde el coder.",
+  "findings": "",
+  "memory": ""
+}

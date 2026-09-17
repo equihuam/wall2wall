@@ -15,6 +15,7 @@ crean bajo tmp_path; otro proceso confirma origen del import y metadatos, y
 ejecuta alineación, muestreo y folds mínimos desde los módulos instalados en el wheel.
 Comprueba además particiones aportadas con exclusiones por buffer positivo.
 Verifica fit_final y predicción desde el wheel con un único ajuste dummy mínimo.
+Comprueba disponibilidad de select_and_fit y opciones de evaluate sin fits extra.
 
 ## Notas relevantes
 Usa una fixture espacial constante sin evaluar habilidad predictiva. Las fuentes de pruebas
@@ -161,8 +162,12 @@ assert buffered["diagnostics"]["split_origin"] == "provided"
 assert buffered["diagnostics"]["seed_used"] is False
 assert (Path.cwd() / "buffered-folds/manifest.json").is_file()
 import wall2wall.modeling
+import inspect
 from sklearn.dummy import DummyRegressor
 assert Path(wall2wall.modeling.__file__).resolve() == target / "wall2wall" / "modeling.py"
+assert callable(wall2wall.modeling.select_and_fit)
+assert {"candidates", "inner_fold_config", "permutation", "max_fits"} <= set(inspect.signature(wall2wall.modeling.evaluate).parameters)
+assert {"candidates", "fold_config", "max_fits"} <= set(inspect.signature(wall2wall.modeling.select_and_fit).parameters)
 final_model = wall2wall.modeling.fit_final(
     sampled["table"], sampled["schema"], estimator=DummyRegressor(strategy="mean"))
 assert final_model["predictors"] == ["p01"]
