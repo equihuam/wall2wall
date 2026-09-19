@@ -1,0 +1,310 @@
+[
+  {
+    "slice": "M006-S00",
+    "path": "08_pkg/CONTEXT.md",
+    "sha": "bbd2ac5bb7c32c31cbf1975608b0557a94691d26da4e8b74cbfe7127692764f6",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S00",
+    "path": "08_pkg/src/wall2wall/__init__.py",
+    "sha": "aa5ba425bb103c86625e6fcff4320cf7de3b3352aa53b5d4db1e932bbb932753",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "06_infra/python_header_scope.json",
+    "sha": "7819394343f87973cb84aba781ffce10d2bf3708db908665cc5e56606582e49c",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/README.md",
+    "sha": "af6d817c661f574aa6fb58692e6daa5b820e3c32929fa30db7aaa8f5d42d8bda",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "8b7c3c62a5cdae080763c4b92f19725d911f11372f4ae197312ea3e41b83cd20",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/docs/workflow.md",
+    "sha": "bdee1ec4abeb67f2668b1001e305b8868d12aa3970af4d91bd8e5d780c680277",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/examples/workflow.json",
+    "sha": "35cd22cfd7f9f5ffa9b324a40348a6377dd4a136521b17824c67470adef0e6e1",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/tests/test_workflow.py",
+    "sha": "c817f90ec8a8917b5ede4a2a4b3635cc253a01d35561e9feb6b4a0172b04ce4c",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/workflow/Snakefile",
+    "sha": "7b664f0e634b59baed0a017f6ae67ed086eeee1aee7c7b3eb2dd0af4ebeb09e3",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/workflow/run.py",
+    "sha": "f62d74fff91cf5ebf6d9a9b5f7b38003fc6442628332952fb5d78172d6b72002",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/workflow/stage_checks.py",
+    "sha": "1b638cf918a4f082430d0889df07a39a77e683437f19a88f90c1b774b5a55879",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S01",
+    "path": "08_pkg/workflow/stages.py",
+    "sha": "d9a74358e26ccfdef5e77013e0ee4c347d27359d6741d816c9e950fbcd54b45d",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S04",
+    "path": "08_pkg/docs/workflow.md",
+    "sha": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S04",
+    "path": "06_infra/m006-s02-docs-bridge.json",
+    "sha": "bc3d82209a4c6fd1e87d0e01690c36256a1f9f6fdac159edb1321d8ff709dc53",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "06_infra/LINUX.md",
+    "sha": "50061e4de40620ddf51ff4ea70c489ee768039cae53033d91adedef6a34da848",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/CONTEXT.md",
+    "sha": "70e9e97dd616168c5faeb39795e7eeaec7acd61092315ec3874e83c967276721",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/docs/workflow.md",
+    "kind": "modified",
+    "sha": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6",
+    "round": 3
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/examples/workflow.json",
+    "sha": "411e4ac1c8ac25aca25bffd2303edca9201e1e5dde038e0e29fb7531c5edd3d6",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/src/wall2wall/prediction.py",
+    "sha": "ef66be856e4b8a6e9e5be6cdec03ebf4cab737d0e666f03dc6fe31ca9b9136fb",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "96dbd0a7366125e62865afca8a0171bd9f0c1bac1e65e91cbe8e3e0a2ef62e39",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/test_engine_integration.py",
+    "sha": "b9658c43f0b5b5dc414d79a6f3c73305a9f1dbe01e9b8e89441f2281b2961aca",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/test_prediction.py",
+    "sha": "c036378cc8ada9aba3965a9d30a5a2afa4fa5b05d0d4412035e3a4cc9043e069",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/test_workflow.py",
+    "sha": "6c724baf8e38e8e6da564baa77f7c2c32674f58657c4674faa7fe3e4ca5e5cea",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/workflow/Snakefile",
+    "sha": "3321e55d2083e97966a66d1f553517eb382d739e3a6592e08a7d0515df75ab17",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/workflow/run.py",
+    "sha": "495a0c9deddb0e4d7118ca317280488121c2dcdf1c754e71768cb51fcf03e469",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/workflow/stage_checks.py",
+    "sha": "b26824a0ae8a6e14570231eb9d7c4b6c103c8b8045458458cb0ec71356efbf36",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/workflow/stages.py",
+    "sha": "2ae16298418a3a0ef166f066a768e84307a6758bb1d2c7f8e00288f34edb09db",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "06_infra/m006-s02-validation.json",
+    "sha": "42cae6664043d2a002ea1417980c28432e1be6c2217b46b353fe7f1e45d934a8",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "06_infra/python_header_scope_m006_s02.json",
+    "sha": "7880f9ff6ec8d9e985dbfc6c951f229a0b297eccd06db1c1fe2db56c78232fea",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/test_workflow_resume.py",
+    "sha": "cc490c15732d0e59a78614782bc9d4efddd60850d2ac671acdae496f458b4c96",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/workflow/qualify_linux.py",
+    "sha": "26942ee063cd23c885bd00bbf9607df318862e43750f7ad7f76c5d6a63352e64",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "06_infra/m006-s02-r2-validation.json",
+    "sha": "1bec22cd1f6c080f0bdcc65c9f0a4d244f613903b6b6518af57a91d9b8f7ef32",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M006-S02",
+    "path": "08_pkg/tests/test_workflow_control.py",
+    "sha": "f90738b15944afdae086676883d68f779c95e05b3bd0cd377fc94749c7f9a070",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M006-S03",
+    "path": "06_infra/LINUX.md",
+    "sha": "3be1315650788f4a70de1281458afabdb3649835285ea39d88d2bad6a3ba0113",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/CONTEXT.md",
+    "sha": "299cbe46122ffc1f212fa42fa276ad00aceb759097623d9753e29b056c4d6da7",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/README.md",
+    "sha": "a1f9d3ac1cfb396a34bdefefdae9eefe58b0ab8d153e33edc759b26e74c6c180",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/pyproject.toml",
+    "sha": "9d787f00d5172e59862f2e889d1762d89991a13f505153d71d9d0f52cb495a2f",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "79c2de3d02f0e7d7bdc3aedd6e45903a6c8823de5c4909f3a3967f763e60eb0d",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "ENVIRONMENT.md",
+    "sha": "e1f7a7c5eb5b8f5290f186dbf3b5d7e701decc459f3b4cf94950416fd2a4ba8a",
+    "kind": "modified",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/MANIFEST.in",
+    "sha": "d29356ce33e85fd8b23e76e83e46be64758beb9491931704c0962b76834ea057",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/build_release.py",
+    "sha": "eee8fd750cd6cfbdddb4100fd9a6506e33a7348560b2415d1567d1574cbe9b0d",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/docs/quickstart.md",
+    "sha": "b5329d097acc9585c86a79a18c8874facb02c5d2a6613a5e23224c31a15ea2eb",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/release-files.json",
+    "sha": "2943d393c026e65d2e8d976bec3262f92034a3ac486bba983be4c41fc0c2d015",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M006-S03",
+    "path": "08_pkg/tests/test_release.py",
+    "sha": "2331be9c1ec2a23154472bf40914e303b790e2a0d85f6053cc8c5e688b45f9af",
+    "kind": "added",
+    "round": 1
+  }
+]
