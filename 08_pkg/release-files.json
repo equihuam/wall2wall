@@ -55,7 +55,8 @@
     "pip-linux-64.lock.txt",
     "pip-win-64.lock.txt",
     "run_checks.py",
-    "windows.ps1"
+    "windows.ps1",
+    "pip-engines-win-64.lock.txt"
   ],
   "excluded_user_tools": [
     "workflow/qualify_linux.py"

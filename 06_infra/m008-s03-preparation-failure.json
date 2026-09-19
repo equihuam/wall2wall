@@ -1,0 +1,54 @@
+{
+  "schema": "wall2wall.s03-preparation-failure/1",
+  "status": "failed",
+  "invocation": "b2c4af7952a84d90b48b1d8e2ab68649",
+  "report_sha256": "c9f534a0ab4c6243af723854a37fdf22a293e3cbcab0e66e5a5e4a147acb3454",
+  "artifacts": {
+    "started.json": "0ac67a702e3444f534969de9aa308c2fb93499fba17bfb078c47f34e10b5f276",
+    "dispatch-result.json": "c5846e81132bcb5110ef3461e355ec4bfc0b6b360db3cd674236116b06bfc435",
+    "logs/dispatch.log": "fc64e9f991f20761862f0b55e70ad324156a76e44c6b047d3cbf8043b467bcf7",
+    "evidence/worker-started.json": "01c9285534669f87a340fb31e5253e80ca89497ea3581bf685310995a1cacda5",
+    "evidence/receipt.json": "9ed08a29a1235cbc5c14a82d72cd8b7e931da3fa8e520ee5a14656c9b1f8dafb",
+    "evidence/suite.log": "b497e64fe204377112e18bff4726ca764a84c15f270d61fcd95a099d66aa1eda",
+    "evidence/junit.xml": "24476a2dc0c9c4bbd39ae4abfdefc82b34dd481b33ddbe2625f6714a951d1e1e"
+  },
+  "planned_suite_ids": [
+    "tests/test_workflow_control.py::test_qualification_preconditions",
+    "tests/test_workflow_control.py::test_shared_writer_lock",
+    "tests/test_workflow_timeout.py::test_completed_writer_requires_explicit_recovery",
+    "tests/test_workflow_timeout.py::test_pending_writer_rejects_resume_and_validated",
+    "tests/test_workflow_timeout.py::test_stage_timeout_preserves_unknown_evidence",
+    "tests/test_workflow_timeout.py::test_timeout_preserves_writer_lock_and_marker"
+  ],
+  "observed_tests": 1,
+  "failures": 1,
+  "fits": 0,
+  "completed_exit": 1,
+  "attempts_consumed": {
+    "linux_controls": 1
+  },
+  "not_started": [
+    "linux_release",
+    "win32_controls",
+    "win32_release",
+    "coder_gate",
+    "official_gate"
+  ],
+  "cause": "snapshot missing 08_pkg/CONTEXT.md required by qualifier source identity check",
+  "historical_identities_preserved": {
+    "06_infra/windows-validation.json": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e",
+    "06_infra/manual-windows-qualification.json": "4487786b076975accb65a15152a767269827c16f41b6473aaad1661c11aef618",
+    "06_infra/m008-native-preparation.json": "1aad6fbb13024f4dd0641da72cf032a0fafcddeb7fdfd90eb65201b1d28d78f1",
+    "06_infra/m008-native-preparation-r2.json": "caf2a7a229577045ab4f4fa5525b49fea0a50f733ad801278a49a3bb75afe591",
+    "06_infra/m008-s01-native.json": "64f382b173088843ec1522f5db688d1c5f05c6160eff27d9b506a9741e6256c6",
+    "00_brief/decisions.md": "34cafca4b15f7b9c22f28ccde847a726941a8a95d88498d1f8da8d5b7d6505b6",
+    "06_infra/m008-s02-preparation.json": "8cfd9a0324873c1d7b94cca8f861372ca820a32120b2a59f056e2f2c966415f3",
+    "06_infra/m008-s02-preparation-bridge.json": "7e2a5942ae5dc20ef75dea82b35c161c5087dc4207c45b0ab10cd137bf89b351",
+    "00_brief/D036-m008-s02-preparation.md": "9fd47b5de29ed4f9f30f6937019fd6d6fa4b6c53a5eaeaca6aac879476e1bb74",
+    "06_infra/M008-S02-PREPARATION.md": "6ded7ce6e2481a93dfb144982a73bed152e380792f4f30badd4dc2ea4b15bb32"
+  },
+  "current_sources_match_snapshot": true,
+  "rss_peak": "unknown",
+  "scratch_peak": "unknown",
+  "tokens": "unknown"
+}

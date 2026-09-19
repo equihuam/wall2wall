@@ -1,0 +1,454 @@
+{
+  "schema": "wall2wall.s03-preparation/1",
+  "base_commit": "de338131e40b80474ed9cfe353bfc1f81a1d3290",
+  "sources": [
+    {
+      "path": "06_infra/LINUX.md",
+      "kind": "file",
+      "size": 10608,
+      "sha256": "3be1315650788f4a70de1281458afabdb3649835285ea39d88d2bad6a3ba0113"
+    },
+    {
+      "path": "06_infra/check_python_headers.py",
+      "kind": "file",
+      "size": 5588,
+      "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+    },
+    {
+      "path": "06_infra/conda-linux-64.lock.txt",
+      "kind": "file",
+      "size": 16883,
+      "sha256": "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"
+    },
+    {
+      "path": "06_infra/conda-win-64.lock.txt",
+      "kind": "file",
+      "size": 15042,
+      "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+    },
+    {
+      "path": "06_infra/environment-linux.yml",
+      "kind": "file",
+      "size": 281,
+      "sha256": "092929ca550218879ea775003be7e61d492b090db78b58226d885ea260af6a2a"
+    },
+    {
+      "path": "06_infra/environment-windows.yml",
+      "kind": "file",
+      "size": 279,
+      "sha256": "f77c0e5d65ea26c8649a35231402671fe309f8b7eaf0f99c5f96a57faa996de5"
+    },
+    {
+      "path": "06_infra/linux.sh",
+      "kind": "file",
+      "size": 561,
+      "sha256": "02666f426055496b0c04be856a7451905be27508f494875e9c0bb0769aa55370"
+    },
+    {
+      "path": "06_infra/m008-s03-history.json",
+      "kind": "file",
+      "size": 1088,
+      "sha256": "86928064e59d5c85846be349013151adc331dc58963c5b693b2e20a1b5509e6a"
+    },
+    {
+      "path": "06_infra/m008_integration/compare.py",
+      "kind": "file",
+      "size": 1414,
+      "sha256": "bfcaa98b9cedc8bb68aab36162d7243b2c4061a8cd6da5015c5c42c5b17689f0"
+    },
+    {
+      "path": "06_infra/m008_integration/dispatch.py",
+      "kind": "file",
+      "size": 7593,
+      "sha256": "b0e2f229518faf5d8d4af1bb85b4d166fb8322b2e67fce5385189c06979fef99"
+    },
+    {
+      "path": "06_infra/m008_integration/test_contract.py",
+      "kind": "file",
+      "size": 5640,
+      "sha256": "9a160555c99f73c3752fe74fe6456577a45a71268bb63f44127dec13fe3ffb8b"
+    },
+    {
+      "path": "06_infra/m008_integration/verify_evidence.py",
+      "kind": "file",
+      "size": 1680,
+      "sha256": "813c92e2e3b92daa002966dd0c434c8d0e9e1a605f49c2d78545ada0b708a1bd"
+    },
+    {
+      "path": "06_infra/m008_integration/verify_s03.py",
+      "kind": "file",
+      "size": 8020,
+      "sha256": "35d2d5cdc333d6640325ab3cfdf35f6060a09bbde1ded9352e0a295fe342bf16"
+    },
+    {
+      "path": "06_infra/m008_integration/windows.ps1",
+      "kind": "file",
+      "size": 2524,
+      "sha256": "81d81d743789d0a8df1337490b1750d359edbde51928f3ef8fb55c3d597f18b8"
+    },
+    {
+      "path": "06_infra/m008_integration/worker.py",
+      "kind": "file",
+      "size": 5048,
+      "sha256": "2c57bf219fe145274156eeba0f2ba4ab48ded9e07c9d903fc70963b9b60e0ec1"
+    },
+    {
+      "path": "06_infra/m008_native/dispatch.py",
+      "kind": "file",
+      "size": 6199,
+      "sha256": "d75d2695c6eeebd7b35912879dff7f84ebc457758ca4835dd5a05a8546266516"
+    },
+    {
+      "path": "06_infra/m008_native/pytest.ini",
+      "kind": "file",
+      "size": 9,
+      "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+    },
+    {
+      "path": "06_infra/m008_native/worker.py",
+      "kind": "file",
+      "size": 11978,
+      "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+    },
+    {
+      "path": "06_infra/pip-engines-linux-64.lock.txt",
+      "kind": "file",
+      "size": 365,
+      "sha256": "50cf6f3ce38d73c2d2c59fa89a493d7b6eecadd3430e79b2d661b258cad5e7de"
+    },
+    {
+      "path": "06_infra/pip-engines-win-64.lock.txt",
+      "kind": "file",
+      "size": 408,
+      "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+    },
+    {
+      "path": "06_infra/pip-linux-64.lock.txt",
+      "kind": "file",
+      "size": 4897,
+      "sha256": "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"
+    },
+    {
+      "path": "06_infra/pip-win-64.lock.txt",
+      "kind": "file",
+      "size": 5005,
+      "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+    },
+    {
+      "path": "06_infra/python_header_scope_m006_s02.json",
+      "kind": "file",
+      "size": 445,
+      "sha256": "7880f9ff6ec8d9e985dbfc6c951f229a0b297eccd06db1c1fe2db56c78232fea"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s02.json",
+      "kind": "file",
+      "size": 453,
+      "sha256": "c805bf4afc34df437d9f4f3b037a7d1e4d55de5641dec467a83c9956f6de3e53"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s03.json",
+      "kind": "file",
+      "size": 541,
+      "sha256": "8bc14a26bbc96fb23b2460808a23da7449932a2bdc7eff73fc6b7050834465b3"
+    },
+    {
+      "path": "06_infra/run_checks.py",
+      "kind": "file",
+      "size": 5080,
+      "sha256": "ee1b15be1f4c8b4b001bb12352709f8c6f776ba21bf3799ec94b44e59f921009"
+    },
+    {
+      "path": "06_infra/windows-validation.json",
+      "kind": "file",
+      "size": 2652,
+      "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+    },
+    {
+      "path": "06_infra/windows.ps1",
+      "kind": "file",
+      "size": 1820,
+      "sha256": "f729589b011b269d6d482947bd5702df1eb44df2ab3663d0d8cdc12724c510e3"
+    },
+    {
+      "path": "08_pkg/MANIFEST.in",
+      "kind": "file",
+      "size": 315,
+      "sha256": "d29356ce33e85fd8b23e76e83e46be64758beb9491931704c0962b76834ea057"
+    },
+    {
+      "path": "08_pkg/README.md",
+      "kind": "file",
+      "size": 56487,
+      "sha256": "a1f9d3ac1cfb396a34bdefefdae9eefe58b0ab8d153e33edc759b26e74c6c180"
+    },
+    {
+      "path": "08_pkg/build_release.py",
+      "kind": "file",
+      "size": 5796,
+      "sha256": "40204533f8750cb2a8708b76a4ef16a550e512c998493cc8e148cd3dc45f4e56"
+    },
+    {
+      "path": "08_pkg/docs/audit.md",
+      "kind": "file",
+      "size": 10351,
+      "sha256": "ae1dbb59253e6780962626ae74df81c2fe41c5420fb1277124f7fd7cdd9f7465"
+    },
+    {
+      "path": "08_pkg/docs/prediction.md",
+      "kind": "file",
+      "size": 12674,
+      "sha256": "47b4c27d02da997a4bb73db16c87c083563100a3af164d4c5b215f1238dd2075"
+    },
+    {
+      "path": "08_pkg/docs/quickstart.md",
+      "kind": "file",
+      "size": 10578,
+      "sha256": "5f4a4ddc75ff02c428b9f54f0d494f2100211e5efd34f54d8636d2e100137075"
+    },
+    {
+      "path": "08_pkg/docs/workflow.md",
+      "kind": "file",
+      "size": 12790,
+      "sha256": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6"
+    },
+    {
+      "path": "08_pkg/examples/synthetic.py",
+      "kind": "file",
+      "size": 10269,
+      "sha256": "2f21c98c0f5a43c0787457d22ccac91168de378109b1a0a45dc6e12182bbb159"
+    },
+    {
+      "path": "08_pkg/examples/workflow.json",
+      "kind": "file",
+      "size": 1386,
+      "sha256": "411e4ac1c8ac25aca25bffd2303edca9201e1e5dde038e0e29fb7531c5edd3d6"
+    },
+    {
+      "path": "08_pkg/pyproject.toml",
+      "kind": "file",
+      "size": 523,
+      "sha256": "9d787f00d5172e59862f2e889d1762d89991a13f505153d71d9d0f52cb495a2f"
+    },
+    {
+      "path": "08_pkg/release-files.json",
+      "kind": "file",
+      "size": 1700,
+      "sha256": "6167be3a67791dcd32e21ba130550061685cf088e574c3b23ce667af537b0094"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/__init__.py",
+      "kind": "file",
+      "size": 809,
+      "sha256": "aa5ba425bb103c86625e6fcff4320cf7de3b3352aa53b5d4db1e932bbb932753"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/audit.py",
+      "kind": "file",
+      "size": 26730,
+      "sha256": "25c22dfcd7ba7d131efb0a9517ae39aa43716e7379b3680782daed1ac6293e43"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/engines.py",
+      "kind": "file",
+      "size": 3299,
+      "sha256": "45daa2922fb8a4be711ca0d3438e7e5f137aa915d7927c2312d731346f6b5c13"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/modeling.py",
+      "kind": "file",
+      "size": 31223,
+      "sha256": "a6126fa204644b06729e1a6a157f773b6a936c6913302045729e754b18d6bfa2"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/prediction.py",
+      "kind": "file",
+      "size": 16344,
+      "sha256": "ef66be856e4b8a6e9e5be6cdec03ebf4cab737d0e666f03dc6fe31ca9b9136fb"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/sampling.py",
+      "kind": "file",
+      "size": 18817,
+      "sha256": "9d8ca91b443eec1eae1900aa54c35e730563a5322b7cce21fe7ff04dc532320e"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/spatial.py",
+      "kind": "file",
+      "size": 19450,
+      "sha256": "613d7fe66ac9afd1d368062de7afaa506761b93dd2e4539b3762755c9fe3231c"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/validation.py",
+      "kind": "file",
+      "size": 21784,
+      "sha256": "155e15717e5604d340b759787f4e8e89e8b66328711dd195ff44f8a1fb3c6fb8"
+    },
+    {
+      "path": "08_pkg/tests/run_checks.py",
+      "kind": "file",
+      "size": 17455,
+      "sha256": "9fb19a95e55496615e647be734554323a2c4a1f0dcf5ecf47c00df5a75d05b39"
+    },
+    {
+      "path": "08_pkg/tests/test_audit.py",
+      "kind": "file",
+      "size": 21518,
+      "sha256": "a52e0cbf1103977cc7acb0aa45a1b5649a38ff5d9514322c7200afdc18ad2da0"
+    },
+    {
+      "path": "08_pkg/tests/test_buffer.py",
+      "kind": "file",
+      "size": 16802,
+      "sha256": "d74a49db723855229e7a42d8f80a826a7cdeaf7c6a636f690c976936623047ad"
+    },
+    {
+      "path": "08_pkg/tests/test_engine_integration.py",
+      "kind": "file",
+      "size": 16133,
+      "sha256": "b9658c43f0b5b5dc414d79a6f3c73305a9f1dbe01e9b8e89441f2281b2961aca"
+    },
+    {
+      "path": "08_pkg/tests/test_engines.py",
+      "kind": "file",
+      "size": 6829,
+      "sha256": "b41b8ad9b9844a689d79918fd2589ba1bc8d3e00a249742a6caa03bd4a75f0f3"
+    },
+    {
+      "path": "08_pkg/tests/test_modeling.py",
+      "kind": "file",
+      "size": 21645,
+      "sha256": "7d611fee15c42416ca2a54d9e8541199ab52eede4072468dbf2939bd4bc17aef"
+    },
+    {
+      "path": "08_pkg/tests/test_package.py",
+      "kind": "file",
+      "size": 14955,
+      "sha256": "2e79196c1fcbf6e2b063a9fce1f5578198efe3a04168c3f26df4776f2f3fe571"
+    },
+    {
+      "path": "08_pkg/tests/test_prediction.py",
+      "kind": "file",
+      "size": 19401,
+      "sha256": "c036378cc8ada9aba3965a9d30a5a2afa4fa5b05d0d4412035e3a4cc9043e069"
+    },
+    {
+      "path": "08_pkg/tests/test_quality.py",
+      "kind": "file",
+      "size": 12015,
+      "sha256": "7b13f6925cdb096f59e223eceefc11a8b3bf0a064e705fabcec914688b8a1bcd"
+    },
+    {
+      "path": "08_pkg/tests/test_release.py",
+      "kind": "file",
+      "size": 11296,
+      "sha256": "112db2022a8d3e74bbe7c2b8b0b2dd48b14adfe41729ddb30e6b0f6e0c90784c"
+    },
+    {
+      "path": "08_pkg/tests/test_sampling.py",
+      "kind": "file",
+      "size": 22262,
+      "sha256": "e5b1fb8d6dc0862913494751116be6d609cb4cc622b8612f5510fa8e70661834"
+    },
+    {
+      "path": "08_pkg/tests/test_scale.py",
+      "kind": "file",
+      "size": 14969,
+      "sha256": "afa0dd702a2875617e706e3394240e80bf0e0a410ad910c56e00b32349d633e2"
+    },
+    {
+      "path": "08_pkg/tests/test_selection.py",
+      "kind": "file",
+      "size": 22261,
+      "sha256": "187cc2f844cdaca1f6941cee3374d1a7d929f4b541db0033c2e984f90fd20e10"
+    },
+    {
+      "path": "08_pkg/tests/test_spatial.py",
+      "kind": "file",
+      "size": 21032,
+      "sha256": "12192ad02c466f827351f145fd16c65a91c044e19b3dc914cb119d2e3befbbbe"
+    },
+    {
+      "path": "08_pkg/tests/test_synthetic.py",
+      "kind": "file",
+      "size": 15927,
+      "sha256": "532cfba5d4c1ebecf84fb4bad185f4f1be768ff4b0839d62f18ca816c496826b"
+    },
+    {
+      "path": "08_pkg/tests/test_validation.py",
+      "kind": "file",
+      "size": 17529,
+      "sha256": "4e86cebda925610ca29829ad0fdf701133ac59bf60261ce2984bc2b4af812e03"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow.py",
+      "kind": "file",
+      "size": 16765,
+      "sha256": "c300c65c58561c1830af5069474741a8db9bb638c0ef8e2ca0862c7a42689d6f"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow_control.py",
+      "kind": "file",
+      "size": 8113,
+      "sha256": "f90738b15944afdae086676883d68f779c95e05b3bd0cd377fc94749c7f9a070"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow_resume.py",
+      "kind": "file",
+      "size": 9114,
+      "sha256": "cc490c15732d0e59a78614782bc9d4efddd60850d2ac671acdae496f458b4c96"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow_timeout.py",
+      "kind": "file",
+      "size": 5058,
+      "sha256": "181f83c479b9739fa982c83ca4c42126aa020ce0e1993dae15306733e2e50816"
+    },
+    {
+      "path": "08_pkg/workflow/Snakefile",
+      "kind": "file",
+      "size": 2629,
+      "sha256": "3321e55d2083e97966a66d1f553517eb382d739e3a6592e08a7d0515df75ab17"
+    },
+    {
+      "path": "08_pkg/workflow/qualify_linux.py",
+      "kind": "file",
+      "size": 16775,
+      "sha256": "26942ee063cd23c885bd00bbf9607df318862e43750f7ad7f76c5d6a63352e64"
+    },
+    {
+      "path": "08_pkg/workflow/run.py",
+      "kind": "file",
+      "size": 6496,
+      "sha256": "7d5feb4abfcaed229eb19dd1693a22f26dc63574642541c401674f82c9d04686"
+    },
+    {
+      "path": "08_pkg/workflow/stage_checks.py",
+      "kind": "file",
+      "size": 4646,
+      "sha256": "7c0f4617db7e136df720b33c6e0a37c94f5593000022cedbb7a0c743c1819e15"
+    },
+    {
+      "path": "08_pkg/workflow/stages.py",
+      "kind": "file",
+      "size": 28886,
+      "sha256": "8c4c8241b7c18c25e41ee26c0aa327baa336868ab47f4421003e2f00311a6d59"
+    }
+  ],
+  "results": [
+    {
+      "status": "finished",
+      "exit": 1,
+      "pid": 7677,
+      "platform": "linux",
+      "mode": "controls",
+      "invocation": "b2c4af7952a84d90b48b1d8e2ab68649",
+      "seconds": 4.834
+    }
+  ],
+  "fits": 0,
+  "rss_peak": "unknown",
+  "scratch_peak": "unknown",
+  "tokens": "unknown",
+  "status": "failed"
+}

@@ -280,7 +280,7 @@ def test_validated_contract(production, tmp_path, monkeypatch):
         raise subprocess.CalledProcessError(1, args[0])
     with monkeypatch.context() as patch:
         patch.setattr(stage_checks, "receipt_identity", lambda *args: expected)
-        patch.setattr(stage_checks.subprocess, "run", failed)
+        patch.setattr(stage_checks.subprocess, "Popen", failed)
         with pytest.raises(subprocess.CalledProcessError):
             stage_checks.execute_checks(config, run, "prediction")
     assert not (run / "pytest-prediction.json").exists()

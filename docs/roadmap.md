@@ -585,6 +585,26 @@ Non-goals:
 - Cambiar producto científico, workflow, wrappers históricos, locks, entorno, copia Windows o datos reales.
 - Repetir preparación D033/D034, D014, full Linux/Windows históricos, Snakemake o conceder aceptación automática.
 
+### M008-S03 — Entrega conservada de exclusión tras timeout y revisión del delta D036
+
+Someter a revisión el delta D036 y la corrección D037/D038 ya conservados, con evidencia enlazada y sin nueva implementación ni integración científica.
+
+Acceptance:
+- D038: entrega arquitectónica ya implementada y cualificada como preparación; no nueva implementación coder. La fase coder del gate pasó una vez y está consumida. No repetirla ni ejecutar suites; el arquitecto registra coded de la entrega conservada por transición ordinaria.
+- Única verificación restante: scripts/verify.py M008-S03 tras coded, mediante verify_s03.py --phase official una vez, máximo120s; cero fits/builds/pruebas nuevas. El comando full del contrato identifica esta fase oficial del arquitecto, no una ejecución adicional del coder. Si falla o queda unknown detener sin repetir; destinos externos nuevos previamente creados.
+- Revisar íntegro el delta contra HEAD de338131e40b80474ed9cfe353bfc1f81a1d3290, incluidas las ocho fuentes D036 y las herramientas de integración de la baseline arquitectónica. Las74 identidades del snapshot r2 deben coincidir con fuentes actuales; cotejar manifiestos, invocaciones, logs, JUnit, finalizaciones, recibos y resumen portable con originales.
+- run.py mantiene exclusión y evidencia ante timeout/interrupción y selector pendiente; rechaza nuevos escritores y no infiere terminación de descendientes por salida del padre. Recuperación desconocida manual explícita, sin limpiar locks ajenos ni matar procesos.
+- Conservar seis controles exactos por perfil: test_workflow_timeout.py::test_timeout_preserves_writer_lock_and_marker, test_pending_writer_rejects_resume_and_validated, test_completed_writer_requires_explicit_recovery, test_stage_timeout_preserves_unknown_evidence; test_workflow_control.py::test_shared_writer_lock y test_qualification_preconditions. Son dobles/control sin fits; no afirmar prueba de árbol real.
+- Conservar seis IDs de distribución por perfil de test_release.py (release_inventory, sdist_rebuild, wheel_isolated_import, workflow_bundle_dry_run, release_destination_safety, quickstart_contract), cada uno con prefijo test_. Exactamente24 contratos r2 sin errores/fallos/skips. Ninguna repetición.
+- Preservar el primer intento D037 consumido con fallo de inventario:1 prueba fallida,5 no ejecutadas, cero fits. D036 conserva28 pases sólo para sus fuentes históricas. El puente no acepta drift ni sustituye hashes históricos. D014-D038, copia Windows/prefijos, M007 y bufa ignorado intactos.
+- Presupuestos consumidos r2: controls1 y release1 por perfil,1200s por suite; cero fits. Build conjunto wheel/sdist1, rebuild wheel1 y pip target offline1 por perfil,120s por subcomando. Inventario64MiB/256files; scratch512MiB/comando, evidencia128MiB/perfil, retenidos2GiB/perfil y5GiB total. Trabajo60min; picos RSS/scratch y tokens unknown. No renovar reservas históricas.
+- D016: encabezados AGENTS.md estructurales y veraces en scope explícito m008_s03, incluida baseline arquitectónica. Gate sólo coteja evidencia/encabezados/whitespace; el reviewer revisa contenido, límites y conservación documental.
+- Aceptación sólo después de review pass: no cierra M008 ni acredita DAG científico, validated distribuido, réplica nueva o equivalencia Windows/Linux. S02 mantiene contador global, comparación OOF/mapas/métricas y regresiones pendientes;364 fits no autorizados, atol=rtol=1e-5 sin cambios. S02 requiere aceptación de esta entrega previa.
+
+Non-goals:
+- Nueva implementación, pruebas, fits, builds, producción, validated real, réplicas o canaries.
+- Reabrir entregas aceptadas, editar evidencia histórica, cambiar entornos o commit/push.
+
 ### M008-S02 — Workflow Windows y comparación con WSL
 
 Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar soporte.

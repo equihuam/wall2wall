@@ -6,7 +6,7 @@ Verifica distribución local, reconstrucción offline y dry-run real del complem
 Comparte un build por módulo; ninguna prueba nueva ajusta modelos.
 
 ## Precondiciones
-Entorno Linux fijo con herramientas de build, Pytest y Snakemake instalados.
+Entorno Linux o Windows fijo con herramientas de build, Pytest y Snakemake instalados.
 Scratch externo del launcher; no instalaciones salvo pip --target sin dependencias.
 
 ## Resultados
@@ -14,8 +14,9 @@ Seis IDs verifican inventario, sdist, import aislado, DAG, destinos y quickstart
 Los archivos comprimidos se extraen sólo tras validar rutas y tipos regulares.
 
 ## Notas relevantes
-No ejecuta production/validated real, no crea réplica y no cualifica Windows.
-El certificado dry-run identifica el intérprete actual con los locks distribuidos.
+No ejecuta production/validated real ni crea réplica; sólo cubre distribución.
+El certificado de ejecución dry-run identifica el prefijo existente y sus locks.
+Los subcomandos conservan logs externos y procesos desconocidos ante timeout.
 =============================================================================
 """
 import hashlib
@@ -27,6 +28,7 @@ import runpy
 import subprocess
 import sys
 import tarfile
+import tempfile
 import zipfile
 
 import pytest
@@ -36,9 +38,16 @@ ROOT = PACKAGE.parent
 
 
 def run(argv, cwd, env=None):
-    result = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, timeout=120)
-    assert result.returncode == 0, result.stdout + result.stderr
-    return result.stdout
+    # Persistent command diagnostics; wait never kills on timeout.
+    logs=Path(tempfile.mkdtemp(prefix="release-cmd-",dir=os.environ["VERIFICATION_SCRATCH"]))
+    with (logs/"stdout.log").open("wb") as out, (logs/"stderr.log").open("wb") as err:
+        process=subprocess.Popen(argv,cwd=cwd,env=env,stdout=out,stderr=err)
+        (logs/"started.json").write_text(json.dumps({'pid':process.pid,'argv':argv}))
+        code=process.wait(timeout=120)
+    text=(logs/"stdout.log").read_text(encoding="utf-8",errors="replace")
+    error=(logs/"stderr.log").read_text(encoding="utf-8",errors="replace")
+    assert code==0,text+error
+    return text
 
 
 def identity(path):
@@ -175,11 +184,12 @@ for group in expected:
     assert not any('test_release.py' in n for n in required)
     contracts[group]=sorted(required)
 (work/'groups.json').write_text(json.dumps(contracts))
-cert={'schema':'wall2wall.replica/1','prefix':sys.prefix,'locks':{k:v[1] for k,v in stages.LOCKS.items()},'interpreter':stages.identity(sys.executable)}
+cert={'schema':'wall2wall.execution/1','profile':stages.PROFILE,'prefix':sys.prefix,'locks':{k:v[1] for k,v in stages.LOCKS.items()},'interpreter':stages.identity(sys.executable)}
 (work/'certificate.json').write_text(json.dumps(cert))
 """
     run([sys.executable,"-I","-B","-c",setup,str(bundle),str(work)],work,env)
-    env["WALL2WALL_REPLICA"] = str(work/"certificate.json")
+    env.pop("WALL2WALL_REPLICA", None)
+    env["WALL2WALL_EXECUTION"] = str(work/"certificate.json")
     for target in ("production","validated"):
         destination = work/("dry-"+target)
         text = run([sys.executable,"-B",str(bundle/"08_pkg/workflow/run.py"),"--config",str(work/"fixture/config.json"),"--run-dir",str(destination),"--target",target,"--dry-run"],work,env)
@@ -189,19 +199,30 @@ cert={'schema':'wall2wall.replica/1','prefix':sys.prefix,'locks':{k:v[1] for k,v
             assert "pytest_stage" in text
 
 
-def test_release_destination_safety(tmp_path):
+def test_release_destination_safety(tmp_path, monkeypatch):
     builder = runpy.run_path(str(PACKAGE/"build_release.py"))
     existing = tmp_path/"existing"
     existing.mkdir()
     marker = existing/"keep"
     marker.write_text("unchanged")
     alias = tmp_path/"alias"
-    alias.symlink_to(ROOT,target_is_directory=True)
-    for destination in (existing, ROOT, ROOT.parent, PACKAGE/"dist", alias/"new", PACKAGE/"README.md"):
+    destinations = [existing, ROOT, ROOT.parent, PACKAGE/"dist", PACKAGE/"README.md"]
+    if sys.platform != "win32":
+        alias.symlink_to(ROOT,target_is_directory=True)
+        destinations.append(alias/"new")
+    for destination in destinations:
         with pytest.raises(ValueError,match="external"):
             builder["build"](destination)
     assert marker.read_text() == "unchanged"
-    assert set(tmp_path.iterdir()) == {existing,alias}
+    if sys.platform == "win32":
+        # Model resolution of an alias without requiring host symlink privileges.
+        original = Path.resolve
+        with monkeypatch.context() as patch:
+            patch.setattr(Path, "resolve", lambda p, *a, **kw: ROOT/"new" if p == alias/"new" else original(p, *a, **kw))
+            with pytest.raises(ValueError, match="external"):
+                builder["build"](alias/"new")
+        assert not alias.exists()
+    assert set(tmp_path.iterdir()) == ({existing} if sys.platform == "win32" else {existing,alias})
     assert not (PACKAGE/"dist").exists()
 
 
@@ -215,7 +236,7 @@ def test_quickstart_contract(release):
     blocks = re.findall(r"```bash\n(.*?)```",text,re.S)
     assert blocks
     for block in blocks:
-        result = subprocess.run(["/bin/bash","-n"],input=block,text=True,capture_output=True,timeout=10)
+        result = subprocess.run([os.environ["WALL2WALL_BASH"],"-n"],input=block,text=True,capture_output=True,timeout=10)
         assert result.returncode == 0,result.stderr
     for relative in ("08_pkg/build_release.py","08_pkg/workflow/run.py","08_pkg/examples/synthetic.py"):
         help_text = run([sys.executable,"-B",str(bundle/relative),"--help"],work)

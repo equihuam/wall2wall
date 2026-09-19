@@ -1,0 +1,15 @@
+{
+  "06_infra/windows-validation.json": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e",
+  "06_infra/manual-windows-qualification.json": "4487786b076975accb65a15152a767269827c16f41b6473aaad1661c11aef618",
+  "06_infra/m008-native-preparation.json": "1aad6fbb13024f4dd0641da72cf032a0fafcddeb7fdfd90eb65201b1d28d78f1",
+  "06_infra/m008-native-preparation-r2.json": "caf2a7a229577045ab4f4fa5525b49fea0a50f733ad801278a49a3bb75afe591",
+  "06_infra/m008-s01-native.json": "64f382b173088843ec1522f5db688d1c5f05c6160eff27d9b506a9741e6256c6",
+  "00_brief/decisions.md": "34cafca4b15f7b9c22f28ccde847a726941a8a95d88498d1f8da8d5b7d6505b6",
+  "06_infra/m008-s02-preparation.json": "8cfd9a0324873c1d7b94cca8f861372ca820a32120b2a59f056e2f2c966415f3",
+  "06_infra/m008-s02-preparation-bridge.json": "7e2a5942ae5dc20ef75dea82b35c161c5087dc4207c45b0ab10cd137bf89b351",
+  "00_brief/D036-m008-s02-preparation.md": "9fd47b5de29ed4f9f30f6937019fd6d6fa4b6c53a5eaeaca6aac879476e1bb74",
+  "06_infra/M008-S02-PREPARATION.md": "6ded7ce6e2481a93dfb144982a73bed152e380792f4f30badd4dc2ea4b15bb32",
+  "06_infra/m008-s03-preparation.json": "c9f534a0ab4c6243af723854a37fdf22a293e3cbcab0e66e5a5e4a147acb3454",
+  "06_infra/m008-s03-preparation-failure.json": "648d39609adde91a034aa87f1ae7a4ebabb36ebc46a1758b7f81e2c07c9afb63",
+  "06_infra/m008-s03-history.json": "86928064e59d5c85846be349013151adc331dc58963c5b693b2e20a1b5509e6a"
+}

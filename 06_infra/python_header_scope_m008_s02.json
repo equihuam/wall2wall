@@ -1,0 +1,14 @@
+[
+  "08_pkg/build_release.py",
+  "08_pkg/tests/run_checks.py",
+  "08_pkg/tests/test_release.py",
+  "08_pkg/tests/test_workflow.py",
+  "08_pkg/workflow/run.py",
+  "08_pkg/workflow/stage_checks.py",
+  "08_pkg/workflow/stages.py",
+  "06_infra/m008_integration/dispatch.py",
+  "06_infra/m008_integration/worker.py",
+  "06_infra/m008_integration/compare.py",
+  "06_infra/m008_integration/verify_evidence.py",
+  "06_infra/m008_integration/test_contract.py"
+]

@@ -18,12 +18,14 @@ respectivos, manteniendo IDs obligatorios. --release-only selecciona distribuci�
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
 ## Notas relevantes
+WALL2WALL_RETAIN_SCRATCH=1 conserva el árbol externo nuevo incluso ante fallos.
 No instala en el prefijo fijo ni realiza evaluaciones científicas. El tamaño
 informado corresponde al scratch final, no a su máximo durante la ejecución.
 Emite el reporte saneado de escala; WALL2WALL_TEST_EVIDENCE conserva JUnit externo.
 =============================================================================
 """
 from pathlib import Path
+import contextlib
 import argparse
 import os
 import shutil
@@ -256,7 +258,10 @@ def main():
         print("Verification scratch must be outside the checkout", file=sys.stderr)
         return 2
     scratch_parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="wall2wall-package-", dir=scratch_parent) as name:
+    retain = os.environ.get("WALL2WALL_RETAIN_SCRATCH") == "1"
+    manager = (contextlib.nullcontext(tempfile.mkdtemp(prefix="w2-", dir=scratch_parent))
+               if retain else tempfile.TemporaryDirectory(prefix="wall2wall-package-", dir=scratch_parent))
+    with manager as name:
         scratch = Path(name)
         os.environ.update(
             VERIFICATION_SCRATCH=str(scratch), TEMP=str(scratch), TMP=str(scratch),

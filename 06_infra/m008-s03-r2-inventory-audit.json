@@ -1,0 +1,77 @@
+{
+  "schema": "wall2wall.s03-static-inventory/1",
+  "method": "AST literals and bounded source inspection; no product imports or execution",
+  "qualifier_required": [
+    "06_infra/LINUX.md",
+    "06_infra/python_header_scope_m006_s02.json",
+    "08_pkg/CONTEXT.md",
+    "08_pkg/README.md",
+    "08_pkg/docs/workflow.md",
+    "08_pkg/examples/workflow.json",
+    "08_pkg/pyproject.toml",
+    "08_pkg/src/wall2wall/__init__.py",
+    "08_pkg/src/wall2wall/audit.py",
+    "08_pkg/src/wall2wall/engines.py",
+    "08_pkg/src/wall2wall/modeling.py",
+    "08_pkg/src/wall2wall/prediction.py",
+    "08_pkg/src/wall2wall/sampling.py",
+    "08_pkg/src/wall2wall/spatial.py",
+    "08_pkg/src/wall2wall/validation.py",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_engine_integration.py",
+    "08_pkg/tests/test_prediction.py",
+    "08_pkg/tests/test_workflow.py",
+    "08_pkg/tests/test_workflow_control.py",
+    "08_pkg/tests/test_workflow_resume.py",
+    "08_pkg/workflow/Snakefile",
+    "08_pkg/workflow/qualify_linux.py",
+    "08_pkg/workflow/run.py",
+    "08_pkg/workflow/stage_checks.py",
+    "08_pkg/workflow/stages.py"
+  ],
+  "missing_in_first_snapshot": [
+    "08_pkg/CONTEXT.md"
+  ],
+  "selected_imports": {
+    "08_pkg/tests/test_workflow_control.py": [
+      "pathlib"
+    ],
+    "08_pkg/tests/test_workflow_timeout.py": [
+      "test_workflow_control"
+    ],
+    "08_pkg/tests/test_workflow.py": [
+      "pathlib",
+      "rasterio.transform",
+      "sklearn.dummy",
+      "sklearn.ensemble",
+      "wall2wall"
+    ],
+    "08_pkg/tests/test_workflow_resume.py": [
+      "pathlib",
+      "test_workflow"
+    ],
+    "08_pkg/workflow/run.py": [
+      "pathlib",
+      "stage_checks",
+      "stages"
+    ],
+    "08_pkg/workflow/stage_checks.py": [
+      "pathlib",
+      "stages"
+    ],
+    "08_pkg/workflow/stages.py": [
+      "pathlib",
+      "sklearn.ensemble",
+      "wall2wall"
+    ],
+    "08_pkg/workflow/qualify_linux.py": [
+      "pathlib",
+      "stage_checks",
+      "stages",
+      "test_workflow",
+      "test_workflow_resume"
+    ]
+  },
+  "zero_fit_boundary": "fixture_files replaced before qualifier can call command; six explicit IDs; no scientific fixtures selected",
+  "previous_report_sha256": "c9f534a0ab4c6243af723854a37fdf22a293e3cbcab0e66e5a5e4a147acb3454"
+}

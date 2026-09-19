@@ -1,0 +1,19 @@
+{
+  "schema": "wall2wall.s03-conserved-delivery/1",
+  "base_commit": "de338131e40b80474ed9cfe353bfc1f81a1d3290",
+  "report_sha256": "346eea21867f0bd7a7da16f820e6ae63f013ee01be7e85d47bc5b2f645aa3df5",
+  "gate_preparation": {
+    "ok": true,
+    "tests": 24,
+    "fits": 0,
+    "report_sha256": "346eea21867f0bd7a7da16f820e6ae63f013ee01be7e85d47bc5b2f645aa3df5",
+    "base_commit": "de338131e40b80474ed9cfe353bfc1f81a1d3290",
+    "execution": "retained preparation; no suite rerun",
+    "phase": "coder"
+  },
+  "gate_preparation_sha256": "5fe49dae1bfb1acd238ee333dcc0252b0ad25e0c1fb4ec9f69521f1ede86e33b",
+  "failed_preparation_sha256": "c9f534a0ab4c6243af723854a37fdf22a293e3cbcab0e66e5a5e4a147acb3454",
+  "failed_preparation_record_sha256": "648d39609adde91a034aa87f1ae7a4ebabb36ebc46a1758b7f81e2c07c9afb63",
+  "qualification": "preparation only; official receipt and review pending",
+  "fits": 0
+}

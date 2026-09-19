@@ -6,7 +6,8 @@ Adapta las API públicas a etapas persistidas del DAG Linux/Windows y comprueba 
 identidades antes de consumir productos o cerrar el inventario de producción.
 
 ## Precondiciones
-Perfil Linux D020 o Windows D014 fijo, JSON declarativo y entradas locales, directorio externo nuevo.
+Perfil Linux D020 o Windows D014 fijo, JSON declarativo y entradas locales.
+WALL2WALL_EXECUTION admite certificado local del prefijo existente, no una réplica.
 La CLI mantiene el bloqueo exclusivo antes de preparar el directorio o ejecutar etapas.
 Los datos geométricos y estadísticos se validan en las API públicas respectivas.
 
@@ -196,12 +197,26 @@ def environment(inputs):
     primary = ROOT / ("local_state/envs/wall2wall-linux" if sys.platform == "linux" else "local_state/envs/wall2wall-win")
     prefix = primary
     replica_file = os.environ.get("WALL2WALL_REPLICA")
+    execution_file = os.environ.get("WALL2WALL_EXECUTION")
+    if replica_file and execution_file:
+        raise ValueError("choose execution prefix or replica, not both")
+    if execution_file:
+        certificate = read_json(execution_file)
+        if (certificate.get("schema") != "wall2wall.execution/1"
+                or certificate.get("profile") != PROFILE
+                or certificate.get("locks") != {k: v[1] for k, v in LOCKS.items()}):
+            raise ValueError("execution certificate differs from fixed profile/locks")
+        prefix = Path(certificate["prefix"]).resolve()
+        if prefix != Path(sys.prefix).resolve():
+            raise ValueError("execution prefix differs from active interpreter")
+        if certificate.get("interpreter") != identity(prefix / ("bin/python" if sys.platform == "linux" else "python.exe")):
+            raise ValueError("execution interpreter changed")
     if replica_file:
         certificate = read_json(replica_file)
         prefix = Path(certificate["prefix"]).resolve()
         if certificate["schema"] != "wall2wall.replica/1" or certificate["locks"] != {k: v[1] for k, v in LOCKS.items()}:
             raise ValueError("replica certificate differs from fixed locks")
-        if certificate["interpreter"] != identity(prefix / "bin/python"):
+        if certificate["interpreter"] != identity(prefix / ("bin/python" if sys.platform == "linux" else "python.exe")):
             raise ValueError("replica interpreter changed")
     if sys.platform not in ("linux", "win32") or platform.python_version() != "3.11.16" or Path(sys.prefix).resolve() != prefix.resolve():
         raise ValueError("requires explicitly qualified fixed prefix Python 3.11.16")
@@ -222,6 +237,11 @@ def environment(inputs):
             raise ValueError("Conda archive hash differs: " + name)
         if (record["name"], record["version"], record["build"]) != (name, version, build):
             raise ValueError("Conda record differs: " + name)
+    if execution_file:
+        for module in ("numpy", "pandas", "rasterio", "sklearn", "joblib"):
+            origin = Path(importlib.import_module(module).__file__).resolve()
+            if not origin.is_relative_to(prefix):
+                raise ValueError("import outside execution prefix: " + module)
     versions = {}
     pip_lines = inputs["lock/pip"].read_text().splitlines()
     if "lock/engines" in inputs:

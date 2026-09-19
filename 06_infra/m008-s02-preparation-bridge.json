@@ -1,0 +1,55 @@
+{
+  "schema": "wall2wall.preparation-bridge/1",
+  "base_commit": "de338131e40b80474ed9cfe353bfc1f81a1d3290",
+  "status": "candidate-not-accepted",
+  "files": [
+    {
+      "path": "08_pkg/build_release.py",
+      "baseline_sha256": "eee8fd750cd6cfbdddb4100fd9a6506e33a7348560b2415d1567d1574cbe9b0d",
+      "candidate_sha256": "40204533f8750cb2a8708b76a4ef16a550e512c998493cc8e148cd3dc45f4e56",
+      "size": 5796
+    },
+    {
+      "path": "08_pkg/release-files.json",
+      "baseline_sha256": "2943d393c026e65d2e8d976bec3262f92034a3ac486bba983be4c41fc0c2d015",
+      "candidate_sha256": "6167be3a67791dcd32e21ba130550061685cf088e574c3b23ce667af537b0094",
+      "size": 1700
+    },
+    {
+      "path": "08_pkg/tests/run_checks.py",
+      "baseline_sha256": "79c2de3d02f0e7d7bdc3aedd6e45903a6c8823de5c4909f3a3967f763e60eb0d",
+      "candidate_sha256": "9fb19a95e55496615e647be734554323a2c4a1f0dcf5ecf47c00df5a75d05b39",
+      "size": 17455
+    },
+    {
+      "path": "08_pkg/tests/test_release.py",
+      "baseline_sha256": "2331be9c1ec2a23154472bf40914e303b790e2a0d85f6053cc8c5e688b45f9af",
+      "candidate_sha256": "112db2022a8d3e74bbe7c2b8b0b2dd48b14adfe41729ddb30e6b0f6e0c90784c",
+      "size": 11296
+    },
+    {
+      "path": "08_pkg/tests/test_workflow.py",
+      "baseline_sha256": "6c724baf8e38e8e6da564baa77f7c2c32674f58657c4674faa7fe3e4ca5e5cea",
+      "candidate_sha256": "c300c65c58561c1830af5069474741a8db9bb638c0ef8e2ca0862c7a42689d6f",
+      "size": 16765
+    },
+    {
+      "path": "08_pkg/workflow/run.py",
+      "baseline_sha256": "495a0c9deddb0e4d7118ca317280488121c2dcdf1c754e71768cb51fcf03e469",
+      "candidate_sha256": "aae40705a7f019493292c1b754be19b988d769c3bf5903fb7c4393d5a35d8184",
+      "size": 5225
+    },
+    {
+      "path": "08_pkg/workflow/stage_checks.py",
+      "baseline_sha256": "b26824a0ae8a6e14570231eb9d7c4b6c103c8b8045458458cb0ec71356efbf36",
+      "candidate_sha256": "561f6f733b2e917b1cdad1a4d869e73b55a944571e8c68d787ad02904b0853be",
+      "size": 4037
+    },
+    {
+      "path": "08_pkg/workflow/stages.py",
+      "baseline_sha256": "2ae16298418a3a0ef166f066a768e84307a6758bb1d2c7f8e00288f34edb09db",
+      "candidate_sha256": "8c4c8241b7c18c25e41ee26c0aa327baa336868ab47f4421003e2f00311a6d59",
+      "size": 28886
+    }
+  ]
+}

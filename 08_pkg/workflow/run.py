@@ -14,12 +14,15 @@ CLI --config, --run-dir, --target production|validated, --dry-run, --reuse-from 
 Devuelve el estado de Snakemake; los dry-run nuevos usan scratch temporal externo.
 
 ## Notas relevantes
-No instala ni borra runs. La recuperación archiva parciales y sus descendientes.
+No instala ni borra runs. Timeout conserva proceso, marcador y exclusión; exige
+diagnóstico de todos los escritores y recuperación manual antes de otro intento.
+No hay desbloqueo automático por PID terminado. --resume archiva parciales conocidos.
 Toda escritura mantiene el mismo bloqueo exclusivo, también validated y preparación.
 No-op production comprueba todos los productos sin cambiar bytes ni mtimes.
 =============================================================================
 """
 import argparse
+import json
 import os
 from pathlib import Path
 import subprocess
@@ -37,7 +40,19 @@ def plan(config, run, target, dry):
                "--printshellcmds", "--rerun-triggers", "mtime", "--", target]
     if dry:
         command.insert(command.index("--"), "--dry-run")
-    return subprocess.run(command, cwd=run, env=environment, timeout=1100, check=False).returncode
+    pending = run / ".workflow.pending.json"
+    # Write before launch: even interruption between spawn and PID recording is unknown.
+    write_json(pending, {"status": "unknown", "owner_pid": os.getpid()})
+    process = subprocess.Popen(command, cwd=run, env=environment)
+    pending.write_text(json.dumps({"status": "unknown", "owner_pid": os.getpid(), "pid": process.pid}), encoding="utf-8")
+    code = process.wait(timeout=1100)
+    # A selector can outlive Snakemake after its own timeout. Never infer its
+    # completion from the parent's exit or silently clear its marker.
+    from stage_checks import GROUPS
+    if code < 0 or any((run / (".pytest-pending-" + g + ".json")).exists() for g in GROUPS):
+        raise ValueError("writer outcome unknown; preserve lock and diagnose all descendants")
+    pending.unlink()
+    return code
 
 
 def main(argv=None):
@@ -54,17 +69,22 @@ def main(argv=None):
     lock = run / ".workflow.lock"
     owned_lock = None
     try:
+        from stage_checks import GROUPS
+        if (run / ".workflow.pending.json").exists() or any(
+                (run / (".pytest-pending-" + group + ".json")).exists() for group in GROUPS):
+            raise ValueError("writer outcome unknown; explicit manual recovery required")
         state, _, _ = preflight(config, run)
         if args.dry_run and (args.resume or args.reuse_from):
             raise ValueError("dry-run cannot mutate recovery state")
         existing = os.path.lexists(args.run_dir)
         if not existing and args.dry_run:
-            with tempfile.TemporaryDirectory(prefix="wall2wall-dag-") as name:
-                scratch = Path(name).resolve()
-                write_json(scratch / "preflight.json", state)
-                for stage, value in state["stages"].items():
-                    write_json(scratch / (stage + ".key.json"), {"identity": value})
-                return plan(config, scratch, args.target, True)
+            # Persistent scratch: a timed-out planner may still be using it.
+            scratch = Path(tempfile.mkdtemp(prefix="wall2wall-dag-")).resolve()
+            print("Dry-run scratch: " + str(scratch), file=sys.stderr)
+            write_json(scratch / "preflight.json", state)
+            for stage, value in state["stages"].items():
+                write_json(scratch / (stage + ".key.json"), {"identity": value})
+            return plan(config, scratch, args.target, True)
         if existing and args.reuse_from:
             raise ValueError("reuse requires a new destination")
         if not existing:
@@ -99,7 +119,7 @@ def main(argv=None):
         print(str(error), file=sys.stderr)
         return 2
     finally:
-        if owned_lock is not None and lock.exists():
+        if owned_lock is not None and lock.exists() and not (run / ".workflow.pending.json").exists():
             current = lock.stat()
             if (current.st_dev, current.st_ino) == (owned_lock.st_dev, owned_lock.st_ino):
                 lock.unlink()

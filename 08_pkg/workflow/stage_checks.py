@@ -15,10 +15,13 @@ verify_receipt rechaza recibos obsoletos sin entrenar ni ejecutar otras suites.
 
 ## Notas relevantes
 No incluye test_workflow ni ejecuta validated desde pruebas del workflow.
+Timeout conserva selector y marcador pendiente; bloquea el run aun si termina
+Snakemake. Exige diagnóstico de descendientes y recuperación manual, sin reintento.
 Cada selector usa scratch externo y puede conservar JUnit mediante configuración local.
 =============================================================================
 """
 import argparse
+import json
 import os
 from pathlib import Path
 import runpy
@@ -63,14 +66,25 @@ def verify_receipt(path, config, run, group):
 
 
 def execute_checks(config, run, group):
+    pending = run / (".pytest-pending-" + group + ".json")
+    if pending.exists():
+        raise ValueError("selector outcome unknown; explicit manual recovery required")
     before = receipt_identity(config, run, group)
     destination = run / ("pytest-" + group + ".json")
     if destination.exists():
         verify_receipt(destination, config, run, group)
         return
     for selector in GROUPS[group]:
-        subprocess.run([sys.executable, "-B", str(PACKAGE / "tests/run_checks.py"), "--" + selector + "-only"],
-                       cwd=run, check=True, timeout=1200)
+        command = [sys.executable, "-B", str(PACKAGE / "tests/run_checks.py"), "--" + selector + "-only"]
+        write_json(pending, {"status": "unknown", "selector": selector, "owner_pid": os.getpid()})
+        process = subprocess.Popen(command, cwd=run)
+        pending.write_text(json.dumps({"status": "unknown", "selector": selector, "pid": process.pid}), encoding="utf-8")
+        code = process.wait(timeout=1200)
+        if code < 0:
+            raise ValueError("selector interrupted; descendant outcome unknown")
+        pending.unlink()
+        if code:
+            raise subprocess.CalledProcessError(code, command)
     if receipt_identity(config, run, group) != before:
         raise ValueError("inputs changed during Pytest")
     write_json(destination, {**before, "selectors": list(GROUPS[group]), "status": "passed"})

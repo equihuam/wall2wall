@@ -14,7 +14,7 @@ Artefactos locales y release-manifest.json con tamaños, SHA-256 y versiones.
 Staging y logs permanecen en el destino, incluso tras fallo; no instala paquetes.
 
 ## Notas relevantes
-Sin red ni aislamiento que resuelva dependencias. Límite de artefactos 16 MiB.
+Sin red ni aislamiento que resuelva dependencias. Timeout conserva el proceso y logs. Límite de artefactos 16 MiB.
 El wheel contiene sólo API; el workflow requiere entorno fijo y árbol complementario.
 =============================================================================
 """
@@ -81,7 +81,10 @@ def build(output):
     env = dict(os.environ, PIP_NO_INDEX="1", PIP_DISABLE_PIP_VERSION_CHECK="1", PIP_NO_CACHE_DIR="1", PYTHONDONTWRITEBYTECODE="1")
     command = [sys.executable, "-I", "-B", "-m", "build", "--no-isolation", "--sdist", "--wheel", "--outdir", str(resolved), str(stage)]
     with (resolved / "build.log").open("w") as log:
-        subprocess.run(command, cwd=resolved, env=env, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=120)
+        process = subprocess.Popen(command, cwd=resolved, env=env, stdout=log, stderr=subprocess.STDOUT)
+        code = process.wait(timeout=120)
+        if code:
+            raise subprocess.CalledProcessError(code, command)
     bundle = resolved / "workflow-source.tar.gz"
     with tarfile.open(bundle, "w:gz") as archive:
         for name, source in sorted(sources.items()):
