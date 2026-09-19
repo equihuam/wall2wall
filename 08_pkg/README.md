@@ -1,5 +1,12 @@
 # Wall2Wall
 
+Inicio actual: [quickstart Linux/WSL y distribución local](docs/quickstart.md).
+Wheel de API y sdist reconstruible offline, más fuentes complementarias del workflow;
+el wheel no instala Snakemake ni el workflow. M006-S02 r3 y S04 r1 aceptados;
+S03 pendiente de revisión, M006 pendiente de holística y Windows M008 pendiente.
+Las secciones siguientes conservan ejemplos y evidencia de sus entregas originales.
+
+
 Paquete local `wall2wall`, versión `0.1.0.dev0`, Python >=3.11.
 `wall2wall.spatial.align_predictors` armoniza predictores ráster; examples/synthetic.py
 genera fixtures de desarrollo separadas. `wall2wall.sampling.sample_points` extrae

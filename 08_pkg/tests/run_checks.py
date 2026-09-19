@@ -10,11 +10,11 @@ Entorno fijo con Pytest, herramientas de wheel y dependencias core instaladas.
 Requiere el checkout y 06_infra/run_checks.py; VERIFICATION_SCRATCH debe ser externo.
 
 ## Resultados
-Sin argumentos exige 260 pruebas: las 258 previas y dos controles sin fits de M006-S02 r2.
+Sin argumentos exige 266 pruebas: las 260 previas y seis contratos de distribución sin fits.
 --synthetic-only, --spatial-only, --sampling-only, --validation-only, --buffer-only
 y --modeling-only, --selection-only, --engines-only, --engine-integration-only,
 --audit-only, --prediction-only, --quality-only, --scale-only y --workflow-only seleccionan sus grupos
-respectivos, manteniendo IDs obligatorios. --workflow-control-only exige los dos controles sin fits. Devuelve 0 si pasan las
+respectivos, manteniendo IDs obligatorios. --release-only selecciona distribución. --workflow-control-only exige los dos controles sin fits. Devuelve 0 si pasan las
 pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
 
 ## Notas relevantes
@@ -170,6 +170,9 @@ PREDICTION_REQUIRED.add("tests/test_prediction.py::test_compression_contract")
 RESUME_REQUIRED = {"tests/test_workflow_resume.py::" + name for name in (
     "test_selective_inference_reuse", "test_same_mtime_data_invalidation", "test_stage_code_invalidation",
     "test_environment_change_refused", "test_missing_corrupt_repair", "test_failure_resume_preserves_history")}
+RELEASE_REQUIRED = {"tests/test_release.py::" + name for name in (
+    "test_release_inventory", "test_sdist_rebuild", "test_wheel_isolated_import",
+    "test_workflow_bundle_dry_run", "test_release_destination_safety", "test_quickstart_contract")}
 CONTROL_REQUIRED = {"tests/test_workflow_control.py::" + name for name in (
     "test_shared_writer_lock", "test_qualification_preconditions")}
 SCALE_REQUIRED = {"tests/test_scale.py::test_scale_protocol"}
@@ -208,9 +211,12 @@ def main():
     group.add_argument("--scale-only", action="store_true")
     group.add_argument("--workflow-only", action="store_true")
     group.add_argument("--workflow-control-only", action="store_true")
+    group.add_argument("--release-only", action="store_true")
     args = parser.parse_args()
-    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED | WORKFLOW_REQUIRED | RESUME_REQUIRED | CONTROL_REQUIRED
-    if args.synthetic_only:
+    target, required = "tests", REQUIRED | SYNTHETIC_REQUIRED | SPATIAL_REQUIRED | SAMPLING_REQUIRED | VALIDATION_REQUIRED | BUFFER_REQUIRED | MODELING_REQUIRED | SELECTION_REQUIRED | ENGINES_REQUIRED | ENGINE_INTEGRATION_REQUIRED | AUDIT_REQUIRED | PREDICTION_REQUIRED | QUALITY_REQUIRED | SCALE_REQUIRED | WORKFLOW_REQUIRED | RESUME_REQUIRED | CONTROL_REQUIRED | RELEASE_REQUIRED
+    if args.release_only:
+        target, required = "tests/test_release.py", RELEASE_REQUIRED
+    elif args.synthetic_only:
         target, required = "tests/test_synthetic.py", SYNTHETIC_REQUIRED
     elif args.spatial_only:
         target, required = "tests/test_spatial.py", SPATIAL_REQUIRED

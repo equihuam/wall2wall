@@ -1,0 +1,7 @@
+[
+  "06_infra/run_release_checks.py",
+  "08_pkg/build_release.py",
+  "08_pkg/tests/test_release.py",
+  "08_pkg/tests/run_checks.py",
+  "08_pkg/tests/test_package.py"
+]

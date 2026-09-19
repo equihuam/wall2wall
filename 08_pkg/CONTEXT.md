@@ -78,3 +78,11 @@ El full actual es bash 06_infra/linux.sh 06_infra/run_linux_checks.py y no ejecu
 el canary histórico ni el full Windows. La cualificación validated/réplica se
 separa del full; comandos y límites en 08_pkg/docs/workflow.md y protocolo M006-S02.
 No se modifican locks ni linux-validation.json. M006 y M008 no quedan cerrados.
+
+## Estado actual D028
+
+M006-S02 r3 y M006-S04 r1 aceptados, F1/F2 cerrados. M006-S03 entrega
+[quickstart](docs/quickstart.md), builder local y fuentes complementarias; pendiente
+de revisión. M006 exige holística y M008 sigue pendiente. Wheel sólo API; entorno
+fijo y fuentes adicionales para workflow. La evidencia S02 permanece histórica,
+sin refrescar hashes ni acreditar nuevos validated/réplica desde distribución.

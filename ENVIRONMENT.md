@@ -150,3 +150,9 @@ sin commit y archivos nuevos; no exportar sólo HEAD si omite trabajo pendiente.
 Este documento sustituye las indicaciones de exclusividad Linux de la revisión
 anterior sin reescribir decisiones históricas. Publicación y cambios del host siguen
 siendo acciones independientes de la instalación aislada admitida por D014.
+
+## Distribución local M006-S03
+
+[Quickstart de distribución](08_pkg/docs/quickstart.md): wheel de API, sdist y fuentes
+complementarias del workflow. El wheel no instala Snakemake ni prepara entornos.
+Los perfiles, locks y resultados históricos anteriores permanecen sin cambios.

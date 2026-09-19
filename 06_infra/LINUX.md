@@ -175,3 +175,9 @@ El full actual es bash 06_infra/linux.sh 06_infra/run_linux_checks.py y no ejecu
 el canary histórico ni el full Windows. La cualificación validated/réplica se
 separa del full; comandos y límites en 08_pkg/docs/workflow.md y protocolo M006-S02.
 No se modifican locks ni linux-validation.json. M006 y M008 no quedan cerrados.
+
+## Distribución local M006-S03
+
+[Quickstart de distribución](../08_pkg/docs/quickstart.md): wheel de API, sdist y fuentes
+complementarias del workflow. El wheel no instala Snakemake ni prepara entornos.
+Los perfiles, locks y resultados históricos anteriores permanecen sin cambios.
