@@ -1,0 +1,63 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M008-S00",
+  "round": 1,
+  "title": "Contrato documental para cualificación Windows actual",
+  "objective": "Preparar propiedad, baseline, evidencia y gates de M008 preservando D014 y la copia Windows histórica, sin ejecutar cualificación.",
+  "acceptance": [
+    "D032: trabajar sólo en Linux propietario, Python 3.11 mediante linux.sh. Crear únicamente 06_infra/M008-PREPARATION.md. M007 sigue pendiente; datos bufa ignorados. No modificar los documentos M007 admitidos como baseline ajena.",
+    "Usar en orden seis secciones: Evidencia histórica, Comprobaciones actuales, Propiedad y baseline, Entregas y dependencias, Verificación y presupuestos, Límites y bloqueo. Contrastar informe/código D014 y versiones actuales registradas en D032; cinco pruebas iniciales y cinco de réplica son historia, no ejecuciones de esta ronda. Fuentes y locks D014 intactos.",
+    "Distinguir disponibilidad actual de herramientas de cualificación actual. D014 acredita frontera de instalación, dos procesos, argumentos/Unicode, LF/CRLF, no-op/fallo/reanudación, archivo abierto y Git lock en su fixture; no acredita M006 actual, Windows M008, rutas largas no probadas o equivalencia. No repetir canary histórico.",
+    "Concretar instantánea futura Windows aislada con manifiesto exacto, tratamiento LF/CRLF, entorno Conda/Bash nativos existentes y destinos persistentes separados. Linux dueño de fuentes/ledger/reportes; Windows sólo instantánea de ejecución y logs. No sobrescribir copia Windows sucia ni copiar entornos o bufa. Resolver en el diseño el prefijo relativo de windows.ps1 y gate oficial nativo; no implementarlos ni crear checkout ahora.",
+    "S01 requiere cotejo de runtime/locks/fuentes, descubrimiento y recibo nativo actual con testigo estable; identificar qué cobertura adicional necesita y qué evidencia D014 puede conservar sin repetirla. S02 requiere S01 y M006 aceptados, mismo código/configuración/fixtures entre perfiles, production/validated, recuperación/no-op/invalidación y comparación IDs/folds/máscaras/CRS y tolerancia histórica 1e-5 sin relajarla. No emitir ni ejecutar S01/S02 aquí.",
+    "Presupuestar unidades necesarias para cada gate futuro y distinguir cero reserva ejecutable actual de propuestas pendientes de conteo. No inventar fits, repetir reservas D014 ni heredar full Linux. Anotar permisos o decisiones concretas pendientes y actor. Sin instalaciones, cambios de host, datos reales ni ampliación científica.",
+    "D016: coder no modifica Python; reviewer inspecciona gate arquitectónico verify_m008_preparation_docs.py, encabezado canónico AGENTS.md y baseline. Full exclusivamente documental una vez coder y una oficial posterior: python 06_infra/verify_m008_preparation_docs.py. No focused. 20min, tokens medidos o unknown, dos correcciones textuales antes de gate, 120s/gate, scratch16MiB. Fallo: detenerse sin repetir. Cero pruebas científicas/fits/canaries/full científico/validated/réplicas/builds/red. Sin commit/push."
+  ],
+  "non_goals": [
+    "Aceptar S01/S02 o anunciar soporte Windows; ejecutar ejemplos, snapshots o herramientas nativas durante coder.",
+    "Cambiar producto, fuentes históricas, locks, evidencia, entorno o copia Windows."
+  ],
+  "read_first": [
+    "00_brief/D032-windows-preparation.md",
+    "06_infra/WINDOWS.md",
+    "ENVIRONMENT.md",
+    "06_infra/windows-validation.json",
+    "06_infra/manual-windows-qualification.json",
+    "06_infra/windows.ps1",
+    "06_infra/windows_smoke/test_windows.py",
+    "06_infra/windows_smoke/Snakefile",
+    "06_infra/run_release_checks.py",
+    "06_infra/run_linux_checks.py",
+    "06_infra/verify_m008_preparation_docs.py",
+    "00_brief/validation.md"
+  ],
+  "allowed_prefixes": [
+    "06_infra/M008-PREPARATION.md"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [],
+  "full": [
+    "python",
+    "06_infra/verify_m008_preparation_docs.py"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 1200,
+  "observation": "process",
+  "notes": "D032 registra la inspección previa y la separación de propietarios. S00 prepara las fronteras; las entregas funcionales conservan sus identificadores.",
+  "findings": "",
+  "memory": ""
+}

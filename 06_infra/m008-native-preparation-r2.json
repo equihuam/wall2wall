@@ -1,0 +1,218 @@
+{
+  "schema": "wall2wall.native-preparation/1",
+  "invocation": "f2d11d456e844183a7f8961883091b1a",
+  "base_commit": "08b36145bcdb5eb0e09c1a42e56da61e7d614b53",
+  "manifest_sha256": "662591553df135ab146bf8de09c25f27b82cccd2725250c5898d161d3fb15077",
+  "manifest": {
+    "schema": "wall2wall.native-snapshot/1",
+    "base_commit": "08b36145bcdb5eb0e09c1a42e56da61e7d614b53",
+    "files": [
+      {
+        "path": "06_infra/m008_native/worker.py",
+        "kind": "file",
+        "size": 11978,
+        "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+      },
+      {
+        "path": "06_infra/m008_native/dispatch.py",
+        "kind": "file",
+        "size": 5932,
+        "sha256": "5f7ea035980eadc3a07d446c2fd7fae56eb6a3d1e65831059d82a6eb057ac46e"
+      },
+      {
+        "path": "06_infra/m008_native/windows.ps1",
+        "kind": "file",
+        "size": 2503,
+        "sha256": "8c6fb1a3296c70833aa1be678eb500ed5cb7b700657c4d6b1c8e7a7815c7c9ea"
+      },
+      {
+        "path": "06_infra/m008_native/test_boundary.py",
+        "kind": "file",
+        "size": 8332,
+        "sha256": "a415737f88c742c66d0a866ad9bf42d2a4f8392eb11c486f54ad3304f75d6ecb"
+      },
+      {
+        "path": "06_infra/m008_native/pytest.ini",
+        "kind": "file",
+        "size": 9,
+        "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+      },
+      {
+        "path": "06_infra/conda-win-64.lock.txt",
+        "kind": "file",
+        "size": 15042,
+        "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+      },
+      {
+        "path": "06_infra/pip-win-64.lock.txt",
+        "kind": "file",
+        "size": 5005,
+        "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+      },
+      {
+        "path": "06_infra/pip-engines-win-64.lock.txt",
+        "kind": "file",
+        "size": 408,
+        "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+      },
+      {
+        "path": "06_infra/windows-validation.json",
+        "kind": "file",
+        "size": 2652,
+        "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+      },
+      {
+        "path": "06_infra/check_python_headers.py",
+        "kind": "file",
+        "size": 5588,
+        "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+      },
+      {
+        "path": "06_infra/python_header_scope_m008.json",
+        "kind": "file",
+        "size": 120,
+        "sha256": "8bb36a3ef9c4f277216ade744925b3a7d1566a4a990c6a93b8af200efd5a7f50"
+      }
+    ]
+  },
+  "native_receipt": {
+    "schema": "wall2wall.native/1",
+    "invocation": "f2d11d456e844183a7f8961883091b1a",
+    "manifest_sha256": "662591553df135ab146bf8de09c25f27b82cccd2725250c5898d161d3fb15077",
+    "status": "passed",
+    "exit": 0,
+    "runtime": {
+      "platform": "win32",
+      "python": "3.11.16",
+      "versions": {
+        "numpy": "2.4.6",
+        "pandas": "3.0.5",
+        "rasterio": "1.4.4",
+        "scikit-learn": "1.9.1",
+        "joblib": "1.6.0",
+        "lightgbm": "4.6.0",
+        "xgboost": "3.1.3"
+      },
+      "prefix_verified": true
+    },
+    "locks": {
+      "conda": 103,
+      "pip": 51,
+      "pip_check": "installed versions; artifact hashes remain historical"
+    },
+    "before": {
+      "06_infra/m008_native/worker.py": {
+        "size": 11978,
+        "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+      },
+      "06_infra/m008_native/dispatch.py": {
+        "size": 5932,
+        "sha256": "5f7ea035980eadc3a07d446c2fd7fae56eb6a3d1e65831059d82a6eb057ac46e"
+      },
+      "06_infra/m008_native/windows.ps1": {
+        "size": 2503,
+        "sha256": "8c6fb1a3296c70833aa1be678eb500ed5cb7b700657c4d6b1c8e7a7815c7c9ea"
+      },
+      "06_infra/m008_native/test_boundary.py": {
+        "size": 8332,
+        "sha256": "a415737f88c742c66d0a866ad9bf42d2a4f8392eb11c486f54ad3304f75d6ecb"
+      },
+      "06_infra/m008_native/pytest.ini": {
+        "size": 9,
+        "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+      },
+      "06_infra/conda-win-64.lock.txt": {
+        "size": 15042,
+        "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+      },
+      "06_infra/pip-win-64.lock.txt": {
+        "size": 5005,
+        "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+      },
+      "06_infra/pip-engines-win-64.lock.txt": {
+        "size": 408,
+        "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+      },
+      "06_infra/windows-validation.json": {
+        "size": 2652,
+        "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+      },
+      "06_infra/check_python_headers.py": {
+        "size": 5588,
+        "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+      },
+      "06_infra/python_header_scope_m008.json": {
+        "size": 120,
+        "sha256": "8bb36a3ef9c4f277216ade744925b3a7d1566a4a990c6a93b8af200efd5a7f50"
+      }
+    },
+    "after": {
+      "06_infra/m008_native/worker.py": {
+        "size": 11978,
+        "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+      },
+      "06_infra/m008_native/dispatch.py": {
+        "size": 5932,
+        "sha256": "5f7ea035980eadc3a07d446c2fd7fae56eb6a3d1e65831059d82a6eb057ac46e"
+      },
+      "06_infra/m008_native/windows.ps1": {
+        "size": 2503,
+        "sha256": "8c6fb1a3296c70833aa1be678eb500ed5cb7b700657c4d6b1c8e7a7815c7c9ea"
+      },
+      "06_infra/m008_native/test_boundary.py": {
+        "size": 8332,
+        "sha256": "a415737f88c742c66d0a866ad9bf42d2a4f8392eb11c486f54ad3304f75d6ecb"
+      },
+      "06_infra/m008_native/pytest.ini": {
+        "size": 9,
+        "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+      },
+      "06_infra/conda-win-64.lock.txt": {
+        "size": 15042,
+        "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+      },
+      "06_infra/pip-win-64.lock.txt": {
+        "size": 5005,
+        "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+      },
+      "06_infra/pip-engines-win-64.lock.txt": {
+        "size": 408,
+        "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+      },
+      "06_infra/windows-validation.json": {
+        "size": 2652,
+        "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+      },
+      "06_infra/check_python_headers.py": {
+        "size": 5588,
+        "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+      },
+      "06_infra/python_header_scope_m008.json": {
+        "size": 120,
+        "sha256": "8bb36a3ef9c4f277216ade744925b3a7d1566a4a990c6a93b8af200efd5a7f50"
+      }
+    },
+    "fits": 0,
+    "children": 9,
+    "seconds": 20.891,
+    "artifacts": {
+      "native.xml": "b25b6134df963c6acf9ee2f1f0499a23e4e31ee203d1c3f68d6c36e6c9d0c089",
+      "suite.log": "0913355275aeacba2ab68bc761d43f8273ecc6aa9249d38b77b08528520cb8aa"
+    }
+  },
+  "native_receipt_sha256": "c758544ba0f130a4927d9a50ebdebffa9f7fdc5b8a2bdcea7f1ca351bf1af761",
+  "dispatch_log_sha256": "c74f486e8fcf6e04b5952835f67ecd2761b1495f3381417734b65c91348eb37d",
+  "dispatch_exit": 0,
+  "seconds": 38.283,
+  "sizes_final": {
+    "snapshot": 59764,
+    "scratch": 1692,
+    "evidence": 6940,
+    "logs": 55
+  },
+  "rss_peak": "unknown",
+  "scratch_peak": "unknown",
+  "tokens": "unknown",
+  "fits": 0,
+  "product_qualified": false
+}

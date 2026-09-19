@@ -543,23 +543,47 @@ Non-goals:
 
 ## M008 — Compatibilidad Windows opcional con Conda y Bash
 
-Status: planned
+Status: active
 Risk: high
 Holistic review: true
 
-### M008-S01 — Entorno Windows y canary de frontera POSIX
+### M008-S00 — Contrato documental para cualificación Windows actual
 
-Cualificar Windows/Conda 3.11 y un proveedor Bash sin cambiar el comportamiento científico.
+Preparar propiedad, baseline, evidencia y gates de M008 preservando D014 y la copia Windows histórica, sin ejecutar cualificación.
 
 Acceptance:
-- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
-- V1/V8/D013: resolver environment-windows.yml/lock win-64, Snakemake y proveedor Bash; Python/GDAL nativos Conda. Elegir Git Bash o MSYS2 explícito y registrar versión/identidad externa.
-- Canary real: dos reglas/procesos, rutas con espacios/Unicode, argv sin conversión indebida, códigos de error, LF/CRLF, temporales, Git/lock y archivos abiertos. Full Pytest descubre requisitos sin skips.
-- No mezclar runtimes/PATH ni usar Bash WSL desde Windows. Si se prueba otro proveedor consume su canary; reportar fallo/no verificado sin bloquear WSL. Sin cambios de algoritmo para obtener pase.
-- Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en esta revisión.
+- D032: trabajar sólo en Linux propietario, Python 3.11 mediante linux.sh. Crear únicamente 06_infra/M008-PREPARATION.md. M007 sigue pendiente; datos bufa ignorados. No modificar los documentos M007 admitidos como baseline ajena.
+- Usar en orden seis secciones: Evidencia histórica, Comprobaciones actuales, Propiedad y baseline, Entregas y dependencias, Verificación y presupuestos, Límites y bloqueo. Contrastar informe/código D014 y versiones actuales registradas en D032; cinco pruebas iniciales y cinco de réplica son historia, no ejecuciones de esta ronda. Fuentes y locks D014 intactos.
+- Distinguir disponibilidad actual de herramientas de cualificación actual. D014 acredita frontera de instalación, dos procesos, argumentos/Unicode, LF/CRLF, no-op/fallo/reanudación, archivo abierto y Git lock en su fixture; no acredita M006 actual, Windows M008, rutas largas no probadas o equivalencia. No repetir canary histórico.
+- Concretar instantánea futura Windows aislada con manifiesto exacto, tratamiento LF/CRLF, entorno Conda/Bash nativos existentes y destinos persistentes separados. Linux dueño de fuentes/ledger/reportes; Windows sólo instantánea de ejecución y logs. No sobrescribir copia Windows sucia ni copiar entornos o bufa. Resolver en el diseño el prefijo relativo de windows.ps1 y gate oficial nativo; no implementarlos ni crear checkout ahora.
+- S01 requiere cotejo de runtime/locks/fuentes, descubrimiento y recibo nativo actual con testigo estable; identificar qué cobertura adicional necesita y qué evidencia D014 puede conservar sin repetirla. S02 requiere S01 y M006 aceptados, mismo código/configuración/fixtures entre perfiles, production/validated, recuperación/no-op/invalidación y comparación IDs/folds/máscaras/CRS y tolerancia histórica 1e-5 sin relajarla. No emitir ni ejecutar S01/S02 aquí.
+- Presupuestar unidades necesarias para cada gate futuro y distinguir cero reserva ejecutable actual de propuestas pendientes de conteo. No inventar fits, repetir reservas D014 ni heredar full Linux. Anotar permisos o decisiones concretas pendientes y actor. Sin instalaciones, cambios de host, datos reales ni ampliación científica.
+- D016: coder no modifica Python; reviewer inspecciona gate arquitectónico verify_m008_preparation_docs.py, encabezado canónico AGENTS.md y baseline. Full exclusivamente documental una vez coder y una oficial posterior: python 06_infra/verify_m008_preparation_docs.py. No focused. 20min, tokens medidos o unknown, dos correcciones textuales antes de gate, 120s/gate, scratch16MiB. Fallo: detenerse sin repetir. Cero pruebas científicas/fits/canaries/full científico/validated/réplicas/builds/red. Sin commit/push.
 
 Non-goals:
-- Emulación POSIX general, toolchain C/C++ o instalaciones globales.
+- Aceptar S01/S02 o anunciar soporte Windows; ejecutar ejemplos, snapshots o herramientas nativas durante coder.
+- Cambiar producto, fuentes históricas, locks, evidencia, entorno o copia Windows.
+
+### M008-S01 — Frontera nativa Windows y recibo enlazado sin fits
+
+Cualificar la frontera de ejecución sobre el entorno Windows existente y someter su evidencia nativa a verificación oficial Linux, sin integrar aún el workflow científico.
+
+Acceptance:
+- D035: Linux es único propietario; Windows sólo snapshot y evidencia externos. Conservar D014/D015, D033 fallido consumido y D034 preparación satisfactoria, sin reescribir sus informes. M007 pendiente y bufa excluido de Git; sin instalaciones, cambios de entorno, commit o push.
+- Conservar la implementación arquitectónica completa en m008_native y scope. Reviewer inspecciona también baseline y conexión; D034 no acredita cambios posteriores. Coder escribe sólo M008-S01.md y m008-s01-native.json. No corregir código bajo este contrato: devolver bloqueo al arquitecto si hace falta.
+- Documentar configuración ignorada, selección explícita Conda/Git Bash/prefijo, snapshot por manifiesto, persistencia, límites de ruta 200 caracteres, recibos, fallos y pasos coder/oficial. Versiones de ejecución deberán coincidir con locks: Windows Python 3.11.16, imports desde prefijo, 103 registros Conda y 51 versiones pip; hashes pip de artefactos siguen siendo históricos.
+- Una invocación coder: python 06_infra/m008_native/dispatch.py --s01 --config local_state/m008-s01-config.json mediante linux.sh. Configuración ya preparada por arquitecto. No reutilizar marcador ni ejecutar despachador histórico sin --s01. Copiar summary.json externo exactamente a 06_infra/m008-s01-native.json usando puntero local, sin rutas privadas en producto.
+- IDs obligatorios, prefijo 06_infra/m008_native/test_boundary.py::test_: snapshot_bytes_and_manifest, snapshot_rejects_escape_and_links, snapshot_rejects_case_and_reserved_names, destination_existing_preserved, native_prefix_and_import_origins, locks_and_bash_identities, argv_unicode_spaces_and_scoped_path, process_environment_restored, native_files_and_owned_lock, bounded_path_length, discovery_required_ids, discovery_rejects_empty_missing_skip, nonzero_exit_propagated, timeout_and_unknown_preserved, receipt_rejects_missing_stale_or_tampered, witness_rejects_source_mutation. Exactamente16, cero errores/fallos/skips; fixtures negativas esperadas no son fallos de suite.
+- La entrega portable enlaza invocation, manifiesto exacto, fuentes/locks/scopes, recibo win32, before=after, hashes logs/JUnit y finalización código0. Fuentes Linux y snapshot deben coincidir con recibo. Fallar ante ausencia, manipulación, identidad obsoleta, fuente modificada o proceso no terminado.
+- Full coder una vez: python 06_infra/m008_native/verify_evidence.py --phase next después del lote nativo y copia portable. El full oficial congelado usa el mismo --phase next y lo ejecuta sólo arquitecto con scripts/verify.py M008-S01 --timeout 120 tras coded. No repite Windows: valida evidencia nativa nueva del coder; recibo Linux no sustituye recibo Windows. Cero focused. El gate selecciona coder sin marcador previo y official sólo tras resultado coder satisfactorio; coder no vuelve a invocarlo. Cada fase es exclusiva y una repetición queda prohibida.
+- Presupuesto: 1 lote nativo coder1200s, 1 gate coder120s y 1 gate oficial120s; máximo32 lanzamientos directos de fixtures por lote. Inventario64MiB/256 archivos; scratch128MiB; logs/evidencia64MiB; gates16MiB; total persistente acumulado1GiB. RSS objetivo1GiB, picos/tokens unknown si no medidos. Coder60min. Cero fits/pruebas científicas/builds/canaries/validated/réplicas/red.
+- Cada ejecución crea directorios externos persistentes nuevos y separados, fuera de /tmp y repositorios, previamente al proceso; conserva logs/JUnit/config y punteros ignorados. Fallo o desconexión: detener sin repetir ni modificar fuentes, preservar resultado desconocido si aplica; no matar procesos ni limpiar intentos para caber.
+- D016: cumplir encabezados AGENTS.md; scope explícito incluye worker.py, dispatch.py, test_boundary.py y verify_evidence.py de baseline. Gate comprueba estructura; reviewer veracidad. Revisar diff y git diff --check. Sin edición de manifiestos/contratos/recibos históricos.
+- No atribuir aceptación antes del review/ledger, ni soporte integrado Windows, equivalencia plataformas, publicación o cualificación del DAG. M008-S02 conserva integración y comparación con atol=rtol=1e-5.
+
+Non-goals:
+- Cambiar producto científico, workflow, wrappers históricos, locks, entorno, copia Windows o datos reales.
+- Repetir preparación D033/D034, D014, full Linux/Windows históricos, Snakemake o conceder aceptación automática.
 
 ### M008-S02 — Workflow Windows y comparación con WSL
 

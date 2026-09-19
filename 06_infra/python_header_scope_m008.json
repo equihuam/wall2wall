@@ -1,0 +1,6 @@
+[
+  "06_infra/m008_native/worker.py",
+  "06_infra/m008_native/dispatch.py",
+  "06_infra/m008_native/test_boundary.py",
+  "06_infra/m008_native/verify_evidence.py"
+]
