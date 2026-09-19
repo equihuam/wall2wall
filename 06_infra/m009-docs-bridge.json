@@ -1,0 +1,15 @@
+{
+  "schema": "wall2wall.post-closure-docs/1",
+  "baseline": "7ad79c973fe6eaa81c7b6a4d2dd1c5456504eba4",
+  "documents": {
+    "08_pkg/CONTEXT.md": {
+      "before_sha256": "299cbe46122ffc1f212fa42fa276ad00aceb759097623d9753e29b056c4d6da7",
+      "after_sha256": "c6d07c539312eb4fd2fb7e3a9e6005c1b0e0ec68ca923999903f77b311ad7e61"
+    },
+    "08_pkg/docs/quickstart.md": {
+      "before_sha256": "b5329d097acc9585c86a79a18c8874facb02c5d2a6613a5e23224c31a15ea2eb",
+      "after_sha256": "5f4a4ddc75ff02c428b9f54f0d494f2100211e5efd34f54d8636d2e100137075"
+    }
+  },
+  "new_scientific_execution": false
+}

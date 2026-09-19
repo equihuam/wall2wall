@@ -483,6 +483,30 @@ Non-goals:
 - Cambios científicos o al DAG/bloqueo/recuperación aceptados, actualización de locks o dependencias, nueva cualificación Linux/Windows, PyPI/GitHub release o piloto.
 - Convertir wheel en instalador de entornos o framework de despliegue; publicar licencia o nombre como aprobados sin decisión humana.
 
+## M009 — Consistencia documental posterior al cierre de integración
+
+Status: active
+Risk: ordinary
+Holistic review: false
+
+### M009-S01 — Consistencia documental posterior al cierre M006
+
+Preparar para revisión los hashes actuales de CONTEXT y quickstart mediante una entrega independiente; preservar el cierre y la evidencia histórica M006.
+
+Acceptance:
+- D030/D031: checkout Linux único propietario, Python 3.11.16 mediante bash 06_infra/linux.sh o puente wsl.ps1. Conservar la implementación documental existente como baseline arquitectónica exacta; no rehacerla ni asumir que ya está aceptada. Sólo se permiten ajustes necesarios en los dos documentos y crear el puente nuevo.
+- CONTEXT y quickstart reflejan las cinco entregas aceptadas y cierre holístico M006; F1/F2 siguen closed_by_review. Etiquetar contexto obsoleto como histórico, sin borrar hechos ni presentar sus estados pendientes como vigentes. D027 acredita Git SSH, no publicación de distribución.
+- Conservar full coder S03 r1 consumido con resultado desconocido y focused perdido sólo como observación; full oficial S03 r2 independiente con 266 pruebas. La cualificación S02 es histórica; no atribuir validated desde distribución final, réplica nueva, Windows M008, piloto real, publicación ni licencia definitiva.
+- Ejemplo Bash: evidencia/logs persistentes externos fuera de /tmp, /var/tmp y checkout; focused/full separados, nuevos y previamente creados, matriz focused preservada, ausencia de matriz y pending antes de usar destinos, punteros y logs conservados y detención al fallar. No ejecutar ejemplos. Explicar scratch eliminable y full oficial mediante verify.py sin duplicar full directo.
+- Crear 06_infra/m009-docs-bridge.json con esquema wall2wall.post-closure-docs/1, baseline 7ad79c973fe6eaa81c7b6a4d2dd1c5456504eba4, documents con ambas rutas y before_sha256 de git show baseline:ruta y after_sha256 bruto del archivo actual, new_scientific_execution=false. No refrescar manifiestos ni recibos antiguos. Gate fija el esquema exacto.
+- D016: ningún Python coder; el gate arquitectónico verify_m009_docs.py cumple encabezado canónico de AGENTS.md y lo verifica sobre su ruta explícita. Reviewer inspecciona también este gate, D030/D031 y baseline, no sólo cambios posteriores del coder.
+- Full de esta entrega exclusivamente documental: python 06_infra/verify_m009_docs.py una vez al terminar coder y una vez oficial posterior. Focused vacío. Revisión manual de contenido/diff, hashes, conservación de fuentes e historia, bash -n sin ejecución y git diff --check. No ejecutar run_release_checks.py ni el full científico global.
+- Presupuesto: 20 minutos, 5000 tokens si medibles o unknown; hasta dos correcciones textuales antes del único gate coder, 120 s por gate, scratch <=16 MiB, cero fits/pruebas científicas/focused/full científico/validated/réplicas/canaries/builds/red/instalaciones. Fallo del gate o deriva ajena: detenerse, preservar y reportar; no repetir sin nueva autoridad. Sin commit/push.
+
+Non-goals:
+- Reabrir M006, modificar evidencia/contratos históricos, aceptar retroactivamente los documentos o ampliar cualificación.
+- Modificar ejecutables, locks, entorno, índices Git o fuentes ajenas.
+
 ## M007 — Piloto real y evaluación de utilidad
 
 Status: planned

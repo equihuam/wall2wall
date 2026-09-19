@@ -1,8 +1,9 @@
 # Quickstart local Linux / WSL
 
 Wall2Wall 0.1.0.dev0 requiere Python >=3.11. El camino acreditado usa Linux/WSL,
-Micromamba y Python 3.11.16 en el prefijo dedicado. M006-S02 r3 y M006-S04 r1
-están aceptados; S03 está pendiente de revisión. M006 requiere holística.
+Micromamba y Python 3.11.16 en el prefijo dedicado. M006 está cerrado mediante
+revisión holística; sus cinco entregas están aceptadas, incluidas M006-S03 r2,
+M006-S02 r3 y M006-S04 r1. El ledger conserva la autoridad sobre esos estados.
 Windows/Conda con Bash es alternativa pendiente de M008: D014/S01 son historia,
 sin promesa de integración completa ni equivalencia entre plataformas. Nombre
 público y licencia definitiva siguen pendientes; estos artefactos son locales,
@@ -127,24 +128,61 @@ bash 06_infra/linux.sh -c 'import sys; sys.path.insert(0,"08_pkg/src"); from wal
 
 ## Verificación del mantenedor
 
-Sólo en el checkout completo y con presupuesto autorizado. focused y full tienen
-directorios nuevos distintos; nunca reutilizar una matriz ni su archivo .pending:
+Sólo en el checkout completo y con presupuesto autorizado para cada comando.
+Esta secuencia describe un lote nuevo; no autoriza repetir ejecuciones de rondas
+cerradas ni intentos cuyo resultado se perdió. Conforme a D029, guardar evidencia
+y logs en almacenamiento persistente Linux fuera de /tmp, /var/tmp y del checkout.
+focused y full usan directorios exclusivos nuevos; nunca reutilizar una matriz
+ni su archivo .pending. Las rutas se guardan con los logs, fuera de Git:
 
 ```bash
 set -e
-focused_evidence="$(mktemp -d)"
+repo="$(pwd -P)"
+evidence_parent="$HOME/.local/state/wall2wall/evidence"
+mkdir -p "$evidence_parent"
+evidence_parent="$(cd "$evidence_parent" && pwd -P)"
+case "$evidence_parent/" in
+  /tmp/*|/var/tmp/*|"$repo/"*) echo "Elegir evidencia persistente fuera de temporales y checkout" >&2; exit 2 ;;
+esac
+logs="$(mktemp -d "$evidence_parent/logs-XXXXXX")"
+scratch_parent="$(mktemp -d "$evidence_parent/scratch-XXXXXX")"
+export VERIFICATION_SCRATCH="$scratch_parent"
+export TMPDIR="$scratch_parent" TMP="$scratch_parent" TEMP="$scratch_parent"
+focused_evidence="$(mktemp -d "$evidence_parent/focused-XXXXXX")"
+printf '%s\n' "$logs" > "$logs/logs.path"
+printf '%s\n' "$scratch_parent" > "$logs/scratch.path"
+printf '%s\n' "$focused_evidence" > "$logs/focused-evidence.path"
+printf 'Logs y punteros conservados en %s\n' "$logs"
 export WALL2WALL_TEST_EVIDENCE="$focused_evidence"
-bash 06_infra/linux.sh 08_pkg/tests/run_checks.py --workflow-only
+test ! -e "$focused_evidence/workflow-matrix.json"
+test ! -e "$focused_evidence/workflow-matrix.json.pending"
+bash 06_infra/linux.sh 08_pkg/tests/run_checks.py --workflow-only > "$logs/focused.log" 2>&1
 export WALL2WALL_WORKFLOW_MATRIX="$focused_evidence/workflow-matrix.json"
-full_evidence="$(mktemp -d)"
+full_evidence="$(mktemp -d "$evidence_parent/full-XXXXXX")"
+printf '%s\n' "$full_evidence" > "$logs/full-evidence.path"
 export WALL2WALL_TEST_EVIDENCE="$full_evidence"
 test ! -e "$full_evidence/workflow-matrix.json"
 test ! -e "$full_evidence/workflow-matrix.json.pending"
-bash 06_infra/linux.sh 06_infra/run_release_checks.py
+bash 06_infra/linux.sh 06_infra/run_release_checks.py > "$logs/full.log" 2>&1
 ```
+
+Las asignaciones de mktemp se separan de export para detectar fallos. set -e
+detiene la secuencia al primer error; consultar los logs conservados. Los
+verificadores pueden limpiar su scratch interno: no usarlo como archivo de
+evidencia. No borrar directorios de logs/evidencia al terminar. Durante el ciclo
+oficial, el arquitecto usa scripts/verify.py con estas mismas condiciones de
+persistencia en lugar de lanzar otro full directo; conserva además el recibo
+y los punteros en configuración local ignorada. Ante interrupción, comprobar
+el proceso y la evidencia antes de resolver cualquier continuación.
 
 La matriz focused se conserva; S03 no invoca cualificación. La verificación nueva
 se limita a integridad/build/import/dry-run del complemento y regresión del full;
 no demuestra validated real desde distribución ni independencia de un entorno
 recreado. [Workflow histórico](workflow.md) conserva sus contratos y evidencia;
 sus comandos de cualificación no forman parte de este quickstart.
+
+El full coder S03 r1 sigue consumido con resultado desconocido y el focused
+perdido conserva sólo el carácter de observación del coder. El full oficial
+S03 r2 acreditó 266 pruebas con testigo estable; no reconstruye los resultados
+perdidos. El cierre M006 no añade validated desde la distribución, réplica nueva,
+Windows M008, piloto real, publicación de artefactos ni licencia definitiva.

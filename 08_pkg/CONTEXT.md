@@ -1,5 +1,31 @@
 # Workspace: package
 Status: active
+
+## Estado vigente tras el cierre de M006
+
+M001, M004, M005 y M006 están cerrados en el ledger. Las cinco entregas de M006
+están aceptadas: S00 r1, S01 r1, S04 r1, S02 r3 y S03 r2. F1/F2 de S02 están
+closed_by_review. La revisión holística M006 confirma el cierre acotado.
+S03 entrega wheel de API, sdist reconstruible y fuentes complementarias del
+workflow; su full oficial r2 acredita 266 pruebas con testigo estable.
+La cualificación validated/no-op/réplica de S02 corresponde a sus fuentes
+históricas: no acredita validated desde la distribución final ni réplica nueva.
+Windows M008, piloto real, publicación de artefactos y licencia definitiva
+permanecen pendientes. El full coder S03 r1 permanece consumido con resultado
+desconocido; el focused perdido es sólo observación del coder.
+D027 registra acceso Git SSH comprobado; no equivale a publicación de distribución.
+El [quickstart](docs/quickstart.md) documenta evidencia/logs persistentes fuera de
+temporales del sistema, con destinos separados y punteros conservados bajo D029.
+El full mantenido es 06_infra/run_release_checks.py; su uso exige presupuesto
+de la ronda. No repetir full, focused o cualificaciones para actualizar documentos.
+
+## Contexto histórico anterior a D022
+
+Los párrafos siguientes conservan el contexto de preparación y sus límites en
+aquel momento; sus estados pendientes y comandos de ronda no describen el estado
+vigente ni autorizan nuevas ejecuciones. Las decisiones, recibos y revisiones
+históricas permanecen intactos.
+
 Paquete Wall2Wall. Estructura existente: pyproject.toml, src/wall2wall/, tests/,
 examples/, docs/ y workflow/ para Snakemake. Python 3.11 en entorno fijo del perfil;
 WSL/Linux con Micromamba es el perfil recomendado general según D013. El trabajo
@@ -67,7 +93,7 @@ Reviewer inspecciona la baseline arquitectónica completa, no sólo estos docume
 M001 requiere dictamen y registro en el ledger antes de declararse aceptado.
 
 
-## Estado actual bajo D022: integración M006-S02
+## Contexto histórico D022: preparación de M006-S02
 
 M001 está cerrado; las declaraciones de estado anteriores describen la preparación
 D020/D021 y se conservan como historia. M006-S02 añade workflow Linux con perfil
@@ -79,7 +105,7 @@ el canary histórico ni el full Windows. La cualificación validated/réplica se
 separa del full; comandos y límites en 08_pkg/docs/workflow.md y protocolo M006-S02.
 No se modifican locks ni linux-validation.json. M006 y M008 no quedan cerrados.
 
-## Estado actual D028
+## Contexto histórico D028: preparación de M006-S03
 
 M006-S02 r3 y M006-S04 r1 aceptados, F1/F2 cerrados. M006-S03 entrega
 [quickstart](docs/quickstart.md), builder local y fuentes complementarias; pendiente
