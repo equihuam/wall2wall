@@ -1948,7 +1948,7 @@ milestones:
       existentes y comando enfocado; las rutas de salida aún no existentes no son lecturas requeridas.
 - id: M008
   title: Compatibilidad Windows opcional con Conda y Bash
-  status: active
+  status: done
   risk: high
   holistic_review: true
   slices:

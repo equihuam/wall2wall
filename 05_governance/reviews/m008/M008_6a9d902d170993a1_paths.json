@@ -1,0 +1,72 @@
+[
+  {
+    "slice": "M008-S00",
+    "path": "06_infra/M008-PREPARATION.md",
+    "sha": "d485952eb0e81ff438b6a1258d667bc4eb37c368aff56d3d71433e75932422cf",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M008-S01",
+    "path": "06_infra/M008-S01.md",
+    "sha": "2ee7c02374258ef9072a7e40aab9c50d3ee5b2acf86b74383235832e98e64c80",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M008-S01",
+    "path": "06_infra/m008-s01-native.json",
+    "sha": "64f382b173088843ec1522f5db688d1c5f05c6160eff27d9b506a9741e6256c6",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M008-S04",
+    "path": "08_pkg/tests/run_checks.py",
+    "sha": "47aa8d7f94b4f9763e353be6a6280a60a44a8142ec1c449ccd665cd03a7150f4",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M008-S04",
+    "path": "08_pkg/workflow/stage_checks.py",
+    "sha": "cdacfdf4d6195bbb8c95683efd54e22d89dda85d6a846b4f7deeb80854bde3c3",
+    "kind": "modified",
+    "round": 2
+  },
+  {
+    "slice": "M008-S04",
+    "path": "06_infra/m008-s04-r2-validation.json",
+    "sha": "fd96dfe877b8a14023bd6405b662c665a34bcd9bf6691903af0597839ce697f2",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M008-S04",
+    "path": "06_infra/m008_integration/fit_counter.py",
+    "sha": "ce760494979adc19f0e72a9eabc65872bcf37c5f5d952addd9f22797fb1697aa",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M008-S04",
+    "path": "06_infra/m008_integration/products.py",
+    "sha": "18752aa6376d8065affa3ccb6ae4d0950a27e481bded15ac4781511b15092596",
+    "kind": "added",
+    "round": 2
+  },
+  {
+    "slice": "M008-S02",
+    "path": "06_infra/M008-S02.md",
+    "sha": "78eba40f00d860f1cebb8a58d32efa720a04da5f6b26ae568e51ad3d3b2d8b49",
+    "kind": "added",
+    "round": 1
+  },
+  {
+    "slice": "M008-S02",
+    "path": "06_infra/m008-s02-validation.json",
+    "sha": "7354f6f488dd6abbc0523e8299fee3e37299a6cda7b58840226fb8bb617204cd",
+    "kind": "added",
+    "round": 1
+  }
+]

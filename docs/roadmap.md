@@ -543,7 +543,7 @@ Non-goals:
 
 ## M008 — Compatibilidad Windows opcional con Conda y Bash
 
-Status: active
+Status: done
 Risk: high
 Holistic review: true
 
