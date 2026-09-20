@@ -1,6 +1,6 @@
 ---
 title: "Solicitud de datos de prueba para cartografía de altura del arbolado"
-subtitle: "Wall2Wall · Preparación del piloto M007"
+subtitle: "Wall2Wall · Solicitud de datos para el piloto real"
 author: "Proyecto Wall2Wall"
 date: "2026-09-20"
 lang: es
@@ -17,32 +17,51 @@ execute:
 
 ## Contexto del desarrollo
 
-Estamos desarrollando **Wall2Wall**, una biblioteca de Python que relaciona
-mediciones de campo con información de sensores remotos para producir mapas
-continuos de variables ambientales, como la altura del arbolado, y documentar
-su evaluación y procedencia.
+Estamos desarrollando **Wall2Wall**, una infraestructura de cómputo en Python
+para generar estimadores de variables observadas puntualmente en campo y
+representar sus predicciones de forma espacialmente continua, **wall-to-wall**:
+un valor estimado para cada celda del área de interés que cuente con entradas
+válidas. El modelo relaciona las observaciones con covariables disponibles en el
+territorio y utiliza esa relación para predecir también en lugares no muestreados.
 
-El núcleo del software ya está implementado: preparación de entradas, regresión,
-evaluación espacial, generación de mapas y flujo reproducible. Las pruebas con
-datos sintéticos y la cualificación de los perfiles Linux y Windows están
-completadas dentro de los casos evaluados. Esto acredita el funcionamiento técnico,
-pero aún no demuestra la precisión ni la utilidad del mapa en un bosque real.
+La propuesta es general: la altura del arbolado es un ejemplo, y el mismo flujo
+puede aplicarse a otras variables objetivo con datos adecuados. La versión actual
+trabaja con **una variable numérica continua por ajuste**; la utilidad de cada
+aplicación deberá evaluarse con sus propios datos. En este documento, la altura
+sirve para explicar decisiones comunes a cualquier caso: qué se estima, a qué
+escala, con qué observaciones y qué error resulta aceptable.
 
-Para completar la evaluación del producto falta realizar el piloto con datos
-reales: acordar la variable y su escala, obtener mediciones y permisos, preparar
-los datos, fijar criterios de utilidad y evaluar los resultados. El piloto puede
-revelar ajustes adicionales necesarios. Una distribución pública requerirá,
-además, resolver la licencia, el nombre público y la autorización de publicación.
-Esta solicitud busca reunir la información necesaria para ese siguiente paso.
+Las covariables pueden proceder de muchas fuentes. Contamos con información
+satelital de reflectancia y radar, pero también pueden incorporarse variables
+climáticas, geológicas, hidrológicas, topográficas o de suelos, en tanto aporten
+información para modelar la expresión espacial generalizada de la variable
+objetivo. Su pertinencia, cobertura, escala y correspondencia temporal deben
+justificarse para cada aplicación.
+
+El núcleo ya está implementado: preparación de entradas, regresión, evaluación
+espacial, generación de mapas y flujo reproducible. Se completaron pruebas con
+datos sintéticos y la cualificación de perfiles Linux y Windows dentro de los
+casos evaluados. Falta evaluar el producto con datos reales, completar la
+preparación específica del caso y atender los ajustes que revele el piloto.
+La distribución pública requiere además resolver licencia, nombre público y
+autorización de publicación.
+
+El plan original comprende **ocho etapas principales**. La etapa **M007,
+“Piloto real y evaluación de utilidad”**, es la dedicada a acordar datos,
+permisos y protocolo, ejecutar un caso real y determinar su utilidad y límites.
+Esta solicitud prepara esa etapa, aún pendiente. El registro interno incluye
+también una etapa adicional de mantenimiento documental, M009.
 
 ## Propósito y estado
 
 Solicitamos datos de campo y sus metadatos para evaluar la estimación de altura del
 arbolado en bosque seco de encinos de Guanajuato, dentro del área de interés
 denominada **Escenario V**. El objetivo es relacionar observaciones de campo con
-predictores de sensores remotos y producir un mapa continuo de altura en metros.
+covariables del territorio y producir un mapa continuo de altura en metros.
+Este caso ilustra las decisiones del piloto; para otra variable se adaptarán
+las mediciones, unidades, covariables y criterios de utilidad.
 
-**M007 permanece pendiente.** Existen antecedentes de capas remotas, pero aún no
+**La etapa del piloto real (M007) permanece pendiente.** Existen antecedentes de capas remotas, pero aún no
 se dispone de datos de campo para calibrar y evaluar este caso. Se puede avanzar
 ahora en definición de la variable, diseño del muestreo y permisos. El piloto
 requiere completar la admisión de datos y aprobar el protocolo antes de entrenar.
@@ -55,7 +74,7 @@ definitivos ni una promesa de desempeño.
 
 ### Estadístico de altura y población
 
-La respuesta será una variable continua en metros. La propuesta del propietario
+La respuesta será una variable continua en metros. La propuesta del desarrollador
 es representar una **media o mediana por celda**, todavía por elegir.
 
 | Alternativa | Interpretación | Decisión pendiente |
@@ -185,14 +204,39 @@ Un subconjunto pequeño autorizado puede servir para comprobar formatos y
 coherencia. Su recepción no demuestra representatividad ni suficiencia para
 calibración o evaluación espacial.
 
-### Predictores y área de interés
+### Covariables y área de interés
+
+Las covariables son las características del territorio que se usan como
+predictores. Solicitamos un inventario de las disponibles y de su posible relación
+con la variable objetivo, incluyendo fuentes adicionales a las imágenes satelitales.
+
+| Tipo de covariable | Ejemplos que el equipo puede proponer |
+|---|---|
+| Reflectancia e índices satelitales | Bandas espectrales, NDVI y otros resúmenes de vegetación. |
+| Radar | Retrodispersión, polarizaciones y resúmenes temporales. |
+| Climáticas | Precipitación, temperatura, estacionalidad o balance hídrico. |
+| Geológicas y de suelos | Propiedades del sustrato, textura, profundidad o propiedades edáficas cuantitativas. |
+| Hidrológicas | Distancia a cauces, humedad o características del drenaje. |
+| Topográficas | Elevación, pendiente y otras variables del relieve. |
+
+Estos ejemplos amplían las fuentes posibles; no son una lista de capas
+obligatorias ni implican que añadir más variables mejore el modelo. Se acordará
+qué incorporar según pertinencia, calidad y disponibilidad para toda el área
+de predicción, evitando información derivada de la respuesta que introduzca fuga.
+
+El núcleo actual recibe predictores numéricos continuos en ráster. Una cartografía
+geológica u otra fuente categórica requiere acordar una preparación compatible
+o una ampliación explícita: sus códigos de clase no se tratarán automáticamente
+como magnitudes continuas. Cada capa debe tener soporte espacial y temporal
+compatible con la aplicación.
 
 Se solicitan GeoTIFF y catálogo por capa/banda con nombre, variable, unidad,
 CRS, resolución, período, escala/offset, nodata, máscaras, procedencia y método
 de generación. Entregar el contorno exacto de **Escenario V** con su CRS;
 no sustituirlo por nanocuencas ni por el buffer de 1 km.
 
-El inventario preliminar comunicado incluye NDVI mediano 2025 y productos
+Para el ejemplo de altura, el inventario preliminar documentado incluye
+NDVI mediano 2025 y productos
 Sentinel-1 2025 —VH, VV, razón VH/VV, diferencia VV–VH y conteo de observaciones—,
 con resolución nominal de 10 m. Deben confirmarse sus definiciones y máscaras:
 los nombres de archivo no bastan para acreditar unidades, alineación o cobertura.
@@ -243,9 +287,10 @@ Completar antes de aprobar el piloto; indicar “por definir” cuando correspon
 ## Cómo se avanzará al recibir la información
 
 1. Revisar metadatos y permisos; registrar faltantes y acordar variable y soporte.
-2. Completar el protocolo de M007-S01: preparación, particiones, estimador,
+2. Completar la admisión y el protocolo del caso real (M007-S01): preparación, particiones, estimador,
    criterio de utilidad y presupuesto, antes de entrenar.
-3. Con admisión aprobada y datos disponibles, ejecutar M007-S02 y conservar
+3. Con admisión aprobada y datos disponibles, ejecutar el piloto y elaborar
+   su informe reproducible (M007-S02); conservar
    resultados, exclusiones y evidencia reproducible.
 
 Se distinguirá funcionamiento del software, desempeño predictivo y validez de
@@ -263,5 +308,6 @@ Versión de discusión del 20 de septiembre de 2026, basada en:
 - `00_brief/validation.md`, V3–V6, y `roadmap.yaml`, M007: protocolo y admisión.
 
 Esta síntesis no cambia decisiones aceptadas ni acredita validación real.
-La cualificación técnica cerrada de M008 se limita a los fixtures y perfiles
+La cualificación técnica de compatibilidad Windows (etapa M008) se limita
+a los casos de prueba y perfiles
 evaluados; no sustituye la evaluación del caso de Guanajuato.
