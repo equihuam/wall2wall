@@ -1,0 +1,7 @@
+[
+  "06_infra/m008_integration/science_dispatch.py",
+  "06_infra/m008_integration/science_worker.py",
+  "06_infra/m008_integration/verify_s02.py",
+  "06_infra/m008_integration/qualify_integration_gate.py",
+  "06_infra/m008_integration/test_integration_gate.py"
+]

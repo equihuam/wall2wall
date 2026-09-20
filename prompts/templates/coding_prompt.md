@@ -3,6 +3,21 @@
 Read `AGENTS.md` first. This prompt is the whole task; do not read the roadmap or
 ledger.
 
+## Continuation and execution authority
+
+When a blocker has a recorded resolution, read that resolution first. The
+Acceptance and Verification sections retain the original contract for review;
+they do not order a repeat of operations already completed or consume fresh
+reservations. Execute only the pending actions explicitly authorized by the
+resolution. Preserve completed evidence and consumed attempts, including failures.
+A resolution does not silently change acceptance criteria, write boundaries or
+budgets. If the pending action or its authority is ambiguous, stop and report it.
+Without a recorded resolution, follow the applicable contract and findings below.
+
+## Findings to resolve
+
+{{open_findings}}
+
 ## Objective
 
 {{objective}}
@@ -38,10 +53,6 @@ Full, run once before finishing:
 ## Advisory notes
 
 {{notes}}
-
-## Findings to resolve
-
-{{open_findings}}
 
 ## Memory
 

@@ -1,0 +1,5 @@
+[
+  "06_infra/m008_integration/verify_s02.py",
+  "06_infra/m008_integration/test_progress_recovery.py",
+  "06_infra/m008_integration/qualify_progress_recovery.py"
+]

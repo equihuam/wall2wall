@@ -1,0 +1,2226 @@
+{
+  "schema": "wall2wall.s02-science/1",
+  "base_commit": "d665129e70dca0b0dfd5edf90a02f78e796cad81",
+  "invocation": "136f38edb1a845388cece21796a7e9ad",
+  "sources": [
+    {
+      "path": "00_brief/M008-S02-planned-ids-d043.json",
+      "kind": "file",
+      "size": 16637,
+      "sha256": "2bc2f8baf90b35e0d2f80505c9a37202734902ba313c9e97bbc3935da91531fe"
+    },
+    {
+      "path": "06_infra/check_python_headers.py",
+      "kind": "file",
+      "size": 5588,
+      "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+    },
+    {
+      "path": "06_infra/conda-linux-64.lock.txt",
+      "kind": "file",
+      "size": 16883,
+      "sha256": "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"
+    },
+    {
+      "path": "06_infra/conda-win-64.lock.txt",
+      "kind": "file",
+      "size": 15042,
+      "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+    },
+    {
+      "path": "06_infra/environment-linux.yml",
+      "kind": "file",
+      "size": 281,
+      "sha256": "092929ca550218879ea775003be7e61d492b090db78b58226d885ea260af6a2a"
+    },
+    {
+      "path": "06_infra/environment-windows.yml",
+      "kind": "file",
+      "size": 279,
+      "sha256": "f77c0e5d65ea26c8649a35231402671fe309f8b7eaf0f99c5f96a57faa996de5"
+    },
+    {
+      "path": "06_infra/linux.sh",
+      "kind": "file",
+      "size": 561,
+      "sha256": "02666f426055496b0c04be856a7451905be27508f494875e9c0bb0769aa55370"
+    },
+    {
+      "path": "06_infra/m008-s02-d043-bridge.json",
+      "kind": "file",
+      "size": 28908,
+      "sha256": "60f35ba1cafc0f8c63c069ceeacb96768f797031d9123e9735b4373c4d6fb235"
+    },
+    {
+      "path": "06_infra/m008_integration/fit_counter.py",
+      "kind": "file",
+      "size": 9141,
+      "sha256": "ce760494979adc19f0e72a9eabc65872bcf37c5f5d952addd9f22797fb1697aa"
+    },
+    {
+      "path": "06_infra/m008_integration/products.py",
+      "kind": "file",
+      "size": 11582,
+      "sha256": "18752aa6376d8065affa3ccb6ae4d0950a27e481bded15ac4781511b15092596"
+    },
+    {
+      "path": "06_infra/m008_integration/qualify_integration_gate.py",
+      "kind": "file",
+      "size": 18136,
+      "sha256": "ff2b8c5f55a535dd008e8835054d67840368911335e36b133f1ad789e794855f"
+    },
+    {
+      "path": "06_infra/m008_integration/qualify_s04_repair.py",
+      "kind": "file",
+      "size": 11700,
+      "sha256": "cf51e4a2f843b8e2cceb02c45d133a7112bdd66f5a9511ab4daf608f8eae6510"
+    },
+    {
+      "path": "06_infra/m008_integration/repair_s04.py",
+      "kind": "file",
+      "size": 21310,
+      "sha256": "e5f41b7b88496cfd26ef937a8b67f18bda4da2d8933d2f43ebb12b123313eea0"
+    },
+    {
+      "path": "06_infra/m008_integration/science_dispatch.py",
+      "kind": "file",
+      "size": 15698,
+      "sha256": "0d65f808ccedd32944b64d8baec5bd372ff0a95cb299b60d7bad18ae50b2d35b"
+    },
+    {
+      "path": "06_infra/m008_integration/science_worker.py",
+      "kind": "file",
+      "size": 19134,
+      "sha256": "bb7c1597b9f7d8456d19a8aca03cd1f88736c3d6522c9bb8be282392b73a4047"
+    },
+    {
+      "path": "06_infra/m008_integration/test_integration_gate.py",
+      "kind": "file",
+      "size": 12417,
+      "sha256": "062fd9b3e5d0e686572614c57912de76b53bd302c16172c02351dd2e50abe1df"
+    },
+    {
+      "path": "06_infra/m008_integration/test_s04_repair.py",
+      "kind": "file",
+      "size": 12806,
+      "sha256": "02c6dfe803071c42754891c3c6cba253a2541e75a6815771b08a55bc03b04c13"
+    },
+    {
+      "path": "06_infra/m008_integration/test_science_admission.py",
+      "kind": "file",
+      "size": 14685,
+      "sha256": "1f427bc5da8c91d4793ec36bd8531de5fa0d075eb7d3919a8c41847dc58c3f18"
+    },
+    {
+      "path": "06_infra/m008_integration/test_scientific_contract.py",
+      "kind": "file",
+      "size": 12134,
+      "sha256": "017d977308fc8536d3d72506f722e515a01cb88924037b344c753ab93e5aaa1a"
+    },
+    {
+      "path": "06_infra/m008_integration/verify_evidence.py",
+      "kind": "file",
+      "size": 1680,
+      "sha256": "813c92e2e3b92daa002966dd0c434c8d0e9e1a605f49c2d78545ada0b708a1bd"
+    },
+    {
+      "path": "06_infra/m008_integration/verify_s02.py",
+      "kind": "file",
+      "size": 24410,
+      "sha256": "276493d7d612260e3ed19b673f807c8f41a719249d1f03d5bc3b1e8c43c3fc75"
+    },
+    {
+      "path": "06_infra/m008_integration/windows.ps1",
+      "kind": "file",
+      "size": 2524,
+      "sha256": "81d81d743789d0a8df1337490b1750d359edbde51928f3ef8fb55c3d597f18b8"
+    },
+    {
+      "path": "06_infra/m008_native/dispatch.py",
+      "kind": "file",
+      "size": 6199,
+      "sha256": "d75d2695c6eeebd7b35912879dff7f84ebc457758ca4835dd5a05a8546266516"
+    },
+    {
+      "path": "06_infra/m008_native/pytest.ini",
+      "kind": "file",
+      "size": 9,
+      "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+    },
+    {
+      "path": "06_infra/m008_native/worker.py",
+      "kind": "file",
+      "size": 11978,
+      "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+    },
+    {
+      "path": "06_infra/pip-engines-linux-64.lock.txt",
+      "kind": "file",
+      "size": 365,
+      "sha256": "50cf6f3ce38d73c2d2c59fa89a493d7b6eecadd3430e79b2d661b258cad5e7de"
+    },
+    {
+      "path": "06_infra/pip-engines-win-64.lock.txt",
+      "kind": "file",
+      "size": 408,
+      "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+    },
+    {
+      "path": "06_infra/pip-linux-64.lock.txt",
+      "kind": "file",
+      "size": 4897,
+      "sha256": "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"
+    },
+    {
+      "path": "06_infra/pip-win-64.lock.txt",
+      "kind": "file",
+      "size": 5005,
+      "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s02_admission.json",
+      "kind": "file",
+      "size": 264,
+      "sha256": "62d00679c9e0286a52d7b2751a42371bcd8d7c3261665b169df1a13d0ff898eb"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s02_integration.json",
+      "kind": "file",
+      "size": 263,
+      "sha256": "093e1ddbc51820ad20d612d72baacaa9a5c8f0e2227d5d65e3f7242e7d1cf782"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s02_science.json",
+      "kind": "file",
+      "size": 466,
+      "sha256": "798aa80f823ad90b219d18c5a44bbc4cd43f414be51b5009a74089b3731c164c"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s04_r2.json",
+      "kind": "file",
+      "size": 309,
+      "sha256": "3a4f8ab38a30278552dae6dd85177ba1c012c9670adaeee73dd05d84a903b9b3"
+    },
+    {
+      "path": "06_infra/run_checks.py",
+      "kind": "file",
+      "size": 5080,
+      "sha256": "ee1b15be1f4c8b4b001bb12352709f8c6f776ba21bf3799ec94b44e59f921009"
+    },
+    {
+      "path": "06_infra/windows-validation.json",
+      "kind": "file",
+      "size": 2652,
+      "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+    },
+    {
+      "path": "06_infra/windows.ps1",
+      "kind": "file",
+      "size": 1820,
+      "sha256": "f729589b011b269d6d482947bd5702df1eb44df2ab3663d0d8cdc12724c510e3"
+    },
+    {
+      "path": "08_pkg/CONTEXT.md",
+      "kind": "file",
+      "size": 7682,
+      "sha256": "c6d07c539312eb4fd2fb7e3a9e6005c1b0e0ec68ca923999903f77b311ad7e61"
+    },
+    {
+      "path": "08_pkg/MANIFEST.in",
+      "kind": "file",
+      "size": 315,
+      "sha256": "d29356ce33e85fd8b23e76e83e46be64758beb9491931704c0962b76834ea057"
+    },
+    {
+      "path": "08_pkg/README.md",
+      "kind": "file",
+      "size": 56487,
+      "sha256": "a1f9d3ac1cfb396a34bdefefdae9eefe58b0ab8d153e33edc759b26e74c6c180"
+    },
+    {
+      "path": "08_pkg/build_release.py",
+      "kind": "file",
+      "size": 5796,
+      "sha256": "40204533f8750cb2a8708b76a4ef16a550e512c998493cc8e148cd3dc45f4e56"
+    },
+    {
+      "path": "08_pkg/docs/audit.md",
+      "kind": "file",
+      "size": 10351,
+      "sha256": "ae1dbb59253e6780962626ae74df81c2fe41c5420fb1277124f7fd7cdd9f7465"
+    },
+    {
+      "path": "08_pkg/docs/prediction.md",
+      "kind": "file",
+      "size": 12674,
+      "sha256": "47b4c27d02da997a4bb73db16c87c083563100a3af164d4c5b215f1238dd2075"
+    },
+    {
+      "path": "08_pkg/docs/quickstart.md",
+      "kind": "file",
+      "size": 10578,
+      "sha256": "5f4a4ddc75ff02c428b9f54f0d494f2100211e5efd34f54d8636d2e100137075"
+    },
+    {
+      "path": "08_pkg/docs/workflow.md",
+      "kind": "file",
+      "size": 12790,
+      "sha256": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6"
+    },
+    {
+      "path": "08_pkg/examples/synthetic.py",
+      "kind": "file",
+      "size": 10269,
+      "sha256": "2f21c98c0f5a43c0787457d22ccac91168de378109b1a0a45dc6e12182bbb159"
+    },
+    {
+      "path": "08_pkg/examples/workflow.json",
+      "kind": "file",
+      "size": 1386,
+      "sha256": "411e4ac1c8ac25aca25bffd2303edca9201e1e5dde038e0e29fb7531c5edd3d6"
+    },
+    {
+      "path": "08_pkg/pyproject.toml",
+      "kind": "file",
+      "size": 523,
+      "sha256": "9d787f00d5172e59862f2e889d1762d89991a13f505153d71d9d0f52cb495a2f"
+    },
+    {
+      "path": "08_pkg/release-files.json",
+      "kind": "file",
+      "size": 1700,
+      "sha256": "6167be3a67791dcd32e21ba130550061685cf088e574c3b23ce667af537b0094"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/__init__.py",
+      "kind": "file",
+      "size": 809,
+      "sha256": "aa5ba425bb103c86625e6fcff4320cf7de3b3352aa53b5d4db1e932bbb932753"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/audit.py",
+      "kind": "file",
+      "size": 26730,
+      "sha256": "25c22dfcd7ba7d131efb0a9517ae39aa43716e7379b3680782daed1ac6293e43"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/engines.py",
+      "kind": "file",
+      "size": 3299,
+      "sha256": "45daa2922fb8a4be711ca0d3438e7e5f137aa915d7927c2312d731346f6b5c13"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/modeling.py",
+      "kind": "file",
+      "size": 31223,
+      "sha256": "a6126fa204644b06729e1a6a157f773b6a936c6913302045729e754b18d6bfa2"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/prediction.py",
+      "kind": "file",
+      "size": 16344,
+      "sha256": "ef66be856e4b8a6e9e5be6cdec03ebf4cab737d0e666f03dc6fe31ca9b9136fb"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/sampling.py",
+      "kind": "file",
+      "size": 18817,
+      "sha256": "9d8ca91b443eec1eae1900aa54c35e730563a5322b7cce21fe7ff04dc532320e"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/spatial.py",
+      "kind": "file",
+      "size": 19450,
+      "sha256": "613d7fe66ac9afd1d368062de7afaa506761b93dd2e4539b3762755c9fe3231c"
+    },
+    {
+      "path": "08_pkg/src/wall2wall/validation.py",
+      "kind": "file",
+      "size": 21784,
+      "sha256": "155e15717e5604d340b759787f4e8e89e8b66328711dd195ff44f8a1fb3c6fb8"
+    },
+    {
+      "path": "08_pkg/tests/run_checks.py",
+      "kind": "file",
+      "size": 23791,
+      "sha256": "47aa8d7f94b4f9763e353be6a6280a60a44a8142ec1c449ccd665cd03a7150f4"
+    },
+    {
+      "path": "08_pkg/tests/test_audit.py",
+      "kind": "file",
+      "size": 21686,
+      "sha256": "48bc768cc453545a448e4d3ca464e26e49a120bddfd31f45d3bedc7f08ca0208"
+    },
+    {
+      "path": "08_pkg/tests/test_buffer.py",
+      "kind": "file",
+      "size": 16802,
+      "sha256": "d74a49db723855229e7a42d8f80a826a7cdeaf7c6a636f690c976936623047ad"
+    },
+    {
+      "path": "08_pkg/tests/test_engine_integration.py",
+      "kind": "file",
+      "size": 16133,
+      "sha256": "b9658c43f0b5b5dc414d79a6f3c73305a9f1dbe01e9b8e89441f2281b2961aca"
+    },
+    {
+      "path": "08_pkg/tests/test_engines.py",
+      "kind": "file",
+      "size": 6829,
+      "sha256": "b41b8ad9b9844a689d79918fd2589ba1bc8d3e00a249742a6caa03bd4a75f0f3"
+    },
+    {
+      "path": "08_pkg/tests/test_modeling.py",
+      "kind": "file",
+      "size": 21645,
+      "sha256": "7d611fee15c42416ca2a54d9e8541199ab52eede4072468dbf2939bd4bc17aef"
+    },
+    {
+      "path": "08_pkg/tests/test_package.py",
+      "kind": "file",
+      "size": 14955,
+      "sha256": "2e79196c1fcbf6e2b063a9fce1f5578198efe3a04168c3f26df4776f2f3fe571"
+    },
+    {
+      "path": "08_pkg/tests/test_prediction.py",
+      "kind": "file",
+      "size": 19569,
+      "sha256": "09887e7b7ea40be44ec11c91f572b2c9782d1f4d4546d31be86f216654983f66"
+    },
+    {
+      "path": "08_pkg/tests/test_quality.py",
+      "kind": "file",
+      "size": 12183,
+      "sha256": "358a19093999d18b509e3f3690cd00240bc399141869c2ff3b83c100daf7c4e9"
+    },
+    {
+      "path": "08_pkg/tests/test_release.py",
+      "kind": "file",
+      "size": 11296,
+      "sha256": "112db2022a8d3e74bbe7c2b8b0b2dd48b14adfe41729ddb30e6b0f6e0c90784c"
+    },
+    {
+      "path": "08_pkg/tests/test_sampling.py",
+      "kind": "file",
+      "size": 22262,
+      "sha256": "e5b1fb8d6dc0862913494751116be6d609cb4cc622b8612f5510fa8e70661834"
+    },
+    {
+      "path": "08_pkg/tests/test_scale.py",
+      "kind": "file",
+      "size": 14969,
+      "sha256": "afa0dd702a2875617e706e3394240e80bf0e0a410ad910c56e00b32349d633e2"
+    },
+    {
+      "path": "08_pkg/tests/test_selection.py",
+      "kind": "file",
+      "size": 22261,
+      "sha256": "187cc2f844cdaca1f6941cee3374d1a7d929f4b541db0033c2e984f90fd20e10"
+    },
+    {
+      "path": "08_pkg/tests/test_spatial.py",
+      "kind": "file",
+      "size": 21032,
+      "sha256": "12192ad02c466f827351f145fd16c65a91c044e19b3dc914cb119d2e3befbbbe"
+    },
+    {
+      "path": "08_pkg/tests/test_synthetic.py",
+      "kind": "file",
+      "size": 15927,
+      "sha256": "532cfba5d4c1ebecf84fb4bad185f4f1be768ff4b0839d62f18ca816c496826b"
+    },
+    {
+      "path": "08_pkg/tests/test_validation.py",
+      "kind": "file",
+      "size": 17529,
+      "sha256": "4e86cebda925610ca29829ad0fdf701133ac59bf60261ce2984bc2b4af812e03"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow.py",
+      "kind": "file",
+      "size": 16933,
+      "sha256": "b16f1c6e7edb0a4cae99393219b426aac1cbe5c25b53693bf5aa686516ca5ddb"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow_control.py",
+      "kind": "file",
+      "size": 8113,
+      "sha256": "f90738b15944afdae086676883d68f779c95e05b3bd0cd377fc94749c7f9a070"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow_resume.py",
+      "kind": "file",
+      "size": 9114,
+      "sha256": "cc490c15732d0e59a78614782bc9d4efddd60850d2ac671acdae496f458b4c96"
+    },
+    {
+      "path": "08_pkg/workflow/Snakefile",
+      "kind": "file",
+      "size": 2629,
+      "sha256": "3321e55d2083e97966a66d1f553517eb382d739e3a6592e08a7d0515df75ab17"
+    },
+    {
+      "path": "08_pkg/workflow/run.py",
+      "kind": "file",
+      "size": 6496,
+      "sha256": "7d5feb4abfcaed229eb19dd1693a22f26dc63574642541c401674f82c9d04686"
+    },
+    {
+      "path": "08_pkg/workflow/stage_checks.py",
+      "kind": "file",
+      "size": 5524,
+      "sha256": "cdacfdf4d6195bbb8c95683efd54e22d89dda85d6a846b4f7deeb80854bde3c3"
+    },
+    {
+      "path": "08_pkg/workflow/stages.py",
+      "kind": "file",
+      "size": 28886,
+      "sha256": "8c4c8241b7c18c25e41ee26c0aa327baa336868ab47f4421003e2f00311a6d59"
+    }
+  ],
+  "results": [
+    {
+      "profile": "linux",
+      "report": {
+        "schema": "wall2wall.s02-profile/1",
+        "qualification": false,
+        "status": "passed",
+        "unknown": false,
+        "profile": "linux",
+        "invocation": "136f38edb1a845388cece21796a7e9ad-linux",
+        "sources": [
+          {
+            "path": "00_brief/M008-S02-planned-ids-d043.json",
+            "kind": "file",
+            "size": 16637,
+            "sha256": "2bc2f8baf90b35e0d2f80505c9a37202734902ba313c9e97bbc3935da91531fe"
+          },
+          {
+            "path": "06_infra/check_python_headers.py",
+            "kind": "file",
+            "size": 5588,
+            "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+          },
+          {
+            "path": "06_infra/conda-linux-64.lock.txt",
+            "kind": "file",
+            "size": 16883,
+            "sha256": "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"
+          },
+          {
+            "path": "06_infra/conda-win-64.lock.txt",
+            "kind": "file",
+            "size": 15042,
+            "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+          },
+          {
+            "path": "06_infra/environment-linux.yml",
+            "kind": "file",
+            "size": 281,
+            "sha256": "092929ca550218879ea775003be7e61d492b090db78b58226d885ea260af6a2a"
+          },
+          {
+            "path": "06_infra/environment-windows.yml",
+            "kind": "file",
+            "size": 279,
+            "sha256": "f77c0e5d65ea26c8649a35231402671fe309f8b7eaf0f99c5f96a57faa996de5"
+          },
+          {
+            "path": "06_infra/linux.sh",
+            "kind": "file",
+            "size": 561,
+            "sha256": "02666f426055496b0c04be856a7451905be27508f494875e9c0bb0769aa55370"
+          },
+          {
+            "path": "06_infra/m008-s02-d043-bridge.json",
+            "kind": "file",
+            "size": 28908,
+            "sha256": "60f35ba1cafc0f8c63c069ceeacb96768f797031d9123e9735b4373c4d6fb235"
+          },
+          {
+            "path": "06_infra/m008_integration/fit_counter.py",
+            "kind": "file",
+            "size": 9141,
+            "sha256": "ce760494979adc19f0e72a9eabc65872bcf37c5f5d952addd9f22797fb1697aa"
+          },
+          {
+            "path": "06_infra/m008_integration/products.py",
+            "kind": "file",
+            "size": 11582,
+            "sha256": "18752aa6376d8065affa3ccb6ae4d0950a27e481bded15ac4781511b15092596"
+          },
+          {
+            "path": "06_infra/m008_integration/qualify_integration_gate.py",
+            "kind": "file",
+            "size": 18136,
+            "sha256": "ff2b8c5f55a535dd008e8835054d67840368911335e36b133f1ad789e794855f"
+          },
+          {
+            "path": "06_infra/m008_integration/qualify_s04_repair.py",
+            "kind": "file",
+            "size": 11700,
+            "sha256": "cf51e4a2f843b8e2cceb02c45d133a7112bdd66f5a9511ab4daf608f8eae6510"
+          },
+          {
+            "path": "06_infra/m008_integration/repair_s04.py",
+            "kind": "file",
+            "size": 21310,
+            "sha256": "e5f41b7b88496cfd26ef937a8b67f18bda4da2d8933d2f43ebb12b123313eea0"
+          },
+          {
+            "path": "06_infra/m008_integration/science_dispatch.py",
+            "kind": "file",
+            "size": 15698,
+            "sha256": "0d65f808ccedd32944b64d8baec5bd372ff0a95cb299b60d7bad18ae50b2d35b"
+          },
+          {
+            "path": "06_infra/m008_integration/science_worker.py",
+            "kind": "file",
+            "size": 19134,
+            "sha256": "bb7c1597b9f7d8456d19a8aca03cd1f88736c3d6522c9bb8be282392b73a4047"
+          },
+          {
+            "path": "06_infra/m008_integration/test_integration_gate.py",
+            "kind": "file",
+            "size": 12417,
+            "sha256": "062fd9b3e5d0e686572614c57912de76b53bd302c16172c02351dd2e50abe1df"
+          },
+          {
+            "path": "06_infra/m008_integration/test_s04_repair.py",
+            "kind": "file",
+            "size": 12806,
+            "sha256": "02c6dfe803071c42754891c3c6cba253a2541e75a6815771b08a55bc03b04c13"
+          },
+          {
+            "path": "06_infra/m008_integration/test_science_admission.py",
+            "kind": "file",
+            "size": 14685,
+            "sha256": "1f427bc5da8c91d4793ec36bd8531de5fa0d075eb7d3919a8c41847dc58c3f18"
+          },
+          {
+            "path": "06_infra/m008_integration/test_scientific_contract.py",
+            "kind": "file",
+            "size": 12134,
+            "sha256": "017d977308fc8536d3d72506f722e515a01cb88924037b344c753ab93e5aaa1a"
+          },
+          {
+            "path": "06_infra/m008_integration/verify_evidence.py",
+            "kind": "file",
+            "size": 1680,
+            "sha256": "813c92e2e3b92daa002966dd0c434c8d0e9e1a605f49c2d78545ada0b708a1bd"
+          },
+          {
+            "path": "06_infra/m008_integration/verify_s02.py",
+            "kind": "file",
+            "size": 24410,
+            "sha256": "276493d7d612260e3ed19b673f807c8f41a719249d1f03d5bc3b1e8c43c3fc75"
+          },
+          {
+            "path": "06_infra/m008_integration/windows.ps1",
+            "kind": "file",
+            "size": 2524,
+            "sha256": "81d81d743789d0a8df1337490b1750d359edbde51928f3ef8fb55c3d597f18b8"
+          },
+          {
+            "path": "06_infra/m008_native/dispatch.py",
+            "kind": "file",
+            "size": 6199,
+            "sha256": "d75d2695c6eeebd7b35912879dff7f84ebc457758ca4835dd5a05a8546266516"
+          },
+          {
+            "path": "06_infra/m008_native/pytest.ini",
+            "kind": "file",
+            "size": 9,
+            "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+          },
+          {
+            "path": "06_infra/m008_native/worker.py",
+            "kind": "file",
+            "size": 11978,
+            "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+          },
+          {
+            "path": "06_infra/pip-engines-linux-64.lock.txt",
+            "kind": "file",
+            "size": 365,
+            "sha256": "50cf6f3ce38d73c2d2c59fa89a493d7b6eecadd3430e79b2d661b258cad5e7de"
+          },
+          {
+            "path": "06_infra/pip-engines-win-64.lock.txt",
+            "kind": "file",
+            "size": 408,
+            "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+          },
+          {
+            "path": "06_infra/pip-linux-64.lock.txt",
+            "kind": "file",
+            "size": 4897,
+            "sha256": "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"
+          },
+          {
+            "path": "06_infra/pip-win-64.lock.txt",
+            "kind": "file",
+            "size": 5005,
+            "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_admission.json",
+            "kind": "file",
+            "size": 264,
+            "sha256": "62d00679c9e0286a52d7b2751a42371bcd8d7c3261665b169df1a13d0ff898eb"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_integration.json",
+            "kind": "file",
+            "size": 263,
+            "sha256": "093e1ddbc51820ad20d612d72baacaa9a5c8f0e2227d5d65e3f7242e7d1cf782"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_science.json",
+            "kind": "file",
+            "size": 466,
+            "sha256": "798aa80f823ad90b219d18c5a44bbc4cd43f414be51b5009a74089b3731c164c"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s04_r2.json",
+            "kind": "file",
+            "size": 309,
+            "sha256": "3a4f8ab38a30278552dae6dd85177ba1c012c9670adaeee73dd05d84a903b9b3"
+          },
+          {
+            "path": "06_infra/run_checks.py",
+            "kind": "file",
+            "size": 5080,
+            "sha256": "ee1b15be1f4c8b4b001bb12352709f8c6f776ba21bf3799ec94b44e59f921009"
+          },
+          {
+            "path": "06_infra/windows-validation.json",
+            "kind": "file",
+            "size": 2652,
+            "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+          },
+          {
+            "path": "06_infra/windows.ps1",
+            "kind": "file",
+            "size": 1820,
+            "sha256": "f729589b011b269d6d482947bd5702df1eb44df2ab3663d0d8cdc12724c510e3"
+          },
+          {
+            "path": "08_pkg/CONTEXT.md",
+            "kind": "file",
+            "size": 7682,
+            "sha256": "c6d07c539312eb4fd2fb7e3a9e6005c1b0e0ec68ca923999903f77b311ad7e61"
+          },
+          {
+            "path": "08_pkg/MANIFEST.in",
+            "kind": "file",
+            "size": 315,
+            "sha256": "d29356ce33e85fd8b23e76e83e46be64758beb9491931704c0962b76834ea057"
+          },
+          {
+            "path": "08_pkg/README.md",
+            "kind": "file",
+            "size": 56487,
+            "sha256": "a1f9d3ac1cfb396a34bdefefdae9eefe58b0ab8d153e33edc759b26e74c6c180"
+          },
+          {
+            "path": "08_pkg/build_release.py",
+            "kind": "file",
+            "size": 5796,
+            "sha256": "40204533f8750cb2a8708b76a4ef16a550e512c998493cc8e148cd3dc45f4e56"
+          },
+          {
+            "path": "08_pkg/docs/audit.md",
+            "kind": "file",
+            "size": 10351,
+            "sha256": "ae1dbb59253e6780962626ae74df81c2fe41c5420fb1277124f7fd7cdd9f7465"
+          },
+          {
+            "path": "08_pkg/docs/prediction.md",
+            "kind": "file",
+            "size": 12674,
+            "sha256": "47b4c27d02da997a4bb73db16c87c083563100a3af164d4c5b215f1238dd2075"
+          },
+          {
+            "path": "08_pkg/docs/quickstart.md",
+            "kind": "file",
+            "size": 10578,
+            "sha256": "5f4a4ddc75ff02c428b9f54f0d494f2100211e5efd34f54d8636d2e100137075"
+          },
+          {
+            "path": "08_pkg/docs/workflow.md",
+            "kind": "file",
+            "size": 12790,
+            "sha256": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6"
+          },
+          {
+            "path": "08_pkg/examples/synthetic.py",
+            "kind": "file",
+            "size": 10269,
+            "sha256": "2f21c98c0f5a43c0787457d22ccac91168de378109b1a0a45dc6e12182bbb159"
+          },
+          {
+            "path": "08_pkg/examples/workflow.json",
+            "kind": "file",
+            "size": 1386,
+            "sha256": "411e4ac1c8ac25aca25bffd2303edca9201e1e5dde038e0e29fb7531c5edd3d6"
+          },
+          {
+            "path": "08_pkg/pyproject.toml",
+            "kind": "file",
+            "size": 523,
+            "sha256": "9d787f00d5172e59862f2e889d1762d89991a13f505153d71d9d0f52cb495a2f"
+          },
+          {
+            "path": "08_pkg/release-files.json",
+            "kind": "file",
+            "size": 1700,
+            "sha256": "6167be3a67791dcd32e21ba130550061685cf088e574c3b23ce667af537b0094"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/__init__.py",
+            "kind": "file",
+            "size": 809,
+            "sha256": "aa5ba425bb103c86625e6fcff4320cf7de3b3352aa53b5d4db1e932bbb932753"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/audit.py",
+            "kind": "file",
+            "size": 26730,
+            "sha256": "25c22dfcd7ba7d131efb0a9517ae39aa43716e7379b3680782daed1ac6293e43"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/engines.py",
+            "kind": "file",
+            "size": 3299,
+            "sha256": "45daa2922fb8a4be711ca0d3438e7e5f137aa915d7927c2312d731346f6b5c13"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/modeling.py",
+            "kind": "file",
+            "size": 31223,
+            "sha256": "a6126fa204644b06729e1a6a157f773b6a936c6913302045729e754b18d6bfa2"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/prediction.py",
+            "kind": "file",
+            "size": 16344,
+            "sha256": "ef66be856e4b8a6e9e5be6cdec03ebf4cab737d0e666f03dc6fe31ca9b9136fb"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/sampling.py",
+            "kind": "file",
+            "size": 18817,
+            "sha256": "9d8ca91b443eec1eae1900aa54c35e730563a5322b7cce21fe7ff04dc532320e"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/spatial.py",
+            "kind": "file",
+            "size": 19450,
+            "sha256": "613d7fe66ac9afd1d368062de7afaa506761b93dd2e4539b3762755c9fe3231c"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/validation.py",
+            "kind": "file",
+            "size": 21784,
+            "sha256": "155e15717e5604d340b759787f4e8e89e8b66328711dd195ff44f8a1fb3c6fb8"
+          },
+          {
+            "path": "08_pkg/tests/run_checks.py",
+            "kind": "file",
+            "size": 23791,
+            "sha256": "47aa8d7f94b4f9763e353be6a6280a60a44a8142ec1c449ccd665cd03a7150f4"
+          },
+          {
+            "path": "08_pkg/tests/test_audit.py",
+            "kind": "file",
+            "size": 21686,
+            "sha256": "48bc768cc453545a448e4d3ca464e26e49a120bddfd31f45d3bedc7f08ca0208"
+          },
+          {
+            "path": "08_pkg/tests/test_buffer.py",
+            "kind": "file",
+            "size": 16802,
+            "sha256": "d74a49db723855229e7a42d8f80a826a7cdeaf7c6a636f690c976936623047ad"
+          },
+          {
+            "path": "08_pkg/tests/test_engine_integration.py",
+            "kind": "file",
+            "size": 16133,
+            "sha256": "b9658c43f0b5b5dc414d79a6f3c73305a9f1dbe01e9b8e89441f2281b2961aca"
+          },
+          {
+            "path": "08_pkg/tests/test_engines.py",
+            "kind": "file",
+            "size": 6829,
+            "sha256": "b41b8ad9b9844a689d79918fd2589ba1bc8d3e00a249742a6caa03bd4a75f0f3"
+          },
+          {
+            "path": "08_pkg/tests/test_modeling.py",
+            "kind": "file",
+            "size": 21645,
+            "sha256": "7d611fee15c42416ca2a54d9e8541199ab52eede4072468dbf2939bd4bc17aef"
+          },
+          {
+            "path": "08_pkg/tests/test_package.py",
+            "kind": "file",
+            "size": 14955,
+            "sha256": "2e79196c1fcbf6e2b063a9fce1f5578198efe3a04168c3f26df4776f2f3fe571"
+          },
+          {
+            "path": "08_pkg/tests/test_prediction.py",
+            "kind": "file",
+            "size": 19569,
+            "sha256": "09887e7b7ea40be44ec11c91f572b2c9782d1f4d4546d31be86f216654983f66"
+          },
+          {
+            "path": "08_pkg/tests/test_quality.py",
+            "kind": "file",
+            "size": 12183,
+            "sha256": "358a19093999d18b509e3f3690cd00240bc399141869c2ff3b83c100daf7c4e9"
+          },
+          {
+            "path": "08_pkg/tests/test_release.py",
+            "kind": "file",
+            "size": 11296,
+            "sha256": "112db2022a8d3e74bbe7c2b8b0b2dd48b14adfe41729ddb30e6b0f6e0c90784c"
+          },
+          {
+            "path": "08_pkg/tests/test_sampling.py",
+            "kind": "file",
+            "size": 22262,
+            "sha256": "e5b1fb8d6dc0862913494751116be6d609cb4cc622b8612f5510fa8e70661834"
+          },
+          {
+            "path": "08_pkg/tests/test_scale.py",
+            "kind": "file",
+            "size": 14969,
+            "sha256": "afa0dd702a2875617e706e3394240e80bf0e0a410ad910c56e00b32349d633e2"
+          },
+          {
+            "path": "08_pkg/tests/test_selection.py",
+            "kind": "file",
+            "size": 22261,
+            "sha256": "187cc2f844cdaca1f6941cee3374d1a7d929f4b541db0033c2e984f90fd20e10"
+          },
+          {
+            "path": "08_pkg/tests/test_spatial.py",
+            "kind": "file",
+            "size": 21032,
+            "sha256": "12192ad02c466f827351f145fd16c65a91c044e19b3dc914cb119d2e3befbbbe"
+          },
+          {
+            "path": "08_pkg/tests/test_synthetic.py",
+            "kind": "file",
+            "size": 15927,
+            "sha256": "532cfba5d4c1ebecf84fb4bad185f4f1be768ff4b0839d62f18ca816c496826b"
+          },
+          {
+            "path": "08_pkg/tests/test_validation.py",
+            "kind": "file",
+            "size": 17529,
+            "sha256": "4e86cebda925610ca29829ad0fdf701133ac59bf60261ce2984bc2b4af812e03"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow.py",
+            "kind": "file",
+            "size": 16933,
+            "sha256": "b16f1c6e7edb0a4cae99393219b426aac1cbe5c25b53693bf5aa686516ca5ddb"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow_control.py",
+            "kind": "file",
+            "size": 8113,
+            "sha256": "f90738b15944afdae086676883d68f779c95e05b3bd0cd377fc94749c7f9a070"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow_resume.py",
+            "kind": "file",
+            "size": 9114,
+            "sha256": "cc490c15732d0e59a78614782bc9d4efddd60850d2ac671acdae496f458b4c96"
+          },
+          {
+            "path": "08_pkg/workflow/Snakefile",
+            "kind": "file",
+            "size": 2629,
+            "sha256": "3321e55d2083e97966a66d1f553517eb382d739e3a6592e08a7d0515df75ab17"
+          },
+          {
+            "path": "08_pkg/workflow/run.py",
+            "kind": "file",
+            "size": 6496,
+            "sha256": "7d5feb4abfcaed229eb19dd1693a22f26dc63574642541c401674f82c9d04686"
+          },
+          {
+            "path": "08_pkg/workflow/stage_checks.py",
+            "kind": "file",
+            "size": 5524,
+            "sha256": "cdacfdf4d6195bbb8c95683efd54e22d89dda85d6a846b4f7deeb80854bde3c3"
+          },
+          {
+            "path": "08_pkg/workflow/stages.py",
+            "kind": "file",
+            "size": 28886,
+            "sha256": "8c4c8241b7c18c25e41ee26c0aa327baa336868ab47f4421003e2f00311a6d59"
+          }
+        ],
+        "runtime": {
+          "python": "3.11.16",
+          "profile": "linux"
+        },
+        "fits": 184,
+        "counts": {
+          "workflow": 37,
+          "production": 5,
+          "validated": 142,
+          "production-noop": 0,
+          "validated-noop": 0
+        },
+        "workflow_ids": [
+          "tests/test_workflow.py::test_content_change_same_mtime",
+          "tests/test_workflow.py::test_corrupt_intermediate_refused",
+          "tests/test_workflow.py::test_failure_preserves_outputs",
+          "tests/test_workflow.py::test_fit_budget",
+          "tests/test_workflow.py::test_invalid_config_before_fit",
+          "tests/test_workflow.py::test_noop",
+          "tests/test_workflow.py::test_production_processes_and_reference",
+          "tests/test_workflow.py::test_validated_contract",
+          "tests/test_workflow_resume.py::test_environment_change_refused",
+          "tests/test_workflow_resume.py::test_failure_resume_preserves_history",
+          "tests/test_workflow_resume.py::test_missing_corrupt_repair",
+          "tests/test_workflow_resume.py::test_same_mtime_data_invalidation",
+          "tests/test_workflow_resume.py::test_selective_inference_reuse",
+          "tests/test_workflow_resume.py::test_stage_code_invalidation"
+        ],
+        "validated_ids": [
+          "tests/test_audit.py::test_environment_unavailable_and_no_optional_import",
+          "tests/test_audit.py::test_evidence_roles_null_and_save_validation",
+          "tests/test_audit.py::test_exclusive_and_incomplete[copy]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[empty]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[manifest]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[prior]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[serialize]",
+          "tests/test_audit.py::test_hashing_single_pass_and_bytes",
+          "tests/test_audit.py::test_link_rejected_before_read",
+          "tests/test_audit.py::test_process_roundtrip_and_move",
+          "tests/test_audit.py::test_reject_before_load[ancestor]",
+          "tests/test_audit.py::test_reject_before_load[collision]",
+          "tests/test_audit.py::test_reject_before_load[corrupt]",
+          "tests/test_audit.py::test_reject_before_load[drive_relative]",
+          "tests/test_audit.py::test_reject_before_load[duplicate]",
+          "tests/test_audit.py::test_reject_before_load[grid]",
+          "tests/test_audit.py::test_reject_before_load[infinity]",
+          "tests/test_audit.py::test_reject_before_load[invalid_character]",
+          "tests/test_audit.py::test_reject_before_load[missing]",
+          "tests/test_audit.py::test_reject_before_load[missing_version]",
+          "tests/test_audit.py::test_reject_before_load[nan]",
+          "tests/test_audit.py::test_reject_before_load[posix]",
+          "tests/test_audit.py::test_reject_before_load[predictor_order]",
+          "tests/test_audit.py::test_reject_before_load[required]",
+          "tests/test_audit.py::test_reject_before_load[reserved]",
+          "tests/test_audit.py::test_reject_before_load[schema]",
+          "tests/test_audit.py::test_reject_before_load[traversal]",
+          "tests/test_audit.py::test_reject_before_load[truncate]",
+          "tests/test_audit.py::test_reject_before_load[unc]",
+          "tests/test_audit.py::test_reject_before_load[unknown_version]",
+          "tests/test_audit.py::test_reject_before_load[version]",
+          "tests/test_audit.py::test_reject_before_load[windows]",
+          "tests/test_audit.py::test_trust_before_load[false]",
+          "tests/test_audit.py::test_trust_before_load[none]",
+          "tests/test_audit.py::test_trust_before_load[numpy]",
+          "tests/test_audit.py::test_trust_before_load[one]",
+          "tests/test_audit.py::test_trust_before_load[string]",
+          "tests/test_buffer.py::test_analytic_buffer",
+          "tests/test_buffer.py::test_bounded_buffer_distances",
+          "tests/test_buffer.py::test_csv_reconstruction",
+          "tests/test_buffer.py::test_failure_and_existing",
+          "tests/test_buffer.py::test_group_leakage[block]",
+          "tests/test_buffer.py::test_group_leakage[cell]",
+          "tests/test_buffer.py::test_group_leakage[site]",
+          "tests/test_buffer.py::test_group_leakage[transitive]",
+          "tests/test_buffer.py::test_insufficient_train[exhaustion]",
+          "tests/test_buffer.py::test_insufficient_train[minimum]",
+          "tests/test_buffer.py::test_insufficient_train[zero]",
+          "tests/test_buffer.py::test_invalid_buffer_parameters",
+          "tests/test_buffer.py::test_invalid_provided_partitions",
+          "tests/test_buffer.py::test_modes[positive-generated]",
+          "tests/test_buffer.py::test_modes[positive-provided]",
+          "tests/test_buffer.py::test_modes[zero-generated]",
+          "tests/test_buffer.py::test_modes[zero-provided]",
+          "tests/test_buffer.py::test_provided_order_seed_and_immutability",
+          "tests/test_buffer.py::test_zero_compatibility",
+          "tests/test_modeling.py::test_evaluate_spies_metrics_and_csv",
+          "tests/test_modeling.py::test_existing_and_write_failure",
+          "tests/test_modeling.py::test_fit_final_separate",
+          "tests/test_modeling.py::test_fit_predict_failures[fit_error]",
+          "tests/test_modeling.py::test_fit_predict_failures[nonfinite]",
+          "tests/test_modeling.py::test_fit_predict_failures[predict_error]",
+          "tests/test_modeling.py::test_fit_predict_failures[shape]",
+          "tests/test_modeling.py::test_invalid_estimators_and_config",
+          "tests/test_modeling.py::test_invalid_tables_and_schema",
+          "tests/test_modeling.py::test_metrics_undefined_and_overflow",
+          "tests/test_modeling.py::test_pipeline_fit_transform_is_fold_local",
+          "tests/test_modeling.py::test_z_frozen_protocol",
+          "tests/test_prediction.py::test_compression_contract",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[bool-batch]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[bool-window]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[budget]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[fraction]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[large-batch]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[large-window]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[zero]",
+          "tests/test_prediction.py::test_current_masks_and_all_invalid",
+          "tests/test_prediction.py::test_existing_alias_and_trust",
+          "tests/test_prediction.py::test_fresh_process_scaled_transfer[pipeline]",
+          "tests/test_prediction.py::test_fresh_process_scaled_transfer[rf]",
+          "tests/test_prediction.py::test_io_failure_after_window[read]",
+          "tests/test_prediction.py::test_io_failure_after_window[write]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[error]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[inf]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[length]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[nan]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[overflow]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[shape]",
+          "tests/test_prediction.py::test_preflight_metadata[band]",
+          "tests/test_prediction.py::test_preflight_metadata[count]",
+          "tests/test_prediction.py::test_preflight_metadata[encoding]",
+          "tests/test_prediction.py::test_preflight_metadata[grid]",
+          "tests/test_prediction.py::test_preflight_metadata[mask_grid]",
+          "tests/test_prediction.py::test_preflight_metadata[nodata]",
+          "tests/test_prediction.py::test_preflight_metadata[order]",
+          "tests/test_prediction.py::test_preflight_metadata[period]",
+          "tests/test_prediction.py::test_preflight_metadata[raster_encoding]",
+          "tests/test_prediction.py::test_preflight_metadata[unit]",
+          "tests/test_prediction.py::test_source_hash_once_and_pipeline_once",
+          "tests/test_prediction.py::test_windowed_reference[empty-window]",
+          "tests/test_prediction.py::test_windowed_reference[small-batches]",
+          "tests/test_prediction.py::test_windowed_reference[uneven]",
+          "tests/test_quality.py::test_analytic_quality[clean-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[clean-rf]",
+          "tests/test_quality.py::test_analytic_quality[empty-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[empty-rf]",
+          "tests/test_quality.py::test_analytic_quality[mixed-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[mixed-rf]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[boolean]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[duplicate]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[empty]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[extra]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[missing]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[nan]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[none]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[order]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[reverse]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[unknown]",
+          "tests/test_quality.py::test_historical_and_quality_boolean",
+          "tests/test_quality.py::test_no_extra_band_reads",
+          "tests/test_quality.py::test_quality_write_failure[out_of_range]",
+          "tests/test_quality.py::test_quality_write_failure[validity]",
+          "tests/test_quality.py::test_ranges_fresh_process",
+          "tests/test_sampling.py::test_crs_and_invalid_coordinates",
+          "tests/test_sampling.py::test_csv_ids",
+          "tests/test_sampling.py::test_dataframe_ids",
+          "tests/test_sampling.py::test_edges_order_persistence",
+          "tests/test_sampling.py::test_manifest_rejections",
+          "tests/test_sampling.py::test_masks_and_physical_values",
+          "tests/test_sampling.py::test_observation_rejections",
+          "tests/test_sampling.py::test_output_and_failure",
+          "tests/test_sampling.py::test_partial_coverage",
+          "tests/test_sampling.py::test_raster_metadata_rejections",
+          "tests/test_sampling.py::test_signal_pipeline",
+          "tests/test_sampling.py::test_window_reads",
+          "tests/test_sampling.py::test_zero_eligible[coordinates]",
+          "tests/test_sampling.py::test_zero_eligible[outside]",
+          "tests/test_sampling.py::test_zero_eligible[predictors]",
+          "tests/test_selection.py::test_all_inner_preflight_and_budgets_no_fits",
+          "tests/test_selection.py::test_candidate_failure_records_attempt",
+          "tests/test_selection.py::test_exact_ties_keep_candidate_order",
+          "tests/test_selection.py::test_existing_and_selection_write_failure",
+          "tests/test_selection.py::test_invalid_candidates_configs_and_limits_no_fits",
+          "tests/test_selection.py::test_negative_importance_preserved",
+          "tests/test_selection.py::test_nested_buffers_mapping_pipeline_and_independence",
+          "tests/test_selection.py::test_permutation_analytic_repeat_and_oof_unchanged",
+          "tests/test_selection.py::test_pooled_selection_two_families_and_final_refit",
+          "tests/test_selection.py::test_z_fit_plan",
+          "tests/test_spatial.py::test_band_validity",
+          "tests/test_spatial.py::test_crs_change",
+          "tests/test_spatial.py::test_empty_coverage[geometric]",
+          "tests/test_spatial.py::test_empty_coverage[individual]",
+          "tests/test_spatial.py::test_empty_coverage[joint]",
+          "tests/test_spatial.py::test_existing_and_failure",
+          "tests/test_spatial.py::test_grid_methods[average]",
+          "tests/test_spatial.py::test_grid_methods[bilinear]",
+          "tests/test_spatial.py::test_grid_methods[nearest]",
+          "tests/test_spatial.py::test_identity_reuse",
+          "tests/test_spatial.py::test_invalid_inputs",
+          "tests/test_spatial.py::test_invalid_interpolation[average]",
+          "tests/test_spatial.py::test_invalid_interpolation[bilinear]",
+          "tests/test_spatial.py::test_invalid_interpolation[nearest]",
+          "tests/test_spatial.py::test_metadata_validation",
+          "tests/test_spatial.py::test_origin_and_partial_coverage",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[envelope_only]",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[other_crs]",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[point_contact]",
+          "tests/test_spatial.py::test_rotated_source",
+          "tests/test_spatial.py::test_scale_idempotence[declaration]",
+          "tests/test_spatial.py::test_scale_idempotence[metadata]",
+          "tests/test_spatial.py::test_window_boundaries_and_reads[identity]",
+          "tests/test_spatial.py::test_window_boundaries_and_reads[reprojection]",
+          "tests/test_validation.py::test_block_edges",
+          "tests/test_validation.py::test_cell_crosses_block",
+          "tests/test_validation.py::test_distance_batches",
+          "tests/test_validation.py::test_insufficient_groups[blocks]",
+          "tests/test_validation.py::test_insufficient_groups[cells]",
+          "tests/test_validation.py::test_insufficient_groups[sites]",
+          "tests/test_validation.py::test_invalid_parameters",
+          "tests/test_validation.py::test_invalid_schema_and_crs",
+          "tests/test_validation.py::test_invalid_tables",
+          "tests/test_validation.py::test_persistence_and_failure",
+          "tests/test_validation.py::test_reproducibility_rng_and_response_independence",
+          "tests/test_validation.py::test_signal_pipeline",
+          "tests/test_validation.py::test_statistics_and_distance",
+          "tests/test_validation.py::test_transitive_sites",
+          "tests/test_validation.py::test_unequal_groups_and_positions"
+        ],
+        "noops": [
+          "production-noop",
+          "validated-noop"
+        ],
+        "artifacts": {
+          "evidence/fits.sqlite": "96df9e382b7b0e0d8275ef1917bf8a0ce53c513043a97a2a8638e7f1a865462b",
+          "sequence/receipt.json": "43b919d0bcc5ff24b259eda6cbc6aca035e84585b014ba765dc38adfb00d7092",
+          "evidence/provenance.json": "3675083c61246e5334a92b3a4ab2043e0a3d289dc00c4081d0fef0a7ab2cd017",
+          "config.json": "fd625b550f2d37958658f2d5be17a00443b083cdcfd5efb9a888896e024c980f",
+          "snapshot/manifest.json": "15c16a49b460f1fc3e0e3498bad02ea8a8391232e5dc9eae65d6e0499eb15e2d",
+          "evidence/worker-started.json": "22bd66b961aa05455bfe4c62d74f52175859d0826517143c09f9b699419fa9f1",
+          "evidence/execution.json": "bf4e2fcc9ad98994ca5e4417f0a417afa99c84c76e7dae0976c5b198e42ff8d1",
+          "fixture/config.json": "eead60ac619b6e04992b6127e98e24cbc7de89d18ebb969083c17c959352ce2c",
+          "fixture/origin.json": "9d828f85544d01f31a9bdde77676023bd30871ca8e97ad96fe94d2aa7931f2c5",
+          "fixture/points.csv": "bf3e0257017c1a9f28efba3ef4a828db2c5a32aefa0a8e642868c77dc84b2f14",
+          "fixture/predictors.tif": "58aeaff4ce8c5ff5a2347f6d58d7c9ab0327af59830314ae6e9729d2fc000494",
+          "sequence/workflow/result.json": "b8f124ea57123fcd16adf4e6d12f6f8942325e3912a8678afb2e3e9029dc508b",
+          "sequence/workflow/logs/command.log": "511fc0b3b9d2ae275211e61c1f165d17c3bd745b90186bf6aa45cd2badeed85c",
+          "sequence/workflow/logs/started.json": "cae3952f6799dbfbb286c46c89c6cce87946c41ca5afeb1935fc3ce636fd9a56",
+          "sequence/workflow/logs/completion.json": "b8f124ea57123fcd16adf4e6d12f6f8942325e3912a8678afb2e3e9029dc508b",
+          "sequence/workflow/evidence/pytest-b5d6fbce8c914e5abc01ea7f43af777f.xml": "94f91bd09596ed489bbb2ca35a681b05a350bdb23314692a428f02abc30d77b1",
+          "sequence/workflow/evidence/workflow-matrix.json": "bacaac1f1767a4eb3ec7f23cb1228625dfab922511d75fde046772ff70b6f1fb",
+          "sequence/production/result.json": "80e0e5553ef3acac8e3f415f6bfc846b0127e298caf74869dbd8d2a88f3f24ca",
+          "sequence/production/logs/command.log": "2c33886a67a02a7f6b438a68681d94ae48ddc8da1913ef6f8a8089abc01f9c05",
+          "sequence/production/logs/started.json": "af48d6c5d37c184cae4400744a3126598774a6acc603e1bd5272c5f5a8822965",
+          "sequence/production/logs/completion.json": "80e0e5553ef3acac8e3f415f6bfc846b0127e298caf74869dbd8d2a88f3f24ca",
+          "sequence/validated/result.json": "f9bb4ba3dce2ea77e02260c52d295d99a62f8da623819a75f897c046eef513b8",
+          "sequence/validated/logs/command.log": "f785fec33174cfcafbf9d969e0a6b92df574cd076bdacd715eccab8d069c192a",
+          "sequence/validated/logs/started.json": "b55165018d05f6cbf5c8c75061f94619bb9db54b52235aeef98513c9614ab729",
+          "sequence/validated/logs/completion.json": "f9bb4ba3dce2ea77e02260c52d295d99a62f8da623819a75f897c046eef513b8",
+          "sequence/validated/evidence/pytest-01afe1fc97c344d69abf45deabfef7dd.xml": "3403e94926f0d9a4f171ed1ce329936a4423a9f29008da670540ffb0797f40fd",
+          "sequence/validated/evidence/pytest-072358a75075484c85d32351c668b912.xml": "a97b5d8316add6523a4e13e606a84951269f672f61d991c2d9e740c69dd00f76",
+          "sequence/validated/evidence/pytest-09301738ab42480bb93a0a85aea1caa0.xml": "0b1d46f482e317a0cfe941843f76af82e81e3df8d3a921bbca9cde6f0a0ade66",
+          "sequence/validated/evidence/pytest-12ee8ac1d67e41e5a95ee584e3c34083.xml": "ddeddb5862cf1118049a6088db27f4894b06de46beecbddf80ef04b44228a0ff",
+          "sequence/validated/evidence/pytest-2bb0bb1734cc483f99c8bbf23fe0f878.xml": "19fbfd4cdb0bfdc6de44962dd2c1510c025d06aaa094020da806f2c3635cbab6",
+          "sequence/validated/evidence/pytest-3b030db294ab427b9dd55d790150d5dc.xml": "50048603042e50b0e9254eb8af2d7ceea2f5b7a60bf1af7542d444d5e198e10b",
+          "sequence/validated/evidence/pytest-4ea61872d4b7473eb352cf03789daebe.xml": "362adf2df3e313781008e9ac7163621cf5e9e989fda88cca671f8b0f62148ec0",
+          "sequence/validated/evidence/pytest-d65bca15605843eca452bded368399d3.xml": "0edd6789e8eec8bac1450cca8e3d98ad40fd58b7c79038df2a8bd5844b676177",
+          "sequence/validated/evidence/pytest-ef83f78ad33040789c134876911cf27b.xml": "1c3cb2b504d2ace529474cca377449dbbfdc8db632524e4d22b35f9c614fad5c",
+          "sequence/production-noop/result.json": "5131bf688caf48a497215009f05a5205ef851458c8870b26db55bfe2971ce66b",
+          "sequence/production-noop/logs/command.log": "3f8319e366079e94da0c8cf6fe2554eaae48ad11512fe9d10dab5f9d1d81db0e",
+          "sequence/production-noop/logs/started.json": "dc6c947974a3da91faaacf8c2607f72c7d5acbce645703300c46f975cf04d122",
+          "sequence/production-noop/logs/completion.json": "5131bf688caf48a497215009f05a5205ef851458c8870b26db55bfe2971ce66b",
+          "sequence/validated-noop/result.json": "5aa472b4926d61d93b9dd9d8ac17797f4b42c9cf9d2a08f633fada607a3474cc",
+          "sequence/validated-noop/logs/command.log": "1dc65d725e5d0e1f3196443eddde19ab57c5bbd3e163e170ea98481653876f6d",
+          "sequence/validated-noop/logs/started.json": "851ce85112352d0416b46b99f166be9eb84384be2acb28ac2223b554deb619b9",
+          "sequence/validated-noop/logs/completion.json": "5aa472b4926d61d93b9dd9d8ac17797f4b42c9cf9d2a08f633fada607a3474cc",
+          "run/align/manifest.json": "e830a2dfb2b879b3a616396a39b8cb4a1a2bc4c5e373a87cc0ce2430ed90cd40",
+          "run/align/valid_001.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align/valid_002.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align/valid_all.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align.json": "ccf80b936b6f2c4db81e15a4e24d0ce412b7123920354efadab5170156868233",
+          "run/sample/exclusions.csv": "98515e042e950cbb577a96fab4e2f608b62e7823edf58f387d4a40ca838e8f86",
+          "run/sample/manifest.json": "98e02430ea554d06e084e71414368185e02f29ddffa287a409c3781d14308cb0",
+          "run/sample/schema.json": "f3f0fd9e9cc184d638c351be04b34c7a05f44f960c56e2a2871fdc2e59b80069",
+          "run/sample/table.csv": "ce69ae17211e30c300be6e5cd6787a6d888f866aa015b07b761631b107724740",
+          "run/sample.json": "7cb2241052110a77df28bfcc5c69c58628e6d5199735d46f294b158654d2a891",
+          "run/folds/diagnostics.json": "4223978adcb1970b1ba73d78887ff5a2c096717ca56acda37a04359532c98147",
+          "run/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+          "run/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+          "run/folds/manifest.json": "6b8f2ee0d58cb2fe2e653ec3de49e75b582514056784161a28d7d8a2df0d66e3",
+          "run/folds.json": "3226942e497d13aa42b93db0f9c2ad30db26607357994c72f32a8c38330f7792",
+          "run/evaluate/fit_budget.json": "ca8d4e4638f6c3c1a0793215692b59c3e9d29d545156233c60700b8460c82985",
+          "run/evaluate/folds/diagnostics.json": "90191d06ccc01b06c4433717474f9fe3b5bb70b97a33bb0d21fc25db6b789faa",
+          "run/evaluate/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+          "run/evaluate/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+          "run/evaluate/folds/manifest.json": "8d444629497f612aca7bee5486ddd9f07190099bd84b3a92822e30b321811798",
+          "run/evaluate/manifest.json": "b619c1d5f687d147bfc3a0374a09b5a9252d70acb1bfd80720a3016ac32854c9",
+          "run/evaluate/metrics.json": "c2fc390a131d7413d5df706f678131b5f90566712246bfd3b0efefa48c870aec",
+          "run/evaluate/oof_predictions.csv": "2241198e952c1a67d3fe3752676b3e416463f5f8f5e2fac9a54fc8a74743ef45",
+          "run/evaluate.json": "dbfa366b879b971fd9bb451cae891678b9d904bb88165351aceac2c1e491688c",
+          "run/final_fit_plan.json": "63e4c167ba3039678b07bf8e078d76b8fd07a474e7c56a374b0bc7d37e44942c",
+          "run/fit/artifacts/evaluation/fit_budget.json": "ca8d4e4638f6c3c1a0793215692b59c3e9d29d545156233c60700b8460c82985",
+          "run/fit/artifacts/evaluation/folds/diagnostics.json": "90191d06ccc01b06c4433717474f9fe3b5bb70b97a33bb0d21fc25db6b789faa",
+          "run/fit/artifacts/evaluation/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+          "run/fit/artifacts/evaluation/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+          "run/fit/artifacts/evaluation/manifest.json": "b619c1d5f687d147bfc3a0374a09b5a9252d70acb1bfd80720a3016ac32854c9",
+          "run/fit/artifacts/evaluation/metrics.json": "c2fc390a131d7413d5df706f678131b5f90566712246bfd3b0efefa48c870aec",
+          "run/fit/artifacts/evaluation/oof_predictions.csv": "2241198e952c1a67d3fe3752676b3e416463f5f8f5e2fac9a54fc8a74743ef45",
+          "run/fit/artifacts/sampling/exclusions.csv": "98515e042e950cbb577a96fab4e2f608b62e7823edf58f387d4a40ca838e8f86",
+          "run/fit/manifest.json": "c8fecac3a8f7a1801e6934f32a45068c3bd05ec35930418e16438a350f30b224",
+          "run/fit/model.joblib": "1a83ee0f654e2eabe35417580feab70a5e2a6a7e1e79f9b42ba44d980c66bdd3",
+          "run/fit.json": "7210ced5a3e18a5ccce7ceddf01ca95379b6b4a4c51a9416baffb11e4b87b40a",
+          "run/predict/manifest.json": "158e703d2d7d8e111135a2e19600bcf232a6f2347cc3d608b43ff4b9c769bc0f",
+          "run/predict/out_of_range.tif": "c6314c962c61d9744d2c47e621bbce893c649337af4a533bcba8e3ef78e26138",
+          "run/predict/prediction.tif": "413bc3102a88a3ced7b4c9451e171fcb8596716839a9b61d5fdd48dd2a07f624",
+          "run/predict/validity.tif": "00193e48ede636e311f39f34ab4b1bff20eaa65558db3c3e21777dd32c89c360",
+          "run/predict.json": "48bbe0c50148cc366ab5dc448ae821c15acd51a86b4f3493f8e8cf0587a82083",
+          "run/preflight.json": "ba8c0f83de2718b7852f28aac8187f54356f47e5f18dc5fb705f4ef553907858",
+          "run/preflight.checked": "c7519d5fb7c5eb781fb1f04258c501a23c3863b26de618cf917ca0b86f87563e",
+          "run/production.json": "5a89eb0d11b61485e311c0482dede3a0df22ec7968883f339db3309e5b6cca44",
+          "run/pytest-spatial.json": "5513343ede2001c1307265bee233857e44e5a95de79905a9bf11572c9db3e502",
+          "run/pytest-sampling.json": "eb91c9b8505663c1058c5ce0d7a3890e842edb19db80b4c03cc38313a7fb75cd",
+          "run/pytest-validation.json": "4025fb29b82b8cfa28db79d9cae757b9829dfad8167fe80f40980545b3b9a752",
+          "run/pytest-modeling.json": "95d147191adc529f18ad717aa8f49c9a148a12b6c29de15f18db47d289ce9fbe",
+          "run/pytest-audit.json": "c6b3ee5f6df0496a9e3cbd6d6903dbf42dc8789fb205f6fdd46752e627f58ca5",
+          "run/pytest-prediction.json": "689040c00ebbf51041a7fb5336f0602616cdf2735525ba7a964c4eb588069c00"
+        }
+      },
+      "sha256": "498ceb520ec4b8dd5c2a31470e7fff11c9c73c768f84d93c51a4f274d7942f68",
+      "dispatch": {
+        "status": "finished",
+        "exit": 0,
+        "pid": 16013,
+        "invocation": "136f38edb1a845388cece21796a7e9ad-linux",
+        "profile": "linux",
+        "seconds": 268.414
+      }
+    },
+    {
+      "profile": "win32",
+      "report": {
+        "schema": "wall2wall.s02-profile/1",
+        "qualification": false,
+        "status": "passed",
+        "unknown": false,
+        "profile": "win32",
+        "invocation": "136f38edb1a845388cece21796a7e9ad-win32",
+        "sources": [
+          {
+            "path": "00_brief/M008-S02-planned-ids-d043.json",
+            "kind": "file",
+            "size": 16637,
+            "sha256": "2bc2f8baf90b35e0d2f80505c9a37202734902ba313c9e97bbc3935da91531fe"
+          },
+          {
+            "path": "06_infra/check_python_headers.py",
+            "kind": "file",
+            "size": 5588,
+            "sha256": "40c8646dc172b42851d9ace3d418e82edb9fbe4fc387111d55d891bd39e485ff"
+          },
+          {
+            "path": "06_infra/conda-linux-64.lock.txt",
+            "kind": "file",
+            "size": 16883,
+            "sha256": "7a7b7829dc7ba53af28608a3f69eed981d70bbe41b4c708acadde84a43ce7160"
+          },
+          {
+            "path": "06_infra/conda-win-64.lock.txt",
+            "kind": "file",
+            "size": 15042,
+            "sha256": "e96d0239e38547e343e41737c0e8b8cbc2a83ffbc9234f709c56a94d903bfc19"
+          },
+          {
+            "path": "06_infra/environment-linux.yml",
+            "kind": "file",
+            "size": 281,
+            "sha256": "092929ca550218879ea775003be7e61d492b090db78b58226d885ea260af6a2a"
+          },
+          {
+            "path": "06_infra/environment-windows.yml",
+            "kind": "file",
+            "size": 279,
+            "sha256": "f77c0e5d65ea26c8649a35231402671fe309f8b7eaf0f99c5f96a57faa996de5"
+          },
+          {
+            "path": "06_infra/linux.sh",
+            "kind": "file",
+            "size": 561,
+            "sha256": "02666f426055496b0c04be856a7451905be27508f494875e9c0bb0769aa55370"
+          },
+          {
+            "path": "06_infra/m008-s02-d043-bridge.json",
+            "kind": "file",
+            "size": 28908,
+            "sha256": "60f35ba1cafc0f8c63c069ceeacb96768f797031d9123e9735b4373c4d6fb235"
+          },
+          {
+            "path": "06_infra/m008_integration/fit_counter.py",
+            "kind": "file",
+            "size": 9141,
+            "sha256": "ce760494979adc19f0e72a9eabc65872bcf37c5f5d952addd9f22797fb1697aa"
+          },
+          {
+            "path": "06_infra/m008_integration/products.py",
+            "kind": "file",
+            "size": 11582,
+            "sha256": "18752aa6376d8065affa3ccb6ae4d0950a27e481bded15ac4781511b15092596"
+          },
+          {
+            "path": "06_infra/m008_integration/qualify_integration_gate.py",
+            "kind": "file",
+            "size": 18136,
+            "sha256": "ff2b8c5f55a535dd008e8835054d67840368911335e36b133f1ad789e794855f"
+          },
+          {
+            "path": "06_infra/m008_integration/qualify_s04_repair.py",
+            "kind": "file",
+            "size": 11700,
+            "sha256": "cf51e4a2f843b8e2cceb02c45d133a7112bdd66f5a9511ab4daf608f8eae6510"
+          },
+          {
+            "path": "06_infra/m008_integration/repair_s04.py",
+            "kind": "file",
+            "size": 21310,
+            "sha256": "e5f41b7b88496cfd26ef937a8b67f18bda4da2d8933d2f43ebb12b123313eea0"
+          },
+          {
+            "path": "06_infra/m008_integration/science_dispatch.py",
+            "kind": "file",
+            "size": 15698,
+            "sha256": "0d65f808ccedd32944b64d8baec5bd372ff0a95cb299b60d7bad18ae50b2d35b"
+          },
+          {
+            "path": "06_infra/m008_integration/science_worker.py",
+            "kind": "file",
+            "size": 19134,
+            "sha256": "bb7c1597b9f7d8456d19a8aca03cd1f88736c3d6522c9bb8be282392b73a4047"
+          },
+          {
+            "path": "06_infra/m008_integration/test_integration_gate.py",
+            "kind": "file",
+            "size": 12417,
+            "sha256": "062fd9b3e5d0e686572614c57912de76b53bd302c16172c02351dd2e50abe1df"
+          },
+          {
+            "path": "06_infra/m008_integration/test_s04_repair.py",
+            "kind": "file",
+            "size": 12806,
+            "sha256": "02c6dfe803071c42754891c3c6cba253a2541e75a6815771b08a55bc03b04c13"
+          },
+          {
+            "path": "06_infra/m008_integration/test_science_admission.py",
+            "kind": "file",
+            "size": 14685,
+            "sha256": "1f427bc5da8c91d4793ec36bd8531de5fa0d075eb7d3919a8c41847dc58c3f18"
+          },
+          {
+            "path": "06_infra/m008_integration/test_scientific_contract.py",
+            "kind": "file",
+            "size": 12134,
+            "sha256": "017d977308fc8536d3d72506f722e515a01cb88924037b344c753ab93e5aaa1a"
+          },
+          {
+            "path": "06_infra/m008_integration/verify_evidence.py",
+            "kind": "file",
+            "size": 1680,
+            "sha256": "813c92e2e3b92daa002966dd0c434c8d0e9e1a605f49c2d78545ada0b708a1bd"
+          },
+          {
+            "path": "06_infra/m008_integration/verify_s02.py",
+            "kind": "file",
+            "size": 24410,
+            "sha256": "276493d7d612260e3ed19b673f807c8f41a719249d1f03d5bc3b1e8c43c3fc75"
+          },
+          {
+            "path": "06_infra/m008_integration/windows.ps1",
+            "kind": "file",
+            "size": 2524,
+            "sha256": "81d81d743789d0a8df1337490b1750d359edbde51928f3ef8fb55c3d597f18b8"
+          },
+          {
+            "path": "06_infra/m008_native/dispatch.py",
+            "kind": "file",
+            "size": 6199,
+            "sha256": "d75d2695c6eeebd7b35912879dff7f84ebc457758ca4835dd5a05a8546266516"
+          },
+          {
+            "path": "06_infra/m008_native/pytest.ini",
+            "kind": "file",
+            "size": 9,
+            "sha256": "8250d20f42b419af40706490ead78aabab9feba93eab09a3f626e3de5256e1f4"
+          },
+          {
+            "path": "06_infra/m008_native/worker.py",
+            "kind": "file",
+            "size": 11978,
+            "sha256": "b1a5b08c78370b43d3f5dfb11a1adb91ac63a921fda95db9b1f5facee71f57d7"
+          },
+          {
+            "path": "06_infra/pip-engines-linux-64.lock.txt",
+            "kind": "file",
+            "size": 365,
+            "sha256": "50cf6f3ce38d73c2d2c59fa89a493d7b6eecadd3430e79b2d661b258cad5e7de"
+          },
+          {
+            "path": "06_infra/pip-engines-win-64.lock.txt",
+            "kind": "file",
+            "size": 408,
+            "sha256": "fba79afccc18cba14205d18301adae08e4c8eaf5b4eedb8468e3244b668f169c"
+          },
+          {
+            "path": "06_infra/pip-linux-64.lock.txt",
+            "kind": "file",
+            "size": 4897,
+            "sha256": "a28179175c4bf769a914d0f06f889263e914dba389e127a5a28c8ac1977a25e1"
+          },
+          {
+            "path": "06_infra/pip-win-64.lock.txt",
+            "kind": "file",
+            "size": 5005,
+            "sha256": "9afe6199b89a8ab97b0e8190e091b2440370e90e04e1da6aad5f3a2b01248bfc"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_admission.json",
+            "kind": "file",
+            "size": 264,
+            "sha256": "62d00679c9e0286a52d7b2751a42371bcd8d7c3261665b169df1a13d0ff898eb"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_integration.json",
+            "kind": "file",
+            "size": 263,
+            "sha256": "093e1ddbc51820ad20d612d72baacaa9a5c8f0e2227d5d65e3f7242e7d1cf782"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s02_science.json",
+            "kind": "file",
+            "size": 466,
+            "sha256": "798aa80f823ad90b219d18c5a44bbc4cd43f414be51b5009a74089b3731c164c"
+          },
+          {
+            "path": "06_infra/python_header_scope_m008_s04_r2.json",
+            "kind": "file",
+            "size": 309,
+            "sha256": "3a4f8ab38a30278552dae6dd85177ba1c012c9670adaeee73dd05d84a903b9b3"
+          },
+          {
+            "path": "06_infra/run_checks.py",
+            "kind": "file",
+            "size": 5080,
+            "sha256": "ee1b15be1f4c8b4b001bb12352709f8c6f776ba21bf3799ec94b44e59f921009"
+          },
+          {
+            "path": "06_infra/windows-validation.json",
+            "kind": "file",
+            "size": 2652,
+            "sha256": "33eb31932e6d2477f324491f6eb5ece475e86fc5b034b99e979bbddef41d618e"
+          },
+          {
+            "path": "06_infra/windows.ps1",
+            "kind": "file",
+            "size": 1820,
+            "sha256": "f729589b011b269d6d482947bd5702df1eb44df2ab3663d0d8cdc12724c510e3"
+          },
+          {
+            "path": "08_pkg/CONTEXT.md",
+            "kind": "file",
+            "size": 7682,
+            "sha256": "c6d07c539312eb4fd2fb7e3a9e6005c1b0e0ec68ca923999903f77b311ad7e61"
+          },
+          {
+            "path": "08_pkg/MANIFEST.in",
+            "kind": "file",
+            "size": 315,
+            "sha256": "d29356ce33e85fd8b23e76e83e46be64758beb9491931704c0962b76834ea057"
+          },
+          {
+            "path": "08_pkg/README.md",
+            "kind": "file",
+            "size": 56487,
+            "sha256": "a1f9d3ac1cfb396a34bdefefdae9eefe58b0ab8d153e33edc759b26e74c6c180"
+          },
+          {
+            "path": "08_pkg/build_release.py",
+            "kind": "file",
+            "size": 5796,
+            "sha256": "40204533f8750cb2a8708b76a4ef16a550e512c998493cc8e148cd3dc45f4e56"
+          },
+          {
+            "path": "08_pkg/docs/audit.md",
+            "kind": "file",
+            "size": 10351,
+            "sha256": "ae1dbb59253e6780962626ae74df81c2fe41c5420fb1277124f7fd7cdd9f7465"
+          },
+          {
+            "path": "08_pkg/docs/prediction.md",
+            "kind": "file",
+            "size": 12674,
+            "sha256": "47b4c27d02da997a4bb73db16c87c083563100a3af164d4c5b215f1238dd2075"
+          },
+          {
+            "path": "08_pkg/docs/quickstart.md",
+            "kind": "file",
+            "size": 10578,
+            "sha256": "5f4a4ddc75ff02c428b9f54f0d494f2100211e5efd34f54d8636d2e100137075"
+          },
+          {
+            "path": "08_pkg/docs/workflow.md",
+            "kind": "file",
+            "size": 12790,
+            "sha256": "79a275af3514041444953d8198fbb2623403e1a2b3109769be782a7be9b579a6"
+          },
+          {
+            "path": "08_pkg/examples/synthetic.py",
+            "kind": "file",
+            "size": 10269,
+            "sha256": "2f21c98c0f5a43c0787457d22ccac91168de378109b1a0a45dc6e12182bbb159"
+          },
+          {
+            "path": "08_pkg/examples/workflow.json",
+            "kind": "file",
+            "size": 1386,
+            "sha256": "411e4ac1c8ac25aca25bffd2303edca9201e1e5dde038e0e29fb7531c5edd3d6"
+          },
+          {
+            "path": "08_pkg/pyproject.toml",
+            "kind": "file",
+            "size": 523,
+            "sha256": "9d787f00d5172e59862f2e889d1762d89991a13f505153d71d9d0f52cb495a2f"
+          },
+          {
+            "path": "08_pkg/release-files.json",
+            "kind": "file",
+            "size": 1700,
+            "sha256": "6167be3a67791dcd32e21ba130550061685cf088e574c3b23ce667af537b0094"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/__init__.py",
+            "kind": "file",
+            "size": 809,
+            "sha256": "aa5ba425bb103c86625e6fcff4320cf7de3b3352aa53b5d4db1e932bbb932753"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/audit.py",
+            "kind": "file",
+            "size": 26730,
+            "sha256": "25c22dfcd7ba7d131efb0a9517ae39aa43716e7379b3680782daed1ac6293e43"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/engines.py",
+            "kind": "file",
+            "size": 3299,
+            "sha256": "45daa2922fb8a4be711ca0d3438e7e5f137aa915d7927c2312d731346f6b5c13"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/modeling.py",
+            "kind": "file",
+            "size": 31223,
+            "sha256": "a6126fa204644b06729e1a6a157f773b6a936c6913302045729e754b18d6bfa2"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/prediction.py",
+            "kind": "file",
+            "size": 16344,
+            "sha256": "ef66be856e4b8a6e9e5be6cdec03ebf4cab737d0e666f03dc6fe31ca9b9136fb"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/sampling.py",
+            "kind": "file",
+            "size": 18817,
+            "sha256": "9d8ca91b443eec1eae1900aa54c35e730563a5322b7cce21fe7ff04dc532320e"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/spatial.py",
+            "kind": "file",
+            "size": 19450,
+            "sha256": "613d7fe66ac9afd1d368062de7afaa506761b93dd2e4539b3762755c9fe3231c"
+          },
+          {
+            "path": "08_pkg/src/wall2wall/validation.py",
+            "kind": "file",
+            "size": 21784,
+            "sha256": "155e15717e5604d340b759787f4e8e89e8b66328711dd195ff44f8a1fb3c6fb8"
+          },
+          {
+            "path": "08_pkg/tests/run_checks.py",
+            "kind": "file",
+            "size": 23791,
+            "sha256": "47aa8d7f94b4f9763e353be6a6280a60a44a8142ec1c449ccd665cd03a7150f4"
+          },
+          {
+            "path": "08_pkg/tests/test_audit.py",
+            "kind": "file",
+            "size": 21686,
+            "sha256": "48bc768cc453545a448e4d3ca464e26e49a120bddfd31f45d3bedc7f08ca0208"
+          },
+          {
+            "path": "08_pkg/tests/test_buffer.py",
+            "kind": "file",
+            "size": 16802,
+            "sha256": "d74a49db723855229e7a42d8f80a826a7cdeaf7c6a636f690c976936623047ad"
+          },
+          {
+            "path": "08_pkg/tests/test_engine_integration.py",
+            "kind": "file",
+            "size": 16133,
+            "sha256": "b9658c43f0b5b5dc414d79a6f3c73305a9f1dbe01e9b8e89441f2281b2961aca"
+          },
+          {
+            "path": "08_pkg/tests/test_engines.py",
+            "kind": "file",
+            "size": 6829,
+            "sha256": "b41b8ad9b9844a689d79918fd2589ba1bc8d3e00a249742a6caa03bd4a75f0f3"
+          },
+          {
+            "path": "08_pkg/tests/test_modeling.py",
+            "kind": "file",
+            "size": 21645,
+            "sha256": "7d611fee15c42416ca2a54d9e8541199ab52eede4072468dbf2939bd4bc17aef"
+          },
+          {
+            "path": "08_pkg/tests/test_package.py",
+            "kind": "file",
+            "size": 14955,
+            "sha256": "2e79196c1fcbf6e2b063a9fce1f5578198efe3a04168c3f26df4776f2f3fe571"
+          },
+          {
+            "path": "08_pkg/tests/test_prediction.py",
+            "kind": "file",
+            "size": 19569,
+            "sha256": "09887e7b7ea40be44ec11c91f572b2c9782d1f4d4546d31be86f216654983f66"
+          },
+          {
+            "path": "08_pkg/tests/test_quality.py",
+            "kind": "file",
+            "size": 12183,
+            "sha256": "358a19093999d18b509e3f3690cd00240bc399141869c2ff3b83c100daf7c4e9"
+          },
+          {
+            "path": "08_pkg/tests/test_release.py",
+            "kind": "file",
+            "size": 11296,
+            "sha256": "112db2022a8d3e74bbe7c2b8b0b2dd48b14adfe41729ddb30e6b0f6e0c90784c"
+          },
+          {
+            "path": "08_pkg/tests/test_sampling.py",
+            "kind": "file",
+            "size": 22262,
+            "sha256": "e5b1fb8d6dc0862913494751116be6d609cb4cc622b8612f5510fa8e70661834"
+          },
+          {
+            "path": "08_pkg/tests/test_scale.py",
+            "kind": "file",
+            "size": 14969,
+            "sha256": "afa0dd702a2875617e706e3394240e80bf0e0a410ad910c56e00b32349d633e2"
+          },
+          {
+            "path": "08_pkg/tests/test_selection.py",
+            "kind": "file",
+            "size": 22261,
+            "sha256": "187cc2f844cdaca1f6941cee3374d1a7d929f4b541db0033c2e984f90fd20e10"
+          },
+          {
+            "path": "08_pkg/tests/test_spatial.py",
+            "kind": "file",
+            "size": 21032,
+            "sha256": "12192ad02c466f827351f145fd16c65a91c044e19b3dc914cb119d2e3befbbbe"
+          },
+          {
+            "path": "08_pkg/tests/test_synthetic.py",
+            "kind": "file",
+            "size": 15927,
+            "sha256": "532cfba5d4c1ebecf84fb4bad185f4f1be768ff4b0839d62f18ca816c496826b"
+          },
+          {
+            "path": "08_pkg/tests/test_validation.py",
+            "kind": "file",
+            "size": 17529,
+            "sha256": "4e86cebda925610ca29829ad0fdf701133ac59bf60261ce2984bc2b4af812e03"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow.py",
+            "kind": "file",
+            "size": 16933,
+            "sha256": "b16f1c6e7edb0a4cae99393219b426aac1cbe5c25b53693bf5aa686516ca5ddb"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow_control.py",
+            "kind": "file",
+            "size": 8113,
+            "sha256": "f90738b15944afdae086676883d68f779c95e05b3bd0cd377fc94749c7f9a070"
+          },
+          {
+            "path": "08_pkg/tests/test_workflow_resume.py",
+            "kind": "file",
+            "size": 9114,
+            "sha256": "cc490c15732d0e59a78614782bc9d4efddd60850d2ac671acdae496f458b4c96"
+          },
+          {
+            "path": "08_pkg/workflow/Snakefile",
+            "kind": "file",
+            "size": 2629,
+            "sha256": "3321e55d2083e97966a66d1f553517eb382d739e3a6592e08a7d0515df75ab17"
+          },
+          {
+            "path": "08_pkg/workflow/run.py",
+            "kind": "file",
+            "size": 6496,
+            "sha256": "7d5feb4abfcaed229eb19dd1693a22f26dc63574642541c401674f82c9d04686"
+          },
+          {
+            "path": "08_pkg/workflow/stage_checks.py",
+            "kind": "file",
+            "size": 5524,
+            "sha256": "cdacfdf4d6195bbb8c95683efd54e22d89dda85d6a846b4f7deeb80854bde3c3"
+          },
+          {
+            "path": "08_pkg/workflow/stages.py",
+            "kind": "file",
+            "size": 28886,
+            "sha256": "8c4c8241b7c18c25e41ee26c0aa327baa336868ab47f4421003e2f00311a6d59"
+          }
+        ],
+        "runtime": {
+          "python": "3.11.16",
+          "profile": "win32"
+        },
+        "fits": 184,
+        "counts": {
+          "workflow": 37,
+          "production": 5,
+          "validated": 142,
+          "production-noop": 0,
+          "validated-noop": 0
+        },
+        "workflow_ids": [
+          "tests/test_workflow.py::test_content_change_same_mtime",
+          "tests/test_workflow.py::test_corrupt_intermediate_refused",
+          "tests/test_workflow.py::test_failure_preserves_outputs",
+          "tests/test_workflow.py::test_fit_budget",
+          "tests/test_workflow.py::test_invalid_config_before_fit",
+          "tests/test_workflow.py::test_noop",
+          "tests/test_workflow.py::test_production_processes_and_reference",
+          "tests/test_workflow.py::test_validated_contract",
+          "tests/test_workflow_resume.py::test_environment_change_refused",
+          "tests/test_workflow_resume.py::test_failure_resume_preserves_history",
+          "tests/test_workflow_resume.py::test_missing_corrupt_repair",
+          "tests/test_workflow_resume.py::test_same_mtime_data_invalidation",
+          "tests/test_workflow_resume.py::test_selective_inference_reuse",
+          "tests/test_workflow_resume.py::test_stage_code_invalidation"
+        ],
+        "validated_ids": [
+          "tests/test_audit.py::test_environment_unavailable_and_no_optional_import",
+          "tests/test_audit.py::test_evidence_roles_null_and_save_validation",
+          "tests/test_audit.py::test_exclusive_and_incomplete[copy]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[empty]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[manifest]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[prior]",
+          "tests/test_audit.py::test_exclusive_and_incomplete[serialize]",
+          "tests/test_audit.py::test_hashing_single_pass_and_bytes",
+          "tests/test_audit.py::test_link_rejected_before_read",
+          "tests/test_audit.py::test_process_roundtrip_and_move",
+          "tests/test_audit.py::test_reject_before_load[ancestor]",
+          "tests/test_audit.py::test_reject_before_load[collision]",
+          "tests/test_audit.py::test_reject_before_load[corrupt]",
+          "tests/test_audit.py::test_reject_before_load[drive_relative]",
+          "tests/test_audit.py::test_reject_before_load[duplicate]",
+          "tests/test_audit.py::test_reject_before_load[grid]",
+          "tests/test_audit.py::test_reject_before_load[infinity]",
+          "tests/test_audit.py::test_reject_before_load[invalid_character]",
+          "tests/test_audit.py::test_reject_before_load[missing]",
+          "tests/test_audit.py::test_reject_before_load[missing_version]",
+          "tests/test_audit.py::test_reject_before_load[nan]",
+          "tests/test_audit.py::test_reject_before_load[posix]",
+          "tests/test_audit.py::test_reject_before_load[predictor_order]",
+          "tests/test_audit.py::test_reject_before_load[required]",
+          "tests/test_audit.py::test_reject_before_load[reserved]",
+          "tests/test_audit.py::test_reject_before_load[schema]",
+          "tests/test_audit.py::test_reject_before_load[traversal]",
+          "tests/test_audit.py::test_reject_before_load[truncate]",
+          "tests/test_audit.py::test_reject_before_load[unc]",
+          "tests/test_audit.py::test_reject_before_load[unknown_version]",
+          "tests/test_audit.py::test_reject_before_load[version]",
+          "tests/test_audit.py::test_reject_before_load[windows]",
+          "tests/test_audit.py::test_trust_before_load[false]",
+          "tests/test_audit.py::test_trust_before_load[none]",
+          "tests/test_audit.py::test_trust_before_load[numpy]",
+          "tests/test_audit.py::test_trust_before_load[one]",
+          "tests/test_audit.py::test_trust_before_load[string]",
+          "tests/test_buffer.py::test_analytic_buffer",
+          "tests/test_buffer.py::test_bounded_buffer_distances",
+          "tests/test_buffer.py::test_csv_reconstruction",
+          "tests/test_buffer.py::test_failure_and_existing",
+          "tests/test_buffer.py::test_group_leakage[block]",
+          "tests/test_buffer.py::test_group_leakage[cell]",
+          "tests/test_buffer.py::test_group_leakage[site]",
+          "tests/test_buffer.py::test_group_leakage[transitive]",
+          "tests/test_buffer.py::test_insufficient_train[exhaustion]",
+          "tests/test_buffer.py::test_insufficient_train[minimum]",
+          "tests/test_buffer.py::test_insufficient_train[zero]",
+          "tests/test_buffer.py::test_invalid_buffer_parameters",
+          "tests/test_buffer.py::test_invalid_provided_partitions",
+          "tests/test_buffer.py::test_modes[positive-generated]",
+          "tests/test_buffer.py::test_modes[positive-provided]",
+          "tests/test_buffer.py::test_modes[zero-generated]",
+          "tests/test_buffer.py::test_modes[zero-provided]",
+          "tests/test_buffer.py::test_provided_order_seed_and_immutability",
+          "tests/test_buffer.py::test_zero_compatibility",
+          "tests/test_modeling.py::test_evaluate_spies_metrics_and_csv",
+          "tests/test_modeling.py::test_existing_and_write_failure",
+          "tests/test_modeling.py::test_fit_final_separate",
+          "tests/test_modeling.py::test_fit_predict_failures[fit_error]",
+          "tests/test_modeling.py::test_fit_predict_failures[nonfinite]",
+          "tests/test_modeling.py::test_fit_predict_failures[predict_error]",
+          "tests/test_modeling.py::test_fit_predict_failures[shape]",
+          "tests/test_modeling.py::test_invalid_estimators_and_config",
+          "tests/test_modeling.py::test_invalid_tables_and_schema",
+          "tests/test_modeling.py::test_metrics_undefined_and_overflow",
+          "tests/test_modeling.py::test_pipeline_fit_transform_is_fold_local",
+          "tests/test_modeling.py::test_z_frozen_protocol",
+          "tests/test_prediction.py::test_compression_contract",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[bool-batch]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[bool-window]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[budget]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[fraction]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[large-batch]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[large-window]",
+          "tests/test_prediction.py::test_configuration_before_raster_reads[zero]",
+          "tests/test_prediction.py::test_current_masks_and_all_invalid",
+          "tests/test_prediction.py::test_existing_alias_and_trust",
+          "tests/test_prediction.py::test_fresh_process_scaled_transfer[pipeline]",
+          "tests/test_prediction.py::test_fresh_process_scaled_transfer[rf]",
+          "tests/test_prediction.py::test_io_failure_after_window[read]",
+          "tests/test_prediction.py::test_io_failure_after_window[write]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[error]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[inf]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[length]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[nan]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[overflow]",
+          "tests/test_prediction.py::test_prediction_failure_preserves_partial[shape]",
+          "tests/test_prediction.py::test_preflight_metadata[band]",
+          "tests/test_prediction.py::test_preflight_metadata[count]",
+          "tests/test_prediction.py::test_preflight_metadata[encoding]",
+          "tests/test_prediction.py::test_preflight_metadata[grid]",
+          "tests/test_prediction.py::test_preflight_metadata[mask_grid]",
+          "tests/test_prediction.py::test_preflight_metadata[nodata]",
+          "tests/test_prediction.py::test_preflight_metadata[order]",
+          "tests/test_prediction.py::test_preflight_metadata[period]",
+          "tests/test_prediction.py::test_preflight_metadata[raster_encoding]",
+          "tests/test_prediction.py::test_preflight_metadata[unit]",
+          "tests/test_prediction.py::test_source_hash_once_and_pipeline_once",
+          "tests/test_prediction.py::test_windowed_reference[empty-window]",
+          "tests/test_prediction.py::test_windowed_reference[small-batches]",
+          "tests/test_prediction.py::test_windowed_reference[uneven]",
+          "tests/test_quality.py::test_analytic_quality[clean-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[clean-rf]",
+          "tests/test_quality.py::test_analytic_quality[empty-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[empty-rf]",
+          "tests/test_quality.py::test_analytic_quality[mixed-pipeline]",
+          "tests/test_quality.py::test_analytic_quality[mixed-rf]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[boolean]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[duplicate]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[empty]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[extra]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[missing]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[nan]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[none]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[order]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[reverse]",
+          "tests/test_quality.py::test_corrupt_ranges_before_load[unknown]",
+          "tests/test_quality.py::test_historical_and_quality_boolean",
+          "tests/test_quality.py::test_no_extra_band_reads",
+          "tests/test_quality.py::test_quality_write_failure[out_of_range]",
+          "tests/test_quality.py::test_quality_write_failure[validity]",
+          "tests/test_quality.py::test_ranges_fresh_process",
+          "tests/test_sampling.py::test_crs_and_invalid_coordinates",
+          "tests/test_sampling.py::test_csv_ids",
+          "tests/test_sampling.py::test_dataframe_ids",
+          "tests/test_sampling.py::test_edges_order_persistence",
+          "tests/test_sampling.py::test_manifest_rejections",
+          "tests/test_sampling.py::test_masks_and_physical_values",
+          "tests/test_sampling.py::test_observation_rejections",
+          "tests/test_sampling.py::test_output_and_failure",
+          "tests/test_sampling.py::test_partial_coverage",
+          "tests/test_sampling.py::test_raster_metadata_rejections",
+          "tests/test_sampling.py::test_signal_pipeline",
+          "tests/test_sampling.py::test_window_reads",
+          "tests/test_sampling.py::test_zero_eligible[coordinates]",
+          "tests/test_sampling.py::test_zero_eligible[outside]",
+          "tests/test_sampling.py::test_zero_eligible[predictors]",
+          "tests/test_selection.py::test_all_inner_preflight_and_budgets_no_fits",
+          "tests/test_selection.py::test_candidate_failure_records_attempt",
+          "tests/test_selection.py::test_exact_ties_keep_candidate_order",
+          "tests/test_selection.py::test_existing_and_selection_write_failure",
+          "tests/test_selection.py::test_invalid_candidates_configs_and_limits_no_fits",
+          "tests/test_selection.py::test_negative_importance_preserved",
+          "tests/test_selection.py::test_nested_buffers_mapping_pipeline_and_independence",
+          "tests/test_selection.py::test_permutation_analytic_repeat_and_oof_unchanged",
+          "tests/test_selection.py::test_pooled_selection_two_families_and_final_refit",
+          "tests/test_selection.py::test_z_fit_plan",
+          "tests/test_spatial.py::test_band_validity",
+          "tests/test_spatial.py::test_crs_change",
+          "tests/test_spatial.py::test_empty_coverage[geometric]",
+          "tests/test_spatial.py::test_empty_coverage[individual]",
+          "tests/test_spatial.py::test_empty_coverage[joint]",
+          "tests/test_spatial.py::test_existing_and_failure",
+          "tests/test_spatial.py::test_grid_methods[average]",
+          "tests/test_spatial.py::test_grid_methods[bilinear]",
+          "tests/test_spatial.py::test_grid_methods[nearest]",
+          "tests/test_spatial.py::test_identity_reuse",
+          "tests/test_spatial.py::test_invalid_inputs",
+          "tests/test_spatial.py::test_invalid_interpolation[average]",
+          "tests/test_spatial.py::test_invalid_interpolation[bilinear]",
+          "tests/test_spatial.py::test_invalid_interpolation[nearest]",
+          "tests/test_spatial.py::test_metadata_validation",
+          "tests/test_spatial.py::test_origin_and_partial_coverage",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[envelope_only]",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[other_crs]",
+          "tests/test_spatial.py::test_rotated_no_overlap_preflight[point_contact]",
+          "tests/test_spatial.py::test_rotated_source",
+          "tests/test_spatial.py::test_scale_idempotence[declaration]",
+          "tests/test_spatial.py::test_scale_idempotence[metadata]",
+          "tests/test_spatial.py::test_window_boundaries_and_reads[identity]",
+          "tests/test_spatial.py::test_window_boundaries_and_reads[reprojection]",
+          "tests/test_validation.py::test_block_edges",
+          "tests/test_validation.py::test_cell_crosses_block",
+          "tests/test_validation.py::test_distance_batches",
+          "tests/test_validation.py::test_insufficient_groups[blocks]",
+          "tests/test_validation.py::test_insufficient_groups[cells]",
+          "tests/test_validation.py::test_insufficient_groups[sites]",
+          "tests/test_validation.py::test_invalid_parameters",
+          "tests/test_validation.py::test_invalid_schema_and_crs",
+          "tests/test_validation.py::test_invalid_tables",
+          "tests/test_validation.py::test_persistence_and_failure",
+          "tests/test_validation.py::test_reproducibility_rng_and_response_independence",
+          "tests/test_validation.py::test_signal_pipeline",
+          "tests/test_validation.py::test_statistics_and_distance",
+          "tests/test_validation.py::test_transitive_sites",
+          "tests/test_validation.py::test_unequal_groups_and_positions"
+        ],
+        "noops": [
+          "production-noop",
+          "validated-noop"
+        ],
+        "artifacts": {
+          "evidence/fits.sqlite": "0d2328755958895fb68ca00801034886a15acbbc13393ce6455f70dddc799976",
+          "sequence/receipt.json": "42a1e55e1b30d82341859a0c0133696a99fe6d64d66c894e636d9e710a4797cc",
+          "evidence/provenance.json": "86f8062a82b0e8c1b36c558b2932197f81f57f152a72cae55efbedce8930d242",
+          "config.json": "14ffff4d4dfdbee764a116e8de3170d8c68afeaa5aff65730ebcefffe79cfe00",
+          "snapshot/manifest.json": "15c16a49b460f1fc3e0e3498bad02ea8a8391232e5dc9eae65d6e0499eb15e2d",
+          "evidence/worker-started.json": "a17593fd35ab45e5e7105e2df91df3f03c60b8a3795983ae9aa04be3faa40875",
+          "evidence/execution.json": "7ed04d6fb85c9a4efa54b758f27477af7b2e9553312ca7ec8c5b7a98cc080c5f",
+          "fixture/config.json": "69a669bc2a26df555f90cc5176db6b5c9289f343f3e526bd3b01a237f5cf171c",
+          "fixture/origin.json": "a6150d79bd74d41624bc7f34d3126b5a9e6fd854a256d7f689419bc7a2631875",
+          "fixture/points.csv": "bf3e0257017c1a9f28efba3ef4a828db2c5a32aefa0a8e642868c77dc84b2f14",
+          "fixture/predictors.tif": "58aeaff4ce8c5ff5a2347f6d58d7c9ab0327af59830314ae6e9729d2fc000494",
+          "sequence/workflow/result.json": "9fe6864afdfc4d22f78114a05697919a2e65ccace039701b5efa3d41e24c905a",
+          "sequence/workflow/logs/command.log": "639700c48f14ca19d3db8ab96c914ffd06b10ea332a5f4514add432e117c79ba",
+          "sequence/workflow/logs/started.json": "df95b80c8c8b33b585c0c4120278927a45cc57b92375b8bdc93e9e672a71bee1",
+          "sequence/workflow/logs/completion.json": "9fe6864afdfc4d22f78114a05697919a2e65ccace039701b5efa3d41e24c905a",
+          "sequence/workflow/evidence/pytest-8aab43a6f5eb456c9f52a0dd6cd431b6.xml": "2166cb5fe6984c39f6a9b7fd9125fe467722acd0b886a8735f69d9949d5f0a34",
+          "sequence/workflow/evidence/workflow-matrix.json": "3094170d2a3622ce7a80b84d44cdc1915a097c94efa8345ff47761bb4d3bc936",
+          "sequence/production/result.json": "078d6d97a52d7d7f700481489ac5d2d13b4ab04a624c8edf92597f3422030db1",
+          "sequence/production/logs/command.log": "5691e121ddc0a2dd174dc46d935f33dda8b3b9f1519441777e42c1bbdff66032",
+          "sequence/production/logs/started.json": "6e46ac51687aeac3f2fc646b25b87a5a3d6acddff9432e352b30705018702833",
+          "sequence/production/logs/completion.json": "078d6d97a52d7d7f700481489ac5d2d13b4ab04a624c8edf92597f3422030db1",
+          "sequence/validated/result.json": "fd8dab8ae21cebf8541908a922254452a875468d445f7fa240142fd8d3169476",
+          "sequence/validated/logs/command.log": "fd34553a30d7acac7ed03444397d09b1d753cd20898c750f3f851cc5fda68b3c",
+          "sequence/validated/logs/started.json": "22831dd6942ae31a5be07339fbda3a2fa37f556d07c07bad4c3cfebbb0b45aed",
+          "sequence/validated/logs/completion.json": "fd8dab8ae21cebf8541908a922254452a875468d445f7fa240142fd8d3169476",
+          "sequence/validated/evidence/pytest-11b666efd599453eb0f43f24ea7f0327.xml": "58cb674393683055127ce3695cfc375fd90ffe34a02490a3fe183a64d022f37e",
+          "sequence/validated/evidence/pytest-1fb0973efcd14c499bcbe8d15ceaf093.xml": "45af9c7f2594d97b6a90ac5c03f20b257b42c7d2251bef734e0bae82a49de2dd",
+          "sequence/validated/evidence/pytest-5de96e5343f7457e99d83b88bf046922.xml": "acd30c6398a9374aea89fdba77d2d6af29cde152705997e3366b44a3925cf4cf",
+          "sequence/validated/evidence/pytest-6fde23afd0e243468e517147c4f0b13c.xml": "5c580d0c7f70c68b4332bf03dfc41468702bdf55cd9a77a2e2df3bf653355adc",
+          "sequence/validated/evidence/pytest-9c70e50b9e054fa296ec02ab400f3112.xml": "814126af9a7982b74fac6147deda9b4b8b264035cd8d91a6f3f7a47c6a12498e",
+          "sequence/validated/evidence/pytest-bed3fd71e793484492258f335218bdd6.xml": "402bb7af82497948a1519b80d9c58018dc9e0c3735f10bdfbd6cfc9213bfa707",
+          "sequence/validated/evidence/pytest-c06d101e245a4d6f98813366a8a15e7e.xml": "f8bc00e034d9b45856d53f4f97b2b3a6fa9746152a53329da85efa8042b528ad",
+          "sequence/validated/evidence/pytest-c172fd83ab464a9e9786a99511701f9f.xml": "601e65bb8697cd53e8808b4bca35d0dc81947d6ef2b3e7d0797d4f78baabfe10",
+          "sequence/validated/evidence/pytest-e2e689c8fa8e4c9eaa9c4649831d6bda.xml": "7f44d1fe27dcbe58f4f9250b4916e985daad8dc56033be0f20a33adaa9a8fa64",
+          "sequence/production-noop/result.json": "4735c9f4a0696e4818aafda2803c4f61108e47a45bc71787b887be1fb9f46f55",
+          "sequence/production-noop/logs/command.log": "90737abec16623ab253b2e00e2e9f41c3e60275186bec2161fd27d6d23ee56c5",
+          "sequence/production-noop/logs/started.json": "19bb8acbfb3a40008b9c69aec3c642cab89b9e685a4291377e4aaa54ccaf8e2c",
+          "sequence/production-noop/logs/completion.json": "4735c9f4a0696e4818aafda2803c4f61108e47a45bc71787b887be1fb9f46f55",
+          "sequence/validated-noop/result.json": "3c01e321d569a927a90deb33b02218bdfb68d9fd768ad47a8b2ddee0fa57f78f",
+          "sequence/validated-noop/logs/command.log": "89207a1be99b963b3626746e7589f842370840b92d3eb439bbc96ec686d9f1d4",
+          "sequence/validated-noop/logs/started.json": "da719fb82f0d2c4c3fa355c13ab5d85d304a8c7c271915827d104b9c76a32b84",
+          "sequence/validated-noop/logs/completion.json": "3c01e321d569a927a90deb33b02218bdfb68d9fd768ad47a8b2ddee0fa57f78f",
+          "run/align/manifest.json": "64ff908bc151a6c597b20c1eb56d4762f55e48befce00b554a4c3236c95c6635",
+          "run/align/valid_001.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align/valid_002.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align/valid_all.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+          "run/align.json": "b8ce97e4d77b02f9ac0645c5b873850f79d35bf78ff7a78bb3390f6e7955b592",
+          "run/sample/exclusions.csv": "8797a72a53bc7552fa034f3abb8666040f76a23d9df16551e1c83f45a1204000",
+          "run/sample/manifest.json": "cbcabdb05ce8a4eb593e138302c789bab758e026efdbdccc639ef1a05db4e685",
+          "run/sample/schema.json": "b0258508c096b7b7c21ce9018077f884b19ec7ba7fe912e19d2ab6278d7d7368",
+          "run/sample/table.csv": "8610b2d70df8a81923a699ae1ccb3f0e16f7d7fc69e4ec22d713bd97fc155dc7",
+          "run/sample.json": "ea9ebfddf6aba771d592efc476deb39b87f6149cd7110f0dd7eb9666c1a3b979",
+          "run/folds/diagnostics.json": "65149a0073013961c42c9f2db0ab9adf6dd9634727b0628cbb9446a30c00d909",
+          "run/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+          "run/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+          "run/folds/manifest.json": "d0f0ac41e15d3e659edfd003a9fd6dcb314dc6c61b3ebac4a40146a4e524e864",
+          "run/folds.json": "210c3e8c70ee53ecc8f9ad2f0c4d642f22cf1ec68aadf98f0a978b064d7457c5",
+          "run/evaluate/fit_budget.json": "fa4808db5a72d7c9856358b76bb2955b52b0695df23c77ae83e1990ddc3f201b",
+          "run/evaluate/folds/diagnostics.json": "a8ebadf06a2a705878436fbe71201e644584768b8985a1b7ac46341af2375a56",
+          "run/evaluate/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+          "run/evaluate/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+          "run/evaluate/folds/manifest.json": "b2650a2529c09acd5336969dd0408db9dc3202a9d81fdd28651995d4fb5cf211",
+          "run/evaluate/manifest.json": "07fc375d776030190b804eefa7c205041e6c5ff1ecbc682538299078f6c93fae",
+          "run/evaluate/metrics.json": "f008f0db7fc0639f570f544d0aa832cfebc35733a19904258a102f2fa092b615",
+          "run/evaluate/oof_predictions.csv": "f3403d621349f5b912c7e0f8bf7c5da158815557b93601270afb6be10c6b6a00",
+          "run/evaluate.json": "d42b834c5b1a21f1c9125398de1363c1c1deb0266724b5b40f98230f28010fb0",
+          "run/final_fit_plan.json": "26b5160295f13d265e9cc48c3b18960759e7a2204fe0d5d3a26c07baf97cd25b",
+          "run/fit/artifacts/evaluation/fit_budget.json": "fa4808db5a72d7c9856358b76bb2955b52b0695df23c77ae83e1990ddc3f201b",
+          "run/fit/artifacts/evaluation/folds/diagnostics.json": "a8ebadf06a2a705878436fbe71201e644584768b8985a1b7ac46341af2375a56",
+          "run/fit/artifacts/evaluation/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+          "run/fit/artifacts/evaluation/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+          "run/fit/artifacts/evaluation/manifest.json": "07fc375d776030190b804eefa7c205041e6c5ff1ecbc682538299078f6c93fae",
+          "run/fit/artifacts/evaluation/metrics.json": "f008f0db7fc0639f570f544d0aa832cfebc35733a19904258a102f2fa092b615",
+          "run/fit/artifacts/evaluation/oof_predictions.csv": "f3403d621349f5b912c7e0f8bf7c5da158815557b93601270afb6be10c6b6a00",
+          "run/fit/artifacts/sampling/exclusions.csv": "8797a72a53bc7552fa034f3abb8666040f76a23d9df16551e1c83f45a1204000",
+          "run/fit/manifest.json": "b65f9e6565ce1be9fda4d49ea39785df50d4f8740b75fc1ebf70535f5747526e",
+          "run/fit/model.joblib": "2bb65e458b3353887a536ad2725d6a2f65e802a9498f165e86f7fa4f809b10e1",
+          "run/fit.json": "367507e935935be84a9952c138fbb2639adcfb947c57b1f5dbc3c0b77db15499",
+          "run/predict/manifest.json": "6202d84d0b4a6dfa964cdb6773c5582a5786d37b8ecc197a1b1dbbed9358a85d",
+          "run/predict/out_of_range.tif": "c6314c962c61d9744d2c47e621bbce893c649337af4a533bcba8e3ef78e26138",
+          "run/predict/prediction.tif": "413bc3102a88a3ced7b4c9451e171fcb8596716839a9b61d5fdd48dd2a07f624",
+          "run/predict/validity.tif": "00193e48ede636e311f39f34ab4b1bff20eaa65558db3c3e21777dd32c89c360",
+          "run/predict.json": "c549a78a401994b523856b47217a99b25b2e4e20e1b305039a124020a38d6f69",
+          "run/preflight.json": "f9ac9502cc3f54692d9d6ef43560a271fd8c0403a09e806ff3155abf3c50be1b",
+          "run/preflight.checked": "4bd8e10d6e7e24fa97522cf4bd7f8a9a5fa3a90b0f2e855121e2be68a816e5b8",
+          "run/production.json": "5c979873ea1e77dc2398e84aece863e50a2fb2b9042ac644c9bb41a494907e15",
+          "run/pytest-spatial.json": "250b675216343d1272b62dcddcdce7e527439f2c4b5261300ccfd592a87e537e",
+          "run/pytest-sampling.json": "9f9b559cb8e90fdb4c15522294ae9dd1ea995914102bdcfb55aa2136ec8df2b0",
+          "run/pytest-validation.json": "9e26c7b5efc5d029567b92d41f83cfa2bd689dc8d80b56c1596a4d58214d0ba4",
+          "run/pytest-modeling.json": "faccf95bdee24ee0a270e271ea8da272024cdd1f4dcc818460e8081a23187a37",
+          "run/pytest-audit.json": "369846db9dcc2e39695ff48beac2dc95431c61827980b65c50612249843db3ac",
+          "run/pytest-prediction.json": "271115b4f629e85221bc02cbec266dab25002e99cfc40ed6d4501e8c338274e9"
+        }
+      },
+      "sha256": "6fdd479eb7248a02e7074dadf315153293a1194fcec41ee0ec2cd52895d2c73e",
+      "dispatch": {
+        "status": "finished",
+        "exit": 0,
+        "pid": 16701,
+        "invocation": "136f38edb1a845388cece21796a7e9ad-win32",
+        "profile": "win32",
+        "seconds": 533.985
+      }
+    }
+  ],
+  "comparison": {
+    "equal": true,
+    "atol": 1e-05,
+    "rtol": 1e-05,
+    "products": {
+      "linux": {
+        "run/align/manifest.json": "e830a2dfb2b879b3a616396a39b8cb4a1a2bc4c5e373a87cc0ce2430ed90cd40",
+        "run/align/valid_001.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align/valid_002.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align/valid_all.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align.json": "ccf80b936b6f2c4db81e15a4e24d0ce412b7123920354efadab5170156868233",
+        "run/sample/exclusions.csv": "98515e042e950cbb577a96fab4e2f608b62e7823edf58f387d4a40ca838e8f86",
+        "run/sample/manifest.json": "98e02430ea554d06e084e71414368185e02f29ddffa287a409c3781d14308cb0",
+        "run/sample/schema.json": "f3f0fd9e9cc184d638c351be04b34c7a05f44f960c56e2a2871fdc2e59b80069",
+        "run/sample/table.csv": "ce69ae17211e30c300be6e5cd6787a6d888f866aa015b07b761631b107724740",
+        "run/sample.json": "7cb2241052110a77df28bfcc5c69c58628e6d5199735d46f294b158654d2a891",
+        "run/folds/diagnostics.json": "4223978adcb1970b1ba73d78887ff5a2c096717ca56acda37a04359532c98147",
+        "run/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+        "run/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+        "run/folds/manifest.json": "6b8f2ee0d58cb2fe2e653ec3de49e75b582514056784161a28d7d8a2df0d66e3",
+        "run/folds.json": "3226942e497d13aa42b93db0f9c2ad30db26607357994c72f32a8c38330f7792",
+        "run/evaluate/fit_budget.json": "ca8d4e4638f6c3c1a0793215692b59c3e9d29d545156233c60700b8460c82985",
+        "run/evaluate/folds/diagnostics.json": "90191d06ccc01b06c4433717474f9fe3b5bb70b97a33bb0d21fc25db6b789faa",
+        "run/evaluate/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+        "run/evaluate/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+        "run/evaluate/folds/manifest.json": "8d444629497f612aca7bee5486ddd9f07190099bd84b3a92822e30b321811798",
+        "run/evaluate/manifest.json": "b619c1d5f687d147bfc3a0374a09b5a9252d70acb1bfd80720a3016ac32854c9",
+        "run/evaluate/metrics.json": "c2fc390a131d7413d5df706f678131b5f90566712246bfd3b0efefa48c870aec",
+        "run/evaluate/oof_predictions.csv": "2241198e952c1a67d3fe3752676b3e416463f5f8f5e2fac9a54fc8a74743ef45",
+        "run/evaluate.json": "dbfa366b879b971fd9bb451cae891678b9d904bb88165351aceac2c1e491688c",
+        "run/final_fit_plan.json": "63e4c167ba3039678b07bf8e078d76b8fd07a474e7c56a374b0bc7d37e44942c",
+        "run/fit/artifacts/evaluation/fit_budget.json": "ca8d4e4638f6c3c1a0793215692b59c3e9d29d545156233c60700b8460c82985",
+        "run/fit/artifacts/evaluation/folds/diagnostics.json": "90191d06ccc01b06c4433717474f9fe3b5bb70b97a33bb0d21fc25db6b789faa",
+        "run/fit/artifacts/evaluation/folds/exclusions.csv": "b2218e643760e4bd381802f39ae3f7c3addc74356e7b76c00195e1e04da1afd4",
+        "run/fit/artifacts/evaluation/folds/folds.csv": "1fc2588c9a4116241554a23c09d363a5f2e2fcd6fc2e29c7b640558eaf077b0c",
+        "run/fit/artifacts/evaluation/manifest.json": "b619c1d5f687d147bfc3a0374a09b5a9252d70acb1bfd80720a3016ac32854c9",
+        "run/fit/artifacts/evaluation/metrics.json": "c2fc390a131d7413d5df706f678131b5f90566712246bfd3b0efefa48c870aec",
+        "run/fit/artifacts/evaluation/oof_predictions.csv": "2241198e952c1a67d3fe3752676b3e416463f5f8f5e2fac9a54fc8a74743ef45",
+        "run/fit/artifacts/sampling/exclusions.csv": "98515e042e950cbb577a96fab4e2f608b62e7823edf58f387d4a40ca838e8f86",
+        "run/fit/manifest.json": "c8fecac3a8f7a1801e6934f32a45068c3bd05ec35930418e16438a350f30b224",
+        "run/fit/model.joblib": "1a83ee0f654e2eabe35417580feab70a5e2a6a7e1e79f9b42ba44d980c66bdd3",
+        "run/fit.json": "7210ced5a3e18a5ccce7ceddf01ca95379b6b4a4c51a9416baffb11e4b87b40a",
+        "run/predict/manifest.json": "158e703d2d7d8e111135a2e19600bcf232a6f2347cc3d608b43ff4b9c769bc0f",
+        "run/predict/out_of_range.tif": "c6314c962c61d9744d2c47e621bbce893c649337af4a533bcba8e3ef78e26138",
+        "run/predict/prediction.tif": "413bc3102a88a3ced7b4c9451e171fcb8596716839a9b61d5fdd48dd2a07f624",
+        "run/predict/validity.tif": "00193e48ede636e311f39f34ab4b1bff20eaa65558db3c3e21777dd32c89c360",
+        "run/predict.json": "48bbe0c50148cc366ab5dc448ae821c15acd51a86b4f3493f8e8cf0587a82083",
+        "run/preflight.json": "ba8c0f83de2718b7852f28aac8187f54356f47e5f18dc5fb705f4ef553907858",
+        "run/preflight.checked": "c7519d5fb7c5eb781fb1f04258c501a23c3863b26de618cf917ca0b86f87563e",
+        "run/production.json": "5a89eb0d11b61485e311c0482dede3a0df22ec7968883f339db3309e5b6cca44",
+        "run/pytest-spatial.json": "5513343ede2001c1307265bee233857e44e5a95de79905a9bf11572c9db3e502",
+        "run/pytest-sampling.json": "eb91c9b8505663c1058c5ce0d7a3890e842edb19db80b4c03cc38313a7fb75cd",
+        "run/pytest-validation.json": "4025fb29b82b8cfa28db79d9cae757b9829dfad8167fe80f40980545b3b9a752",
+        "run/pytest-modeling.json": "95d147191adc529f18ad717aa8f49c9a148a12b6c29de15f18db47d289ce9fbe",
+        "run/pytest-audit.json": "c6b3ee5f6df0496a9e3cbd6d6903dbf42dc8789fb205f6fdd46752e627f58ca5",
+        "run/pytest-prediction.json": "689040c00ebbf51041a7fb5336f0602616cdf2735525ba7a964c4eb588069c00"
+      },
+      "win32": {
+        "run/align/manifest.json": "64ff908bc151a6c597b20c1eb56d4762f55e48befce00b554a4c3236c95c6635",
+        "run/align/valid_001.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align/valid_002.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align/valid_all.tif": "b2f3e06061d6012411be190aa6728f3aa7640c4b8ef07c5cd2ed15a4ea461ea8",
+        "run/align.json": "b8ce97e4d77b02f9ac0645c5b873850f79d35bf78ff7a78bb3390f6e7955b592",
+        "run/sample/exclusions.csv": "8797a72a53bc7552fa034f3abb8666040f76a23d9df16551e1c83f45a1204000",
+        "run/sample/manifest.json": "cbcabdb05ce8a4eb593e138302c789bab758e026efdbdccc639ef1a05db4e685",
+        "run/sample/schema.json": "b0258508c096b7b7c21ce9018077f884b19ec7ba7fe912e19d2ab6278d7d7368",
+        "run/sample/table.csv": "8610b2d70df8a81923a699ae1ccb3f0e16f7d7fc69e4ec22d713bd97fc155dc7",
+        "run/sample.json": "ea9ebfddf6aba771d592efc476deb39b87f6149cd7110f0dd7eb9666c1a3b979",
+        "run/folds/diagnostics.json": "65149a0073013961c42c9f2db0ab9adf6dd9634727b0628cbb9446a30c00d909",
+        "run/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+        "run/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+        "run/folds/manifest.json": "d0f0ac41e15d3e659edfd003a9fd6dcb314dc6c61b3ebac4a40146a4e524e864",
+        "run/folds.json": "210c3e8c70ee53ecc8f9ad2f0c4d642f22cf1ec68aadf98f0a978b064d7457c5",
+        "run/evaluate/fit_budget.json": "fa4808db5a72d7c9856358b76bb2955b52b0695df23c77ae83e1990ddc3f201b",
+        "run/evaluate/folds/diagnostics.json": "a8ebadf06a2a705878436fbe71201e644584768b8985a1b7ac46341af2375a56",
+        "run/evaluate/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+        "run/evaluate/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+        "run/evaluate/folds/manifest.json": "b2650a2529c09acd5336969dd0408db9dc3202a9d81fdd28651995d4fb5cf211",
+        "run/evaluate/manifest.json": "07fc375d776030190b804eefa7c205041e6c5ff1ecbc682538299078f6c93fae",
+        "run/evaluate/metrics.json": "f008f0db7fc0639f570f544d0aa832cfebc35733a19904258a102f2fa092b615",
+        "run/evaluate/oof_predictions.csv": "f3403d621349f5b912c7e0f8bf7c5da158815557b93601270afb6be10c6b6a00",
+        "run/evaluate.json": "d42b834c5b1a21f1c9125398de1363c1c1deb0266724b5b40f98230f28010fb0",
+        "run/final_fit_plan.json": "26b5160295f13d265e9cc48c3b18960759e7a2204fe0d5d3a26c07baf97cd25b",
+        "run/fit/artifacts/evaluation/fit_budget.json": "fa4808db5a72d7c9856358b76bb2955b52b0695df23c77ae83e1990ddc3f201b",
+        "run/fit/artifacts/evaluation/folds/diagnostics.json": "a8ebadf06a2a705878436fbe71201e644584768b8985a1b7ac46341af2375a56",
+        "run/fit/artifacts/evaluation/folds/exclusions.csv": "201a22f79b99c56c34611a881d56f606962a5badc9482ad87d60ae8d08a217ae",
+        "run/fit/artifacts/evaluation/folds/folds.csv": "0a1e4849268177354b3f124b2db14f4cf681f6df81f577c65bff569dbce144b2",
+        "run/fit/artifacts/evaluation/manifest.json": "07fc375d776030190b804eefa7c205041e6c5ff1ecbc682538299078f6c93fae",
+        "run/fit/artifacts/evaluation/metrics.json": "f008f0db7fc0639f570f544d0aa832cfebc35733a19904258a102f2fa092b615",
+        "run/fit/artifacts/evaluation/oof_predictions.csv": "f3403d621349f5b912c7e0f8bf7c5da158815557b93601270afb6be10c6b6a00",
+        "run/fit/artifacts/sampling/exclusions.csv": "8797a72a53bc7552fa034f3abb8666040f76a23d9df16551e1c83f45a1204000",
+        "run/fit/manifest.json": "b65f9e6565ce1be9fda4d49ea39785df50d4f8740b75fc1ebf70535f5747526e",
+        "run/fit/model.joblib": "2bb65e458b3353887a536ad2725d6a2f65e802a9498f165e86f7fa4f809b10e1",
+        "run/fit.json": "367507e935935be84a9952c138fbb2639adcfb947c57b1f5dbc3c0b77db15499",
+        "run/predict/manifest.json": "6202d84d0b4a6dfa964cdb6773c5582a5786d37b8ecc197a1b1dbbed9358a85d",
+        "run/predict/out_of_range.tif": "c6314c962c61d9744d2c47e621bbce893c649337af4a533bcba8e3ef78e26138",
+        "run/predict/prediction.tif": "413bc3102a88a3ced7b4c9451e171fcb8596716839a9b61d5fdd48dd2a07f624",
+        "run/predict/validity.tif": "00193e48ede636e311f39f34ab4b1bff20eaa65558db3c3e21777dd32c89c360",
+        "run/predict.json": "c549a78a401994b523856b47217a99b25b2e4e20e1b305039a124020a38d6f69",
+        "run/preflight.json": "f9ac9502cc3f54692d9d6ef43560a271fd8c0403a09e806ff3155abf3c50be1b",
+        "run/preflight.checked": "4bd8e10d6e7e24fa97522cf4bd7f8a9a5fa3a90b0f2e855121e2be68a816e5b8",
+        "run/production.json": "5c979873ea1e77dc2398e84aece863e50a2fb2b9042ac644c9bb41a494907e15",
+        "run/pytest-spatial.json": "250b675216343d1272b62dcddcdce7e527439f2c4b5261300ccfd592a87e537e",
+        "run/pytest-sampling.json": "9f9b559cb8e90fdb4c15522294ae9dd1ea995914102bdcfb55aa2136ec8df2b0",
+        "run/pytest-validation.json": "9e26c7b5efc5d029567b92d41f83cfa2bd689dc8d80b56c1596a4d58214d0ba4",
+        "run/pytest-modeling.json": "faccf95bdee24ee0a270e271ea8da272024cdd1f4dcc818460e8081a23187a37",
+        "run/pytest-audit.json": "369846db9dcc2e39695ff48beac2dc95431c61827980b65c50612249843db3ac",
+        "run/pytest-prediction.json": "271115b4f629e85221bc02cbec266dab25002e99cfc40ed6d4501e8c338274e9"
+      }
+    },
+    "fixture_identity": {
+      "canonical_sha256": "317095f54522478dd619bc534fdb08c9452be13f11aca1543d97c8512d0878dc",
+      "fixture": {
+        "points.csv": "bf3e0257017c1a9f28efba3ef4a828db2c5a32aefa0a8e642868c77dc84b2f14",
+        "predictors.tif": "58aeaff4ce8c5ff5a2347f6d58d7c9ab0327af59830314ae6e9729d2fc000494"
+      }
+    }
+  },
+  "comparison_sha256": "3302c1b793c2d1de80cc9ae8a1301e933c34a7cf99019c5629541d6df98212b3",
+  "fits": 368,
+  "status": "passed"
+}

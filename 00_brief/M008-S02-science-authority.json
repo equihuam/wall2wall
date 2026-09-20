@@ -1,0 +1,20 @@
+{
+  "slice": "M008-S02",
+  "baseline": "d665129e70dca0b0dfd5edf90a02f78e796cad81",
+  "fits": 368,
+  "profiles": [
+    "linux",
+    "win32"
+  ],
+  "sources_sha256": "eeb58c2117ce7148450be2e5e75dc281265b814a7835cf7bb0e65e5597268be5",
+  "by": "human",
+  "qualification_report_sha256": "fa1a7cda8f05dd5176f5235440dc74e48cf68571501c1b17244f2c8ce7772556",
+  "scope": "One scientific dispatch after ordinary prompt issuance; sequential profiles184 each, zero new builds; stop on failure or unknown, no retry",
+  "budgets": {
+    "profile_seconds": 3960,
+    "global_seconds": 9000,
+    "comparison_seconds": 120,
+    "coder_seconds": 120,
+    "official_seconds": 120
+  }
+}

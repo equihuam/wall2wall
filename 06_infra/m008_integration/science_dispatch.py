@@ -2,7 +2,7 @@
 ## science_dispatch.py
 
 ## Descripción
-Orquesta la preparación D040 secuencial Linux/Windows, sin fits reales.
+Orquesta preparación D040 y despacho científico D043 con autoridad separada.
 
 ## Precondiciones
 Configuración local, dos padres externos persistentes y entornos existentes.
@@ -14,8 +14,8 @@ Sella inventarios y originales, con punteros locales antes de lanzar.
 Guarda informe portable y punteros; termina al primer fallo o resultado desconocido.
 
 ## Notas relevantes
-Sólo admite --prepare; no incluye una autorización de integración científica.
-No mata procesos ni ejecuta ciencia.
+--science requiere gate cualificado, contrato emitido y autorización368 explícita.
+Preparar conexiones no autoriza ciencia; no mata procesos ni repite reservas.
 Las instantáneas preservan fuentes Linux y la copia histórica Windows queda intacta.
 =============================================================================
 """
@@ -43,9 +43,108 @@ def expected_ids(mode):
     return {target+'::test_'+n for n in (CONTRACT_NAMES if mode=='contracts' else RELEASE_NAMES)}
 
 
+
+def check_authority(authority, baseline, sources):
+    import hashlib
+    expected = hashlib.sha256(json.dumps(sources, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    if (authority.get("slice") != "M008-S02" or authority.get("baseline") != baseline
+            or type(authority.get("fits")) is not int or authority["fits"] != 368
+            or authority.get("profiles") != ["linux", "win32"] or authority.get("sources_sha256") != expected
+            or authority.get("by") != "human"):
+        raise ValueError("explicit scientific authority368 and exact sources required")
+
+
+def reserve_science(root, parent, authority, sources):
+    from qualify_integration_gate import BASE, require
+    check_authority(authority, BASE, sources)
+    marker = Path(root)/"local_state/m008-s02-science-attempt.json"
+    require(not marker.exists(), "science reservation consumed; manual recovery required")
+    parent = Path(parent).resolve()
+    require(parent.is_dir() and not parent.is_relative_to(Path(root).resolve()) and
+            not parent.is_relative_to(Path("/tmp")) and not parent.is_relative_to(Path("/var/tmp")), "external persistent root")
+    output = Path(tempfile.mkdtemp(prefix="s02-", dir=parent))
+    token = uuid.uuid4().hex
+    boundary.save(marker, {"output": str(output), "invocation": token, "authority": authority, "status": "reserved"})
+    return output, token
+
+
+def science_main(config):
+    import qualify_integration_gate as q
+    import verify_s02
+    import science_worker
+    deadline=q.Deadline(9000)
+    settings=q.read(config);sources=q.inventory(ROOT)
+    verify_s02.admission_evidence(ROOT)
+    gate=q.read(ROOT/'local_state/m008-s02-d044-preparation-check.json')
+    q.require(q.read(Path(gate['output'])/'result.json').get('ok') is True,'qualified admission gate')
+    events=[json.loads(l) for l in (ROOT/'05_governance/ledger.jsonl').read_text().splitlines()]
+    relevant=[e for e in events if e.get('slice')=='M008-S02' and e['ev'] in ('prompt','coded','verified','reviewed','blocked','accepted')]
+    q.require(relevant and relevant[-1]['ev']=='prompt','issued ordinary coding contract required')
+    authority=q.read(settings['science_authority'])
+    output,token=reserve_science(ROOT,settings['linux_parent'],authority,sources)
+    roots={};prepared={};results=[]
+    try:
+        origin=Path(q.read(q.pointer(ROOT,'linux','release'))['output'])
+        common=q.localpath(q.read(origin/'evidence/release-handoff.json')['work'])/'fixture/config.json'
+        expected=science_worker.fixture_identity(common)
+        # Materialize both complete inputs before starting either scientific profile.
+        for profile in ('linux','win32'):
+            deadline.remaining()
+            parent=Path(settings['linux_parent' if profile=='linux' else 'parent']).resolve()
+            q.require(parent.is_dir() and not parent.is_relative_to(ROOT) and not parent.is_relative_to(Path('/tmp')) and not parent.is_relative_to(Path('/var/tmp')),'persistent profile parent')
+            out=Path(tempfile.mkdtemp(prefix='s02p-',dir=parent));roots[profile]=str(out)
+            q.save(output/(profile+'-pointer.json'),{'output':str(out)})
+            for n in ('logs','evidence','scratch','sequence'):(out/n).mkdir()
+            q.boundary.materialize(ROOT,out/'snapshot',sources)
+            q.save(out/'snapshot/manifest.json',{'base_commit':q.BASE,'files':sources})
+            retained=Path(q.read(q.pointer(ROOT,profile,'release'))['output'])
+            handoff=q.read(retained/'evidence/release-handoff.json')
+            release=science_worker.distribution(handoff,ROOT,translate=q.localpath)
+            identity=science_worker.prepare_fixture(common,release['config'],out/'fixture')
+            q.require(identity==expected,'common fixture before fits')
+            native=q.winpath if profile=='win32' else str
+            c={k:settings[k] for k in ('prefix','conda','bash')}
+            c.update(mode='science',profile=profile,invocation=token+'-'+profile,authority=authority,
+                     authorized_fits=184,sources=sources,base_commit=q.BASE,release=handoff,
+                     fixture_config=native(out/'fixture/config.json'),fixture_identity=identity)
+            for n in ('snapshot','evidence','scratch','sequence','run'):c[n]=native(out/n)
+            if profile=='linux':c.update(prefix=sys.prefix,bash=os.environ['WALL2WALL_BASH'])
+            q.save(out/'config.json',c);prepared[profile]=c
+        q.storage(roots)
+        for profile in ('linux','win32'):
+            out=Path(roots[profile]);c=prepared[profile]
+            q.require(science_worker.fixture_identity(out/'fixture/config.json')==expected,'inputs changed before launch')
+            if profile=='linux':argv=[sys.executable,'-B',str(out/'snapshot'/q.HERE/'science_worker.py'),'--config',str(out/'config.json')]
+            else:
+                adapter=(ROOT/q.HERE/'windows.ps1').read_text().replace(q.HERE+'worker.py',q.HERE+'science_worker.py')
+                (out/'adapter.ps1').write_text(adapter,encoding='utf-8')
+                argv=[settings['powershell'],'-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-File',q.winpath(out/'adapter.ps1'),'-Config',q.winpath(out/'config.json')]
+            d=q.launch(argv,out,c['invocation'],profile,deadline.remaining(3960))
+            q.require(d['status']=='finished' and d['exit']==0,'science failed/unknown; no next profile')
+            r=q.read(out/'evidence/science.json')
+            verify_s02.check_scientific_result(r,profile,sources,c['invocation'])
+            q.boundary.witness(ROOT,sources);q.storage(roots)
+            results.append({'profile':profile,'report':r,'sha256':q.sha(out/'evidence/science.json'),'dispatch':d})
+        import products
+        q.save(output/'comparison-reserved.json',{'invocation':token,'status':'reserved','seconds':120})
+        comparison=q.timed_call(lambda:products.compare_runs(Path(roots['linux'])/'run',Path(roots['win32'])/'run'),deadline.remaining(120))
+        comparison.update(products={r['profile']:{k:v for k,v in r['report']['artifacts'].items() if k.startswith('run/')} for r in results},fixture_identity=expected)
+        q.save(output/'comparison.json',comparison);q.storage(roots);deadline.remaining()
+        report={'schema':'wall2wall.s02-science/1','base_commit':q.BASE,'invocation':token,'sources':sources,
+                'results':results,'comparison':comparison,'comparison_sha256':q.sha(output/'comparison.json'),'fits':368,'status':'passed'}
+        q.save(output/'summary.json',report);q.save(ROOT/'06_infra/m008-s02-validation.json',report)
+        return 0
+    except BaseException as exc:
+        q.save(output/'failure.json',{'status':'failed_or_unknown','error':type(exc).__name__,'message':str(exc),'roots':roots})
+        raise
+
+
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True);parser.add_argument('--prepare',action='store_true',required=True)
-    args=parser.parse_args();settings=json.loads(Path(args.config).read_text())
+    parser=argparse.ArgumentParser();parser.add_argument('--config',required=True)
+    modes=parser.add_mutually_exclusive_group(required=True);modes.add_argument('--prepare',action='store_true');modes.add_argument('--science',action='store_true')
+    args=parser.parse_args()
+    if args.science: return science_main(args.config)
+    settings=json.loads(Path(args.config).read_text())
     label='s02-gate'
     marker=ROOT/'local_state/m008-s02-gate-preparation-attempt.json'
     portable=ROOT/'06_infra/m008-s02-gate-preparation.json'
