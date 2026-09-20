@@ -1,0 +1,247 @@
+---
+title: "Solicitud de datos de prueba para cartografía de altura del arbolado"
+subtitle: "Wall2Wall · Preparación del piloto M007"
+author: "Proyecto Wall2Wall"
+date: "2026-09-20"
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    embed-resources: true
+    theme: cosmo
+execute:
+  enabled: false
+---
+
+## Propósito y estado
+
+Solicitamos datos de campo y sus metadatos para evaluar la estimación de altura del
+arbolado en bosque seco de encinos de Guanajuato, dentro del área de interés
+denominada **Escenario V**. El objetivo es relacionar observaciones de campo con
+predictores de sensores remotos y producir un mapa continuo de altura en metros.
+
+**M007 permanece pendiente.** Existen antecedentes de capas remotas, pero aún no
+se dispone de datos de campo para calibrar y evaluar este caso. Se puede avanzar
+ahora en definición de la variable, diseño del muestreo y permisos. El piloto
+requiere completar la admisión de datos y aprobar el protocolo antes de entrenar.
+
+Este documento reúne lo conversado y sirve para solicitar información al equipo.
+Las alternativas y metas señaladas como **propuestas** no constituyen acuerdos
+definitivos ni una promesa de desempeño.
+
+## Qué queremos estimar
+
+### Estadístico de altura y población
+
+La respuesta será una variable continua en metros. La propuesta del propietario
+es representar una **media o mediana por celda**, todavía por elegir.
+
+| Alternativa | Interpretación | Decisión pendiente |
+|---|---|---|
+| Media de alturas | Altura promedio de los árboles elegibles, con la ponderación acordada. | Precisar población, pesos y diseño de muestreo. |
+| Mediana de alturas | Altura del árbol central de esa población ordenada por altura. | Confirmar que el uso requiere describir el árbol típico. |
+| Altura del dosel por superficie | Resumen de altura ponderado por área, con tratamiento explícito de claros. | Es una variable diferente; sólo se adoptará mediante acuerdo explícito. |
+
+Si el uso busca altura promedio, la **media es la candidata principal propuesta**
+y la mediana puede conservarse como descriptivo auxiliar. Si busca altura del
+árbol típico, considerar la mediana como objetivo principal. No se elegirá el
+estadístico después de observar cuál obtiene mejores métricas.
+
+Antes de medir, definir especies y tamaños incluidos, condición vivo/muerto,
+reglas de borde, ponderación y tratamiento de celdas sin árboles. Un claro no es
+un árbol de altura cero. Para altura de árboles, una celda sin árboles tiene
+respuesta indefinida; la cobertura debe informarse aparte.
+
+No confundir estas variables con altura dominante, altura máxima o percentiles
+lidar. Conservar mediciones individuales y pesos permitirá calcular resúmenes
+reproducibles: una mediana de medianas no reconstruye, en general, la mediana
+del conjunto.
+
+### Soporte espacial del mapa
+
+| Resolución candidata | Área de celda cuadrada | Condición que debe justificar el equipo |
+|---|---|---|
+| 100 m | 1 ha | Que el diseño de campo represente la variación de esa superficie. |
+| 250 m | 6.25 ha | Que el uso requiera esa escala y el muestreo represente el área mayor. |
+
+**Ninguna resolución está elegida.** Una parcela pequeña no representa
+automáticamente toda la celda. No es obligatorio censar la superficie completa,
+pero la estimación muestral debe tener un diseño y pesos justificables.
+
+Acordar CRS, origen de malla, extensión y bordes. Las celdas de 100 y 250 m no se
+anidan exactamente; una comparación debe derivar ambas mallas desde las fuentes
+originales. La resolución nominal de los predictores no determina por sí sola
+la resolución útil del mapa ni el número de observaciones independientes.
+
+## Precisión y criterio de utilidad por acordar
+
+Separar tres aspectos: calidad de la medición de campo, precisión de localización
+y error predictivo del mapa. Los umbrales siguientes corresponden únicamente al
+**error predictivo espacial fuera de muestra**, al soporte elegido.
+
+| Métrica | Propuesta inicial para discusión | Interpretación |
+|---|---|---|
+| MAE | ≤2 m | Promedio del error absoluto. |
+| RMSE | ≤3 m | Raíz del promedio del error cuadrático; penaliza más los errores grandes. |
+| Sesgo medio absoluto | ≤1 m | Magnitud del promedio de predicho menos observado. |
+| R² | Informar, sin umbral acordado | Desempeño relativo a la variación de la respuesta; explicar valores indefinidos. |
+
+Estas cifras fueron sugeridas para conversar con el equipo; **no están
+aceptadas**. Deben revisarse con el uso del mapa, alturas esperadas y error de
+campo antes de observar resultados. No se promete alcanzarlas con Sentinel-1
+y NDVI. Una RMSE de 3 m no significa un error máximo de 3 m, y puede resultar
+excesiva para rodales bajos. La altura de aproximadamente 20 m mencionada para
+el caso es orientativa, no un límite de filtrado ni un denominador para convertir
+errores a porcentajes.
+
+El equipo debe fijar la métrica prioritaria, el umbral final, si las tres metas
+son simultáneamente obligatorias y qué decisión permite tomar el mapa.
+Se comparará con una referencia que predice la media del entrenamiento
+(**Dummy(mean)**), sin trasladar al caso real los umbrales usados en simulaciones.
+
+La tolerancia numérica `atol=rtol=1e-5` utilizada para comparar ejecuciones
+Linux/Windows es un criterio de reproducibilidad del software; **no es una
+precisión de campo ni una meta de error en metros**.
+
+## Tipo de estimador y evaluación
+
+Conviene distinguir el **estadístico objetivo** —media o mediana de altura— del
+**modelo de regresión** utilizado para predecirlo.
+
+El diseño de Wall2Wall contempla **Random Forest como modelo de referencia**,
+con LightGBM y XGBoost como alternativas opcionales. La familia y configuración
+del piloto aún deben fijarse; no existe un ganador elegido para este bosque.
+Predecir etiquetas de mediana mediante un regresor no implica estimar automáticamente
+cuantiles condicionales ni obtener intervalos de incertidumbre.
+
+La evaluación deberá cumplir lo siguiente:
+
+- Validación espacial externa: cada observación evaluada se predice sin haber
+  participado en ajuste ni selección del modelo que la predice.
+- Mantener indivisibles los sitios, celdas y grupos vinculados, incluidas visitas
+  repetidas; no replicar una etiqueta de parcela en muchos píxeles como si fueran
+  observaciones independientes.
+- Definir bloques, separación o buffer y número de folds según el muestreo y el
+  escenario de transferencia, antes de resultados. Si faltan grupos suficientes,
+  revisar el diseño; no sustituir silenciosamente por una partición aleatoria.
+- Si se seleccionan parámetros o familia, hacerlo mediante validación espacial
+  interna dentro de cada entrenamiento externo. Mantener los mismos folds externos
+  para comparaciones y separar el ajuste final de las predicciones de evaluación.
+- Informar RMSE, MAE, sesgo, R², conteos y exclusiones, por fold y sobre las
+  predicciones fuera de muestra agrupadas; revisar clases de altura/cobertura
+  cuando el tamaño muestral permita una interpretación útil.
+
+El alcance actual excluye early stopping y no ofrece incertidumbre calibrada por
+píxel. Una alerta por predictores fuera del rango observado no es un intervalo
+de confianza ni acredita validez fuera del dominio.
+
+## Datos y metadatos solicitados
+
+### Observaciones de campo
+
+Se solicita una tabla CSV en UTF-8, acompañada de un diccionario de variables.
+Los nombres siguientes son una **propuesta de intercambio**, no un esquema de
+entrada obligatorio de la API. Si ya existe una base, enviar su diccionario y
+explicar su estructura; no transformar ni eliminar originales para ajustarla.
+
+| Información | Contenido solicitado |
+|---|---|
+| Identificación | ID único de observación y de sitio/parcela; ID de árbol o subparcela cuando corresponda; vínculo entre visitas. |
+| Altura | Valor original, unidad, fecha, instrumento, método y banderas de calidad; indicar faltantes explícitamente, sin sustituirlos por cero. |
+| Localización | Coordenadas y CRS completo en la entrega autorizada; método y precisión posicional, geometría o extensión del soporte cuando exista. |
+| Población | Reglas de inclusión, especie o grupo si se registra, condición y cobertura; explicar exclusiones. |
+| Muestreo | Selección de sitios y subparcelas, área medida, probabilidades o pesos cuando existan, no respuesta y accesibilidad. |
+| Agregación | Si sólo hay resúmenes: estadístico, número de árboles, área y ponderación, dispersión disponible y método de cálculo. |
+| Trazabilidad | Responsable, procedencia, versión, correcciones y limitaciones conocidas de las mediciones. |
+
+**Conservar observaciones individuales cuando estén disponibles.** No se fija aún
+un número mínimo de árboles, parcelas o sitios: depende de variabilidad, precisión
+requerida, distribución espacial y recursos. Primero se solicita un inventario
+con cantidades aproximadas y cobertura del diseño.
+
+Un subconjunto pequeño autorizado puede servir para comprobar formatos y
+coherencia. Su recepción no demuestra representatividad ni suficiencia para
+calibración o evaluación espacial.
+
+### Predictores y área de interés
+
+Se solicitan GeoTIFF y catálogo por capa/banda con nombre, variable, unidad,
+CRS, resolución, período, escala/offset, nodata, máscaras, procedencia y método
+de generación. Entregar el contorno exacto de **Escenario V** con su CRS;
+no sustituirlo por nanocuencas ni por el buffer de 1 km.
+
+El inventario preliminar comunicado incluye NDVI mediano 2025 y productos
+Sentinel-1 2025 —VH, VV, razón VH/VV, diferencia VV–VH y conteo de observaciones—,
+con resolución nominal de 10 m. Deben confirmarse sus definiciones y máscaras:
+los nombres de archivo no bastan para acreditar unidades, alineación o cobertura.
+
+Acordar el resumen espacial de cada predictor y la fracción válida requerida
+por celda. Una respuesta mediana no obliga a resumir todos los predictores con
+mediana. Precisar la escala de los datos radar y el orden de transformaciones;
+no adoptar conversiones o agregaciones sin dejar constancia.
+
+Las fechas de campo deben relacionarse explícitamente con los compuestos 2025,
+incluyendo cambios del bosque. La agregación de campo y preparación de predictores
+al soporte elegido requieren un procedimiento reproducible previo; este documento
+no afirma que esa preparación del caso real ya esté implementada.
+
+### Permisos y recursos
+
+Indicar responsable de los datos, autorización de procesamiento local, restricciones
+de conservación y compartición, canal de entrega y metadatos que pueden hacerse
+públicos. Las coordenadas, datos y modelos privados se entregarán por un canal
+autorizado y permanecerán fuera del repositorio público.
+
+Informar CPU, RAM, disco y tiempo disponibles. El protocolo deberá contar ajustes
+máximos, intentos, hilos, almacenamiento y condiciones de parada antes de ejecutar.
+La recepción de datos no autoriza por sí sola nuevos experimentos ni publicación.
+
+## Ficha de respuesta del equipo
+
+Completar antes de aprobar el piloto; indicar “por definir” cuando corresponda.
+
+| Acuerdo o información | Respuesta del equipo |
+|---|---|
+| Responsable y contacto para la entrega | Por definir |
+| Uso concreto del mapa y decisión que apoyará | Por definir |
+| Población y definición exacta de altura | Por definir |
+| Media o mediana principal; ponderación | Por definir |
+| Tratamiento de claros y celdas sin árboles | Por definir |
+| Celda de 100 o 250 m; CRS y origen de malla | Por definir |
+| Inventario de observaciones, sitios y visitas | Por definir |
+| Diseño de campo y representación del soporte | Por definir |
+| Método y error de altura; precisión posicional | Por definir |
+| Fechas de campo y correspondencia con 2025 | Por definir |
+| Catálogo de predictores, máscaras y cobertura | Por definir |
+| Métrica prioritaria, umbrales y regla de utilidad | Por definir |
+| Familia/configuración fija o selección interna autorizada | Por definir |
+| Permisos, canal de entrega y restricciones | Por definir |
+| Recursos, presupuesto y responsable de aprobación | Por definir |
+
+## Cómo se avanzará al recibir la información
+
+1. Revisar metadatos y permisos; registrar faltantes y acordar variable y soporte.
+2. Completar el protocolo de M007-S01: preparación, particiones, estimador,
+   criterio de utilidad y presupuesto, antes de entrenar.
+3. Con admisión aprobada y datos disponibles, ejecutar M007-S02 y conservar
+   resultados, exclusiones y evidencia reproducible.
+
+Se distinguirá funcionamiento del software, desempeño predictivo y validez de
+las inferencias. Un resultado predictivo pobre pero correctamente evaluado se
+conserva y comunica; no se cambian metas después para declararlo satisfactorio.
+
+## Base documental y trazabilidad
+
+Versión de discusión del 20 de septiembre de 2026, basada en:
+
+- `00_brief/M007-S01-support-proposal.md`: población, media/mediana y soportes.
+- `questions/open/M007-S01-real-case-admission.md`: petición de datos, respuestas
+  parciales y metas de error propuestas.
+- `00_brief/decisions.md`, D002–D008: alcance, regresión y evaluación espacial.
+- `00_brief/validation.md`, V3–V6, y `roadmap.yaml`, M007: protocolo y admisión.
+
+Esta síntesis no cambia decisiones aceptadas ni acredita validación real.
+La cualificación técnica cerrada de M008 se limita a los fixtures y perfiles
+evaluados; no sustituye la evaluación del caso de Guanajuato.
