@@ -15,6 +15,26 @@ execute:
   enabled: false
 ---
 
+## Contexto del desarrollo
+
+Estamos desarrollando **Wall2Wall**, una biblioteca de Python que relaciona
+mediciones de campo con información de sensores remotos para producir mapas
+continuos de variables ambientales, como la altura del arbolado, y documentar
+su evaluación y procedencia.
+
+El núcleo del software ya está implementado: preparación de entradas, regresión,
+evaluación espacial, generación de mapas y flujo reproducible. Las pruebas con
+datos sintéticos y la cualificación de los perfiles Linux y Windows están
+completadas dentro de los casos evaluados. Esto acredita el funcionamiento técnico,
+pero aún no demuestra la precisión ni la utilidad del mapa en un bosque real.
+
+Para completar la evaluación del producto falta realizar el piloto con datos
+reales: acordar la variable y su escala, obtener mediciones y permisos, preparar
+los datos, fijar criterios de utilidad y evaluar los resultados. El piloto puede
+revelar ajustes adicionales necesarios. Una distribución pública requerirá,
+además, resolver la licencia, el nombre público y la autorización de publicación.
+Esta solicitud busca reunir la información necesaria para ese siguiente paso.
+
 ## Propósito y estado
 
 Solicitamos datos de campo y sus metadatos para evaluar la estimación de altura del
