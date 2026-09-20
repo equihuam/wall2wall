@@ -40,7 +40,7 @@ justificarse para cada aplicación.
 
 El núcleo ya está implementado: preparación de entradas, regresión, evaluación
 espacial, generación de mapas y flujo reproducible. Se completaron pruebas con
-datos sintéticos y la cualificación de perfiles Linux y Windows dentro de los
+datos sintéticos y la verificación técnica de los perfiles Linux y Windows dentro de los
 casos evaluados. Falta evaluar el producto con datos reales, completar la
 preparación específica del caso y atender los ajustes que revele el piloto.
 La distribución pública requiere además resolver licencia, nombre público y
@@ -308,6 +308,6 @@ Versión de discusión del 20 de septiembre de 2026, basada en:
 - `00_brief/validation.md`, V3–V6, y `roadmap.yaml`, M007: protocolo y admisión.
 
 Esta síntesis no cambia decisiones aceptadas ni acredita validación real.
-La cualificación técnica de compatibilidad Windows (etapa M008) se limita
+La verificación técnica de compatibilidad Windows (etapa M008) se limita
 a los casos de prueba y perfiles
 evaluados; no sustituye la evaluación del caso de Guanajuato.
