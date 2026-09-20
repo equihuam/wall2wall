@@ -1,0 +1,80 @@
+{
+  "schema": "frutlups.envelope/2",
+  "slice": "M008-S04",
+  "round": 1,
+  "title": "Revisión acotada del delta D040 y enlace de evidencia conservada",
+  "objective": "Someter las conexiones D040 conservadas a revisión ordinaria con recibo oficial propio, sin ejecutar integración científica ni renovar su preparación.",
+  "acceptance": [
+    "D041 autorizado y cualificado: seis contratos nuevos pasaron una vez, cero fits; no repetir cualificación. M008-S00/S01/S03 permanecen aceptadas y S02 pendiente. Baseline publicada exacta737fe3a4f4b5521491effa196eb053eb99c9c7a8; conservar además toda la baseline arquitectónica de esta emisión, incluidos gate, scope e informe nuevos.",
+    "Conservar sin modificaciones las14 rutas de 00_brief/M008-S04-preserved-identities.json: cinco lanzadores, seis módulos, scope, informe y documento D040. Reviewer inspecciona todo el delta contra baseline publicada y adiciones, no sólo changed posterior. Coder sólo crea 06_infra/M008-S04.md como entrega de la implementación conservada; si requiere corregir código, detener y devolver al arquitecto. El documento debe identificar alcance conservado, baseline e inventario14, informe D04032 y cualificación D0416 como evidencias distintas, reservas futuras y límites científicos; El resultado observado del cotejo coder se reporta en la respuesta final; no anticiparlo en el documento ni declararse aceptado. Completar su contenido antes del full; no modificarlo después para mantener el hash enlazado por coder/oficial.",
+    "El cotejo nuevo exige las67 identidades de ambos snapshots y checkout, resumen portable idéntico a originales, adaptadores, cuatro invocaciones/finalizaciones cero, recibos/logs/JUnit y resultado del gate de preparación conservado. Exige10+6+10+6 IDs exactos sin errores/fallos/skips, siete hashes históricos conservados y hashes del nuevo gate/cualificación. No invocar verify_s02 --preparation ni su check() ni suites consumidas.",
+    "La evidencia D040 acredita32 contratos de preparación, cero fits reales y eventos fake; no acredita las regresiones científicas de los cinco lanzadores, compare_runs integral ni gate científico. Preservar sus límites y evaluar corrección del código dentro del alcance revisado, sin convertir los32 pases en dictamen automático.",
+    "Gate arquitectónico conservado: verify_s04.py y qualify_s04.py, scope python_header_scope_m008_s04.json e informe m008-s04-gate-qualification.json bajo06_infra. Informe SHA-256 a1d672b987c8daf9bddd32775967219990b87a1dfaa8050b1eabc13f9a83171d enlaza las tres identidades cualificadas y seis IDs exactos; reviewer inspecciona código y originales por puntero ignorado. Coder no altera estos archivos ni vuelve a cualificar.",
+    "Full propio autorizado: python 06_infra/m008_integration/verify_s04.py --phase next; ejecutar una fase coder120s después de crear M008-S04.md. Architect ejecutará una fase official120s distinta mediante scripts/verify.py M008-S04 --timeout 120 tras coded. next exige prompt emitido para coder y coded para official, y coder exitoso previo; rechaza repetición/unknown. Cero focused y cero repetición de cualificación/32 suites/gate D040.",
+    "Cada fase conserva evidencia/logs/scratch externos persistentes nuevos, vacíos y previamente creados con punteros ignorados exclusivos. Sin rutas de máquina en producto. Scratch64MiB, logs/evidencia16MiB por fase, adicional256MiB, un proceso/hilo, trabajo30min, RSS objetivo512MiB; picos/tokens unknown si no medidos. Fallo/unknown consume y detiene sin retry ni kill.",
+    "D016: encabezados canónicos AGENTS.md y scope explícito de once módulos D040 más dos módulos nuevos del gate; reviewer verifica veracidad y dependencias del cotejo. Gate sólo lee evidencia y analiza encabezados/whitespace, sin importar ni ejecutar módulos científicos, instalar, cambiar prefijos o crear instantáneas Windows.",
+    "Baseline conservada puede quedar fuera del manifiesto coded; aceptar exige revisión explícita de esas identidades. El inventario no resuelve drift ni modifica manifiestos históricos. Registrar coded/verificación/revisión/aceptación mediante procedimiento ordinario, sin forzar estados, reconcile para producto ni cambios artificiales. Commit posterior requiere autoridad separada conforme a D039.",
+    "Preservar D014-D040, M006 cerrado y S03 r1 full consumido unknown, D037 fallido y D038 independiente, Windows histórico/entornos y M007 pendiente con bufa excluido. No cerrar S02/M008 ni afirmar equivalencia Windows/Linux. 368 fits siguen no autorizados; atol=rtol=1e-5 no se relaja."
+  ],
+  "non_goals": [
+    "Implementar correcciones de producto o completar gate científico S02 bajo esta entrega conservada.",
+    "Ejecutar suites anteriores, fits, builds, production/validated, réplicas, canaries, Windows, instalaciones, commit o push."
+  ],
+  "read_first": [
+    "00_brief/D041-d040-review-admission.md",
+    "00_brief/M008-S04-preserved-identities.json",
+    "00_brief/D040-m008-s02-integration-admission.md",
+    "00_brief/D039-m008-s03-drift-diagnosis.md",
+    "05_governance/reviews/m008/M008-S03_r1_review.md",
+    "05_governance/reviews/m008/M008-S03_r1_verification.json",
+    "06_infra/M008-S02-GATE-PREPARATION.md",
+    "06_infra/m008-s02-gate-preparation.json",
+    "06_infra/m008_integration/fit_counter.py",
+    "06_infra/m008_integration/products.py",
+    "06_infra/m008_integration/science_dispatch.py",
+    "06_infra/m008_integration/science_worker.py",
+    "06_infra/m008_integration/test_scientific_contract.py",
+    "06_infra/m008_integration/verify_s02.py",
+    "06_infra/python_header_scope_m008_s02_science.json",
+    "08_pkg/tests/run_checks.py",
+    "08_pkg/tests/test_audit.py",
+    "08_pkg/tests/test_prediction.py",
+    "08_pkg/tests/test_quality.py",
+    "08_pkg/tests/test_workflow.py",
+    "06_infra/m008_integration/verify_s04.py",
+    "06_infra/m008_integration/qualify_s04.py",
+    "06_infra/python_header_scope_m008_s04.json",
+    "06_infra/m008-s04-gate-qualification.json"
+  ],
+  "allowed_prefixes": [
+    "06_infra/M008-S04.md"
+  ],
+  "forbidden": [
+    "00_brief/",
+    "05_governance/",
+    "prompts/",
+    "questions/answered/",
+    "roadmap.yaml",
+    "frutlups.toml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "scripts/",
+    "tests/",
+    "pyproject.toml"
+  ],
+  "focused": [],
+  "full": [
+    "python",
+    "06_infra/m008_integration/verify_s04.py",
+    "--phase",
+    "next"
+  ],
+  "runtime": {
+    "python": "3.11"
+  },
+  "timeout_seconds": 120,
+  "observation": "process",
+  "notes": "D041 conserva el inventario de admisión y evidencia separada; la aceptación posterior no elimina drift por sí sola. No se hereda presupuesto científico de entregas previas.",
+  "findings": "",
+  "memory": ""
+}

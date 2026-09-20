@@ -605,16 +605,42 @@ Non-goals:
 - Nueva implementación, pruebas, fits, builds, producción, validated real, réplicas o canaries.
 - Reabrir entregas aceptadas, editar evidencia histórica, cambiar entornos o commit/push.
 
-### M008-S02 — Workflow Windows y comparación con WSL
+### M008-S04 — Corrección acotada de timeout, imports instrumentados y métricas D042
 
-Demostrar la alternativa Windows sobre el flujo integrado de M006 antes de anunciar soporte.
+Remediar M008-S04-F1/F2/F3 con regresiones sin fits en ambos perfiles y evidencia r2 independiente; no integrar ciencia.
 
 Acceptance:
-- D016: cumplir AGENTS.md/Python file headers en todo Python propio nuevo o modificado; comprobar estructura con el gate mantenido y veracidad en revisión. El arquitecto fija el alcance explícito antes de emitir.
-- Requiere M006 y M008-S01 aceptados. V7/V8: ejecutar production/validated y full Pytest en Windows con locks/estados propios; no-op, invalidación, fallo/reinicio y archivos finales íntegros.
-- Mismos fixtures/código/configuración que WSL: IDs/folds/máscaras/CRS iguales; predicciones/métricas dentro de 1e-5. Reportar plataforma, versiones y proveedor Bash; investigar discrepancia sin relajar umbral silenciosamente.
-- Documentar selector/instrucciones y evidencia de cada variante anunciada. MSYS2 o Git Bash sin prueba permanece sin verificar. Un defecto requiere corrección acotada; no duplicar la API ni compartir entornos/.snakemake.
-- Respetar R1–R6; no cambiar host/PATH global, instalar software global ni generar prompts en esta revisión.
+- D042 autorizado; cualificación previa nueva6 Linux pasó una vez con cero fits y está consumida. Informe SHA-256 23068033bedb3b50fe297759a3c5ae78b1c10e060b5c909b8fca08ee5c36088b. M008-S04 r2 corrige r1 needs_work: F1 P1 y F2/F3 P2 sólo reviewer los cierra citando informe r1. HEAD737fe3a4f4b5521491effa196eb053eb99c9c7a8; conservar baseline arquitectónica exacta de emisión.
+- F1: guarda persistente común entre cargas runpy; unknown detiene nuevos hijos y Pytest, conserva scratch sin opt-in, logs y marcadores; stage_checks propaga desconocido aunque selector salga positivo, run.py conserva exclusión. Sin kill, desbloqueo por PID ni pérdida de evidencia; recuperación manual explícita. Distinguir fallo ordinario conocido.
+- F2: ejecutar archivo instrumentado con imports hermanos explícitos y verificados manteniendo -I, hash, contador previo, argv y aislamiento de CWD/PYTHONPATH. Cubrir run_child -> fit_counter -> workflow/run.py --help real y -c/-m sin ciencia.
+- F3: validar esquema completo fold_summary contra modeling._summary: claves, weighting, cuatro métricas, tipos no bool, conteos, mean/std_population finitos o null justificado y coherencia con folds. Rechazar dos productos igualmente incompletos antes de comparar. atol=rtol=1e-5.
+- Doce IDs obligatorios por perfil definidos en D042, prefijo test_ en test_s04_repair.py: unknown_blocks_new_children_across_loads, unknown_stops_pytest_followup, unknown_retains_scratch_without_optin, descendant_unknown_preserves_selector_and_lock, known_failure_and_explicit_recovery, instrumented_script_sibling_imports, instrumented_workflow_help, instrumented_command_modes, summary_complete_and_undefined, summary_schema_and_types_rejected, summary_fold_consistency_rejected, equal_incomplete_metrics_rejected. Cero skips/errores/fallos externos y cero fits; negativos esperados internos explícitos. Auxiliares autónomos <=5s, espera<=30s; si no terminan detener unknown sin kill.
+- Conservar gate repair_s04.py, test_s04_repair.py, qualify_s04_repair.py, scope e informe r2 cualificados: no editarlos ni repetir cualificación. Inventario nuevo explícito72 rutas incluye CONTEXT; no alterar inventarios históricos. Gate nuevo separado de verify_s04/qualify_s04/D040 consumidos. Si una corrección requiere cambiar gate o pruebas congelados detener y devolver al arquitecto.
+- Coder corrige sólo cuatro fuentes y crea documento/resumen r2. Comandos obligatorios después de corrección: python 06_infra/m008_integration/repair_s04.py --regress --profile linux --config local_state/m008-s04-r2-config.json una vez600s; tras éxito mismo comando con --profile win32 una vez600s. Copiar bytes exactos summary.json del destino win32 señalado por local_state/m008-s04-r2-win32.json a 06_infra/m008-s04-r2-validation.json. Completar documento antes del full y no modificarlo después. Full --phase next coder120s una vez; arquitecto tras coded ejecuta scripts/verify.py M008-S04 --timeout 120, official120s. Cotejos no repiten suites; cualificación previa180s consumida. Cero focused adicional/build/full científico.
+- Presupuestos completos D042: por perfil16 auxiliares directos+4 descendientes máximo,30s por auxiliar, un hilo; snapshot64MiB/256files, scratch512MiB, evidencia128MiB, gates64MiB cada uno, total2GiB. Una cadena wrapper/worker por perfil. Padres persistentes externos nuevos fuera de /tmp, separados y previamente creados; logs/JUnit, PIDs, invocación, finalización y punteros ignorados. Fallo/unknown detiene sin retry.
+- Conservar D04032/D0416 y todas las identidades históricas r1 sin reescribirlas. Informe r2 distingue fuentes históricas de actuales; no presentar puente como aceptación. Reviewer revisa delta completo D040/D041 y corrección, no sólo changed. D016 headers y scope explícito cuatro fuentes+tres nuevos Python; whitespace y contenido.
+- Linux único dueño; Windows snapshot aislado y evidencia. S00/S01/S03 aceptadas, S02 pendiente, M006 cerrado, su full S03 r1 unknown, D037 fallido/D038 independiente conservados; M007 y bufa ignorados. Cero nueva equivalencia, distribución ejecutada o regresiones científicas.368fits no autorizados. Sin commit/push.
 
 Non-goals:
-- Cualificar todas las versiones de Windows/Snakemake o exigir Windows para cerrar entrega WSL.
+- Repetir suites/gates históricos, builds, ciencia, production/validated, réplicas o canaries.
+- Cambiar productor de métricas, run.py, entornos, evidencia histórica, APIs científicas o framework; cerrar S02/M008.
+
+### M008-S02 — Workflow Windows y comparación con Linux mediante gate científico cualificado
+
+Demostrar integración production/validated, recuperación y distribución sobre los mismos fixtures en Linux y Windows, con contabilidad y evidencia verificables.
+
+Acceptance:
+- D040: lote previo autorizado y32 contratos/gate de preparación pasados, cero fits reales. Reservas consumidas. No emitir ciencia hasta revisión ordinaria del delta, conexión del gate científico oficial y autorización separada. Baseline publicada737fe3a4f4b5521491effa196eb053eb99c9c7a8. Requiere M006 y M008-S00/S01/S03/S04 aceptados; preparación no es aceptación S02.
+- Linux único propietario de fuentes y gobernanza; Windows sólo snapshot y evidencia externa persistente nueva. Prefijos/locks/copia Windows histórica intactos, M007 pendiente y bufa ignorado.
+- Contador persistente por fase/proceso/clase con reserva previa y rechazo antes de sobrepasar; incluir Pipeline/pasos e intentos fallidos sin doble conteo por wrappers ni árboles internos RF. Cualificar hijos aislados -I y monkeypatch con dobles antes de ciencia. Faltantes/unknown bloquean.
+- D040 corrige la propuesta364 a368 bajo criterio uniforme:37 workflow +5 production +142 validated por perfil; modeling47 incluye dos Pipeline.fit no contados por su contador local45. Son estimaciones estáticas, no autorización ni medición. Cambios exigen reconfirmar presupuesto.
+- Exigir14 IDs workflow y187 validated por perfil conforme al inventario estático 00_brief/M008-S02-planned-ids.json; cero extra/ausentes/skips/fallos. No repetir selectores fuera de validated ni full266 ni gates/suites históricos. Coder/oficial sólo cotejan evidencia.
+- Una producción desde distribución por perfil; validated consume esa producción; ambos no-op conservan hashes/mtimes. Reutilizar builds de preparación sólo con hashes vigentes; no rebuild implícito. Matriz workflow cubre invalidación/reparación/fallo/reinicio sin duplicar sus fits.
+- Misma fixture y configuración científica por hash; imports wheel aislados. Extraer CSV/JSON/GeoTIFF reales por claves con tipos y unicidad; sample_id/folds/exclusiones/CRS/grid/máscaras exactos, OOF/mapas/métricas atol=rtol=1e-5, NaN/None sólo donde contrato admite. No comparar binarios joblib.
+- Presupuestos futuros D040: workflow1/perfil1200s37fits; production1/perfil1200s5fits; validated1/perfil1200s142fits (planificador1100s); no-op production1 y validated1 por perfil120s0fits; comparación1 total120s0fits; gate coder1 y oficial1,120s cada uno sin repetir ejecución científica.
+- Snapshot64MiB/256files; scratch512MiB/comando, logs/evidencia128MiB/perfil, retenidos2GiB/perfil y5GiB total; cores/hilos1, trabajo60min; RSS objetivo1GiB, picos/tokens unknown si no medidos. Fallo/unknown consume y detiene, sin retry ni kill.
+- Conservar todos los recibos y dictámenes; D037 fallido consumido, D038 independiente, D036 sólo histórico. D016 encabezados veraces y scope explícito incluye gate arquitectónico. Evidencia por fase en directorios externos nuevos creados antes del proceso con punteros ignorados.
+
+Non-goals:
+- Datos reales, cambios de algoritmos/API, entornos nuevos, motores extras, réplica o canary.
+- Emitir con gate inexistente, renovar reservas consumidas, cerrar M008 o commit/push.

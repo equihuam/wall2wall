@@ -1,0 +1,9 @@
+[
+  "08_pkg/tests/run_checks.py",
+  "08_pkg/workflow/stage_checks.py",
+  "06_infra/m008_integration/fit_counter.py",
+  "06_infra/m008_integration/products.py",
+  "06_infra/m008_integration/repair_s04.py",
+  "06_infra/m008_integration/test_s04_repair.py",
+  "06_infra/m008_integration/qualify_s04_repair.py"
+]

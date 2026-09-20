@@ -15,6 +15,7 @@ Plan de nueve llamadas fit contando Pipeline y pasos, con límite duro de 24.
 Los rechazos reutilizan esos modelos sin ajustes y comprueban bytes preservados.
 
 ## Notas relevantes
+Los hijos usan run_child: evidencia persistente, contador opcional y timeout sin kill.
 La entrada interna prepare permite ejecutar la fixture en un proceso aislado.
 Las identidades de lock y evaluación son fixtures sintéticas declaradas como tales.
 No se mide RAM nativa ni el pico de scratch; no se importan motores opcionales.
@@ -27,6 +28,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import runpy
 import sys
 
 import numpy as np
@@ -38,6 +40,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 PACKAGE = Path(__file__).resolve().parents[1]
+run_child = runpy.run_path(str(PACKAGE / "tests/run_checks.py"))["run_child"]
 sys.path.insert(0, str(PACKAGE / "src"))
 from wall2wall import audit, modeling
 sys.path.pop(0)
@@ -128,7 +131,7 @@ def prepare(root):
 @pytest.fixture(scope="module")
 def bundles(tmp_path_factory):
     root = tmp_path_factory.mktemp("audit")
-    result = subprocess.run([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
+    result = run_child([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
                             cwd=root, capture_output=True, text=True, timeout=120)
     print(result.stdout)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -173,7 +176,7 @@ assert loaded['predictors'] == ['p01', 'p02']
 print(json.dumps(loaded['estimator'].predict(table[loaded['predictors']]).tolist()))
 '''
         table, schema = fixture()
-        completed = subprocess.run([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"), str(moved),
+        completed = run_child([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"), str(moved),
                                     json.dumps(table[["p01", "p02"]].to_dict(orient="list"))],
                                    cwd=tmp_path, capture_output=True, text=True, timeout=60)
         assert completed.returncode == 0, completed.stderr

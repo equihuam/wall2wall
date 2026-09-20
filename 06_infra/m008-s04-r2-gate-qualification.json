@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "status": "passed",
+  "invocation": "14c1d4c6285c4b269160c6e3dd48e1f0",
+  "tests": 6,
+  "fits": 0,
+  "sources": [
+    {
+      "path": "06_infra/m008_integration/qualify_s04_repair.py",
+      "kind": "file",
+      "size": 11700,
+      "sha256": "cf51e4a2f843b8e2cceb02c45d133a7112bdd66f5a9511ab4daf608f8eae6510"
+    },
+    {
+      "path": "06_infra/m008_integration/repair_s04.py",
+      "kind": "file",
+      "size": 21310,
+      "sha256": "e5f41b7b88496cfd26ef937a8b67f18bda4da2d8933d2f43ebb12b123313eea0"
+    },
+    {
+      "path": "06_infra/m008_integration/test_s04_repair.py",
+      "kind": "file",
+      "size": 12806,
+      "sha256": "02c6dfe803071c42754891c3c6cba253a2541e75a6815771b08a55bc03b04c13"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s04_r2.json",
+      "kind": "file",
+      "size": 309,
+      "sha256": "3a4f8ab38a30278552dae6dd85177ba1c012c9670adaeee73dd05d84a903b9b3"
+    }
+  ],
+  "seconds": 7.778,
+  "error": null,
+  "artifacts": {
+    "logs/suite.log": "d3f9ac55f17d64cd4ea09c0bcb4fda63e075d235ae46f1125664b5fd4891d528",
+    "evidence/junit.xml": "a5b640ca9ef2c71b4c9cf83be7862b1d659870fd049a6824784052c1e4966b51"
+  },
+  "size_final": 50648,
+  "rss_peak": "unknown",
+  "scratch_peak": "unknown",
+  "tokens": "unknown"
+}

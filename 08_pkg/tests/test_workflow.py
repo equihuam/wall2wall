@@ -14,6 +14,7 @@ Ocho IDs estables, producción compartida de cinco fits y referencia de cinco fi
 Plan de diez fits por suite, máximo cuarenta; negativos no ajustan modelos.
 
 ## Notas relevantes
+Los hijos usan run_child: evidencia persistente, contador opcional y timeout sin kill.
 No ejecuta validated integral ni exige mejora predictiva. RSS y pico scratch no
 medidos. Las copias corruptas preservan la producción compartida original.
 =============================================================================
@@ -24,6 +25,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import runpy
 import sys
 
 import numpy as np
@@ -35,6 +37,7 @@ from sklearn.dummy import DummyRegressor
 from sklearn.ensemble import RandomForestRegressor
 
 PACKAGE = Path(__file__).resolve().parents[1]
+run_child = runpy.run_path(str(PACKAGE / "tests/run_checks.py"))["run_child"]
 sys.path.insert(0, str(PACKAGE / "workflow"))
 import stages
 import stage_checks
@@ -50,7 +53,7 @@ def invoke(config, run, target="production", dry=False, extra=(), env=None):
     command.extend(extra)
     if dry:
         command.append("--dry-run")
-    return subprocess.run(command, cwd=config.parent, capture_output=True, text=True, encoding="utf-8", timeout=180, env=env)
+    return run_child(command, cwd=config.parent, capture_output=True, text=True, encoding="utf-8", timeout=180, env=env)
 
 
 def success(result):
@@ -293,7 +296,7 @@ def test_validated_contract(production, tmp_path, monkeypatch):
         scratch.mkdir()
         (scratch / "test_probe.py").write_text(content, encoding="utf-8")
         code = "import runpy,sys,pytest; guard=runpy.run_path(sys.argv[1])['RequiredTests']; raise SystemExit(pytest.main(['test_probe.py','-q','-p','no:cacheprovider'],plugins=[guard(set(sys.argv[2:]))]))"
-        result = subprocess.run([sys.executable, "-B", "-c", code, str(PACKAGE / "tests/run_checks.py"), *sorted(required)],
+        result = run_child([sys.executable, "-B", "-c", code, str(PACKAGE / "tests/run_checks.py"), *sorted(required)],
                                 cwd=scratch, capture_output=True, text=True, timeout=30)
         assert (result.returncode == 0) == (mode == "pass"), result.stdout + result.stderr
 

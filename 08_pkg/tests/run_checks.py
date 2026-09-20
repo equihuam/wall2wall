@@ -15,9 +15,12 @@ Sin argumentos exige 266 pruebas: las 260 previas y seis contratos de distribuci
 y --modeling-only, --selection-only, --engines-only, --engine-integration-only,
 --audit-only, --prediction-only, --quality-only, --scale-only y --workflow-only seleccionan sus grupos
 respectivos, manteniendo IDs obligatorios. --release-only selecciona distribución. --workflow-control-only exige los dos controles sin fits. Devuelve 0 si pasan las
-pruebas requeridas y el scratch final no supera 512 MiB; elimina sus temporales.
+pruebas requeridas y el scratch final no supera 512 MiB; sólo elimina scratch conocido.
 
 ## Notas relevantes
+La instrumentación externa opcional verifica el helper por hash y cuenta padres e hijos.
+Una guarda persistente compartida entre cargas runpy detiene hijos y Pytest ante unknown.
+Conserva scratch sin opt-in y propaga el estado al selector; recuperación manual explícita.
 WALL2WALL_RETAIN_SCRATCH=1 conserva el árbol externo nuevo incluso ante fallos.
 No instala en el prefijo fijo ni realiza evaluaciones científicas. El tamaño
 informado corresponde al scratch final, no a su máximo durante la ejecución.
@@ -33,6 +36,9 @@ import uuid
 import runpy
 import sys
 import tempfile
+import subprocess
+import json
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED = {
@@ -192,6 +198,131 @@ class RequiredTests(_RequiredTests):
         if report.skipped:
             self.skipped = True
 
+    def pytest_runtest_setup(self, item):
+        self.stop_unknown()
+
+    def pytest_runtest_logreport(self, report):
+        super().pytest_runtest_logreport(report)
+        self.stop_unknown()
+
+    def stop_unknown(self):
+        if os.path.lexists(child_state() / "unknown.json"):
+            import pytest
+            pytest.exit("child outcome unknown; explicit manual recovery required", returncode=2)
+
+
+def child_state():
+    environment = os.environ
+    root = Path(environment.get("WALL2WALL_CHILD_STATE",
+                                environment.get("VERIFICATION_SCRATCH", tempfile.gettempdir()))).resolve()
+    if not root.is_dir() or root.is_relative_to(ROOT):
+        raise ValueError("persistent external child state required")
+    return root
+
+
+def require_known(state):
+    if os.path.lexists(state / "unknown.json"):
+        raise RuntimeError("child outcome unknown; explicit manual recovery required: " + str(state))
+
+
+def mark_unknown(state, work):
+    try:
+        with (state / "unknown.json").open("x", encoding="utf-8") as stream:
+            json.dump({"status": "unknown", "evidence": str(work)}, stream)
+    except FileExistsError:
+        pass
+
+
+@contextlib.contextmanager
+def package_scratch(parent, retain):
+    state = child_state()
+    require_known(state)
+    old_state = os.environ.get("WALL2WALL_CHILD_STATE")
+    scratch = Path(tempfile.mkdtemp(prefix="w2-", dir=parent))
+    os.environ["WALL2WALL_CHILD_STATE"] = str(state)
+    try:
+        yield scratch
+    except BaseException:
+        # Unknown/unhandled termination must never delete files still used by children.
+        mark_unknown(state, scratch)
+        raise
+    else:
+        if not retain and not os.path.lexists(state / "unknown.json"):
+            shutil.rmtree(scratch)
+    finally:
+        if old_state is None:
+            os.environ.pop("WALL2WALL_CHILD_STATE", None)
+        else:
+            os.environ["WALL2WALL_CHILD_STATE"] = old_state
+
+
+def counter_module():
+    path = Path(os.environ["WALL2WALL_COUNTER_HELPER"])
+    if hashlib.sha256(path.read_bytes()).hexdigest() != os.environ["WALL2WALL_COUNTER_SHA256"]:
+        raise ValueError("counter helper changed")
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("wall2wall_fit_counter", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_child(argv, *, cwd, capture_output=True, text=True, encoding="utf-8", timeout, env=None):
+    """Persist child evidence; timeout never kills a child or permits reuse."""
+    if not capture_output or not text:
+        raise ValueError("only captured text children are supported")
+    environment = dict(os.environ if env is None else env)
+    state = child_state()
+    require_known(state)
+    if environment.get("WALL2WALL_CHILD_STATE", str(state)) != str(state):
+        raise ValueError("child state differs")
+    environment["WALL2WALL_CHILD_STATE"] = str(state)
+    if os.environ.get("WALL2WALL_FIT_DB"):
+        for key in ("WALL2WALL_FIT_DB", "WALL2WALL_FIT_PHASE", "WALL2WALL_COUNTER_HELPER", "WALL2WALL_COUNTER_SHA256"):
+            if environment.get(key) != os.environ[key]:
+                raise ValueError("child counter environment differs")
+        counter = counter_module()
+        if Path(argv[0]).resolve() != Path(sys.executable).resolve():
+            raise ValueError("counter requires selected Python child")
+        arguments = list(argv[1:])
+        index = 0
+        while index < len(arguments) and arguments[index] in ("-I", "-B", "-u"):
+            index += 1
+        if index == len(arguments):
+            raise ValueError("child command missing")
+        if not str(arguments[index]).startswith("-"):
+            script = counter.script_path(arguments[index])
+            environment["WALL2WALL_CHILD_SCRIPT_SHA256"] = hashlib.sha256(script.read_bytes()).hexdigest()
+            arguments[index] = str(script)
+        argv = [argv[0], "-I", "-B", environment["WALL2WALL_COUNTER_HELPER"], "--child", *arguments]
+    parent = Path(environment.get("VERIFICATION_SCRATCH", cwd)).resolve()
+    if not parent.is_dir() or parent.is_relative_to(ROOT):
+        raise ValueError("persistent external child scratch required")
+    work = Path(tempfile.mkdtemp(prefix="child-", dir=parent))
+    def save(name, value):
+        with (work / name).open("x", encoding="utf-8") as stream:
+            json.dump(value, stream)
+    save("reserved.json", {"status": "unknown", "owner_pid": os.getpid()})
+    try:
+        with (work / "stdout.log").open("xb") as out, (work / "stderr.log").open("xb") as err:
+            process = subprocess.Popen(argv, cwd=cwd, env=environment, stdout=out, stderr=err)
+            save("started.json", {"pid": process.pid, "argv": list(map(str, argv))})
+            try:
+                code = process.wait(timeout=timeout)
+            except (subprocess.TimeoutExpired, KeyboardInterrupt):
+                save("completion.json", {"status": "unknown", "pid": process.pid})
+                raise RuntimeError("child pending; no follow-up; evidence: " + str(work))
+        if code < 0:
+            save("completion.json", {"status": "unknown", "pid": process.pid, "exit": code})
+            raise RuntimeError("child interrupted; descendant outcome unknown")
+        require_known(state)
+        save("completion.json", {"status": "finished", "exit": code, "pid": process.pid})
+    except BaseException:
+        mark_unknown(state, work)
+        raise
+    return subprocess.CompletedProcess(argv, code, (work / "stdout.log").read_text(encoding=encoding),
+                                      (work / "stderr.log").read_text(encoding=encoding))
+
 
 def main():
     import pytest
@@ -259,10 +390,7 @@ def main():
         return 2
     scratch_parent.mkdir(parents=True, exist_ok=True)
     retain = os.environ.get("WALL2WALL_RETAIN_SCRATCH") == "1"
-    manager = (contextlib.nullcontext(tempfile.mkdtemp(prefix="w2-", dir=scratch_parent))
-               if retain else tempfile.TemporaryDirectory(prefix="wall2wall-package-", dir=scratch_parent))
-    with manager as name:
-        scratch = Path(name)
+    with package_scratch(scratch_parent, retain) as scratch:
         os.environ.update(
             VERIFICATION_SCRATCH=str(scratch), TEMP=str(scratch), TMP=str(scratch),
             PYTHONDONTWRITEBYTECODE="1", PYTEST_DISABLE_PLUGIN_AUTOLOAD="1",
@@ -271,13 +399,20 @@ def main():
         )
         sys.dont_write_bytecode = True
         os.chdir(package)
+        plugins = [RequiredTests(required)]
+        if os.environ.get("WALL2WALL_FIT_DB"):
+            counter = counter_module()
+            counter.activate()
+            plugins.append(counter.CollectionCounter())
         result = pytest.main([
             *([target] if isinstance(target, str) else target),
             "--rootdir", str(package), "-c", str(package / "pyproject.toml"),
             "-q", "-p", "no:cacheprovider", "--basetemp", str(scratch / "pytest"),
             *(["-rP"] if args.modeling_only or args.selection_only or args.engine_integration_only or args.audit_only or args.prediction_only or args.quality_only or args.workflow_only else []),
             "--junitxml", str(scratch / "package.xml"),
-        ], plugins=[RequiredTests(required)])
+        ], plugins=plugins)
+        if os.path.lexists(child_state() / "unknown.json"):
+            return 2
         evidence = os.environ.get("WALL2WALL_TEST_EVIDENCE")
         if evidence:
             destination = Path(evidence).resolve()
@@ -290,9 +425,12 @@ def main():
             print("SCALE_VALIDATION_JSON_BEGIN\n" + report.read_text(encoding="utf-8") + "SCALE_VALIDATION_JSON_END")
         size = sum(path.stat().st_size for path in scratch.rglob("*") if path.is_file())
         print(f"Package scratch: {size} bytes (limit {512 * 1024 * 1024})")
-        if size > 512 * 1024 * 1024:
-            return 1
-        return int(result)
+        code = 1 if size > 512 * 1024 * 1024 else int(result)
+        completion = os.environ.get("WALL2WALL_SELECTOR_RESULT")
+        if completion:
+            with Path(completion).open("x", encoding="utf-8") as stream:
+                json.dump({"status": "finished", "exit": code}, stream)
+        return code
 
 
 if __name__ == "__main__":

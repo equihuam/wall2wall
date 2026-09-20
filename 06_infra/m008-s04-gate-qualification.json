@@ -1,0 +1,46 @@
+{
+  "schema": "wall2wall.m008-s04-qualification/1",
+  "ok": true,
+  "status": "passed",
+  "invocation": "981349f9dc174eeda03e08f69584c0cb",
+  "tests": 6,
+  "fits": 0,
+  "sources": [
+    {
+      "path": "06_infra/m008_integration/verify_s04.py",
+      "size": 17321,
+      "sha256": "207097956c6ec70e03d7ee0f386234e06a63c9b27790c770107c146c016eaa59"
+    },
+    {
+      "path": "06_infra/m008_integration/qualify_s04.py",
+      "size": 11625,
+      "sha256": "8d7e9849e901d78bbfc4ac9047b4fda57f01d8066905d7e0fa49b44c66c53a14"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s04.json",
+      "size": 557,
+      "sha256": "1b5bdb10f922f43a31bad6457b9342b6bd067c240043f8ec708c171f726bd571"
+    }
+  ],
+  "inventory_sha256": "2cbadbc18b6f9d5b6d751046a642dff806c2e17a4852da7002e527be10545954",
+  "retained": {
+    "retained_tests": 32,
+    "fits": 0,
+    "sources": 67,
+    "report_sha256": "532936f63d8bc3982f64d66b9c18998b3cd325ed7a659005d70550341529aa83",
+    "base_commit": "737fe3a4f4b5521491effa196eb053eb99c9c7a8"
+  },
+  "seconds": 11.325,
+  "sizes_final": {
+    "scratch": 837,
+    "logs": 701,
+    "evidence": 430
+  },
+  "rss_peak": "unknown",
+  "scratch_peak": "unknown",
+  "tokens": "unknown",
+  "artifacts": {
+    "logs/suite.log": "2b97731cc1647e63dcdf792ebf98fdf3cfc12f882511a672425c6bfc1ea6aab5",
+    "evidence/junit.xml": "750d690fdeb1c093215d53c68ca9294c5a353ed97e0715ca7b6c69d45c90c9b9"
+  }
+}

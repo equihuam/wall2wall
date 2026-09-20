@@ -1,0 +1,13 @@
+[
+  "06_infra/m008_integration/fit_counter.py",
+  "06_infra/m008_integration/products.py",
+  "06_infra/m008_integration/science_worker.py",
+  "06_infra/m008_integration/science_dispatch.py",
+  "06_infra/m008_integration/verify_s02.py",
+  "06_infra/m008_integration/test_scientific_contract.py",
+  "08_pkg/tests/run_checks.py",
+  "08_pkg/tests/test_workflow.py",
+  "08_pkg/tests/test_audit.py",
+  "08_pkg/tests/test_prediction.py",
+  "08_pkg/tests/test_quality.py"
+]

@@ -1,0 +1,88 @@
+{
+  "schema": "wall2wall.m008-s04-preserved/1",
+  "base_commit": "737fe3a4f4b5521491effa196eb053eb99c9c7a8",
+  "purpose": "read-only admission inventory; not acceptance or replacement of historical manifests",
+  "files": [
+    {
+      "path": "06_infra/M008-S02-GATE-PREPARATION.md",
+      "size": 4620,
+      "sha256": "a15a307c5ea6c473019f4160dab3d30edc3e312e189651f7963fccac0f283378"
+    },
+    {
+      "path": "06_infra/m008-s02-gate-preparation.json",
+      "size": 126411,
+      "sha256": "532936f63d8bc3982f64d66b9c18998b3cd325ed7a659005d70550341529aa83"
+    },
+    {
+      "path": "06_infra/m008_integration/fit_counter.py",
+      "size": 7899,
+      "sha256": "c94f91e81b33f936795790d34b5dd08b3f88acd1989ff3a5179e62bcffda5890"
+    },
+    {
+      "path": "06_infra/m008_integration/products.py",
+      "size": 9347,
+      "sha256": "02b7a6793eda49e9c8570db56205a886190ab700584a0894552f604914af86d4"
+    },
+    {
+      "path": "06_infra/m008_integration/science_dispatch.py",
+      "size": 8679,
+      "sha256": "0a7f7a07708e0add696408cc3056f30be5d91c69c18e479e8018e4f467deed0f"
+    },
+    {
+      "path": "06_infra/m008_integration/science_worker.py",
+      "size": 10312,
+      "sha256": "ebdf0c6fd5660840afbcde3178385148710d625baa79549394d376113e591b34"
+    },
+    {
+      "path": "06_infra/m008_integration/test_scientific_contract.py",
+      "size": 12134,
+      "sha256": "017d977308fc8536d3d72506f722e515a01cb88924037b344c753ab93e5aaa1a"
+    },
+    {
+      "path": "06_infra/m008_integration/verify_s02.py",
+      "size": 8400,
+      "sha256": "fe806b2f757497084fd62ab331b4ce89c30f56edf131b7a0641be0f399884062"
+    },
+    {
+      "path": "06_infra/python_header_scope_m008_s02_science.json",
+      "size": 466,
+      "sha256": "798aa80f823ad90b219d18c5a44bbc4cd43f414be51b5009a74089b3731c164c"
+    },
+    {
+      "path": "08_pkg/tests/run_checks.py",
+      "size": 20457,
+      "sha256": "fa5ab7fe18203550e65b3b127654c12974c78e8d60b2c53ac8ff509d89cd5fc1"
+    },
+    {
+      "path": "08_pkg/tests/test_audit.py",
+      "size": 21686,
+      "sha256": "48bc768cc453545a448e4d3ca464e26e49a120bddfd31f45d3bedc7f08ca0208"
+    },
+    {
+      "path": "08_pkg/tests/test_prediction.py",
+      "size": 19569,
+      "sha256": "09887e7b7ea40be44ec11c91f572b2c9782d1f4d4546d31be86f216654983f66"
+    },
+    {
+      "path": "08_pkg/tests/test_quality.py",
+      "size": 12183,
+      "sha256": "358a19093999d18b509e3f3690cd00240bc399141869c2ff3b83c100daf7c4e9"
+    },
+    {
+      "path": "08_pkg/tests/test_workflow.py",
+      "size": 16933,
+      "sha256": "b16f1c6e7edb0a4cae99393219b426aac1cbe5c25b53693bf5aa686516ca5ddb"
+    }
+  ],
+  "historical": {
+    "06_infra/m008-s02-preparation.json": "8cfd9a0324873c1d7b94cca8f861372ca820a32120b2a59f056e2f2c966415f3",
+    "06_infra/m008-s03-preparation.json": "c9f534a0ab4c6243af723854a37fdf22a293e3cbcab0e66e5a5e4a147acb3454",
+    "06_infra/m008-s03-preparation-failure.json": "648d39609adde91a034aa87f1ae7a4ebabb36ebc46a1758b7f81e2c07c9afb63",
+    "06_infra/m008-s03-r2-preparation.json": "346eea21867f0bd7a7da16f820e6ae63f013ee01be7e85d47bc5b2f645aa3df5",
+    "06_infra/m008-s03-validation.json": "8bb36ddf27fb8a4a61afc65de90507d969ac0b172508bb3b217d4db414f63c44",
+    "05_governance/reviews/m008/M008-S03_r1_review.md": "5465db0f4ab3c4b0305c344190b185f87fe01da72b18fcd108898be2335db1ae",
+    "05_governance/reviews/m008/M008-S03_r1_verification.json": "5520648dafd955048b2402482d68b84eacbfe85025bfdb2c1eeeb8c56495882d"
+  },
+  "preparation_report_sha256": "532936f63d8bc3982f64d66b9c18998b3cd325ed7a659005d70550341529aa83",
+  "preparation_gate_result_sha256": "90384a3fb9331c08f87465b2019f091c8d79d4769387d80f429d27d9cb7b4073"
+}

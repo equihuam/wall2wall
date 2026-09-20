@@ -15,6 +15,7 @@ cuatro llamadas fit incluidas Pipeline/StandardScaler, con corte antes de ocho.
 Negativos reutilizan modelos; los espías exigen lectura por ventanas y lotes.
 
 ## Notas relevantes
+Los hijos usan run_child: evidencia persistente, contador opcional y timeout sin kill.
 La entrada interna prepare crea los modelos en un proceso que termina.
 Comprueba compresión DEFLATE/LZW y rechazos anteriores a deserializar.
 Las fixtures reutilizan metadatos analíticos de test_audit, sin ejecutar su suite.
@@ -26,6 +27,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import runpy
 import sys
 
 import numpy as np
@@ -38,6 +40,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 PACKAGE = Path(__file__).resolve().parents[1]
+run_child = runpy.run_path(str(PACKAGE / "tests/run_checks.py"))["run_child"]
 sys.path.insert(0, str(PACKAGE / "src"))
 from wall2wall import audit, modeling, prediction, spatial
 sys.path.pop(0)
@@ -75,7 +78,7 @@ def prepare(root):
 @pytest.fixture(scope="module")
 def models(tmp_path_factory):
     root = tmp_path_factory.mktemp("prediction-models")
-    result = subprocess.run([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
+    result = run_child([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
                             cwd=root, text=True, capture_output=True, timeout=120)
     print(result.stdout)
     assert result.returncode == 0, result.stdout + result.stderr
@@ -204,7 +207,7 @@ from wall2wall.prediction import predict_raster
 predict_raster(sys.argv[2], sys.argv[3], sys.argv[4], trusted=True, window_size=3, batch_size=2)
 '''
     output = tmp_path / "map"
-    result = subprocess.run([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"),
+    result = run_child([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"),
                              str(models / name), str(path), str(output)],
                             cwd=tmp_path, capture_output=True, text=True, timeout=60)
     assert result.returncode == 0, result.stdout + result.stderr

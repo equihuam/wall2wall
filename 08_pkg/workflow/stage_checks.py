@@ -15,7 +15,9 @@ verify_receipt rechaza recibos obsoletos sin entrenar ni ejecutar otras suites.
 
 ## Notas relevantes
 No incluye test_workflow ni ejecuta validated desde pruebas del workflow.
-Timeout conserva selector y marcador pendiente; bloquea el run aun si termina
+Timeout o descendiente unknown conserva scratch y marcador pendiente, incluso con
+salida positiva del selector; sólo una finalización explícita conocida libera el run.
+Bloquea el run aun si termina
 Snakemake. Exige diagnóstico de descendientes y recuperación manual, sin reintento.
 Cada selector usa scratch externo y puede conservar JUnit mediante configuración local.
 =============================================================================
@@ -27,6 +29,7 @@ from pathlib import Path
 import runpy
 import subprocess
 import sys
+import tempfile
 
 from stages import PACKAGE, ROOT, check_complete, fingerprint, identity, preflight, read_json, write_json
 
@@ -76,12 +79,21 @@ def execute_checks(config, run, group):
         return
     for selector in GROUPS[group]:
         command = [sys.executable, "-B", str(PACKAGE / "tests/run_checks.py"), "--" + selector + "-only"]
-        write_json(pending, {"status": "unknown", "selector": selector, "owner_pid": os.getpid()})
-        process = subprocess.Popen(command, cwd=run)
-        pending.write_text(json.dumps({"status": "unknown", "selector": selector, "pid": process.pid}), encoding="utf-8")
+        parent = Path(os.environ.get("VERIFICATION_SCRATCH", tempfile.gettempdir())).resolve()
+        if not parent.is_dir() or parent.is_relative_to(ROOT):
+            raise ValueError("external selector scratch required")
+        scratch = Path(tempfile.mkdtemp(prefix="selector-", dir=parent))
+        completion = scratch / "selector-result.json"
+        environment = dict(os.environ, VERIFICATION_SCRATCH=str(scratch),
+                           WALL2WALL_CHILD_STATE=str(scratch), WALL2WALL_SELECTOR_RESULT=str(completion))
+        record = {"status": "unknown", "selector": selector, "owner_pid": os.getpid(), "scratch": str(scratch)}
+        write_json(pending, record)
+        process = subprocess.Popen(command, cwd=run, env=environment)
+        pending.write_text(json.dumps({**record, "pid": process.pid}), encoding="utf-8")
         code = process.wait(timeout=1200)
-        if code < 0:
-            raise ValueError("selector interrupted; descendant outcome unknown")
+        if (code < 0 or os.path.lexists(scratch / "unknown.json") or not completion.is_file()
+                or read_json(completion) != {"status": "finished", "exit": code}):
+            raise ValueError("selector or descendant outcome unknown; preserve evidence and lock")
         pending.unlink()
         if code:
             raise subprocess.CalledProcessError(code, command)

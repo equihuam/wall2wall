@@ -14,6 +14,7 @@ Plan de cuatro fit contando RF, Pipeline y pasos, con corte antes de doce.
 Guardado y carga entre procesos, negativos sin fits y predicciones conservadas.
 
 ## Notas relevantes
+Los hijos usan run_child: evidencia persistente, contador opcional y timeout sin kill.
 La entrada interna prepare genera modelos analíticos; no ejecuta otras suites.
 La alerta es univariada, no AOA ni incertidumbre. RAM nativa y scratch pico unknown.
 =============================================================================
@@ -23,6 +24,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import runpy
 import sys
 
 import numpy as np
@@ -34,6 +36,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 PACKAGE = Path(__file__).resolve().parents[1]
+run_child = runpy.run_path(str(PACKAGE / "tests/run_checks.py"))["run_child"]
 sys.path.insert(0, str(PACKAGE / "src"))
 from wall2wall import audit, modeling, prediction
 sys.path.pop(0)
@@ -73,7 +76,7 @@ def prepare(root):
 @pytest.fixture(scope="module")
 def models(tmp_path_factory):
     root = tmp_path_factory.mktemp("quality")
-    completed = subprocess.run([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
+    completed = run_child([sys.executable, "-I", "-B", str(Path(__file__)), "prepare", str(root)],
                                cwd=root, capture_output=True, text=True, timeout=90)
     print(completed.stdout)
     assert completed.returncode == 0, completed.stdout + completed.stderr
@@ -155,7 +158,7 @@ model = load_run(sys.argv[2], trusted=True)
 assert model['training_ranges'] == [{'name':'p01','min':0.,'max':4.},{'name':'p02','min':2.,'max':2.}]
 predict_raster(sys.argv[2], sys.argv[3], sys.argv[4], trusted=True, quality=True, window_size=2)
 '''
-    completed = subprocess.run([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"), str(models / "pipeline"),
+    completed = run_child([sys.executable, "-I", "-B", "-c", code, str(PACKAGE / "src"), str(models / "pipeline"),
                                str(path), str(tmp_path / "fresh")], cwd=tmp_path, capture_output=True, text=True, timeout=60)
     assert completed.returncode == 0, completed.stdout + completed.stderr
 
