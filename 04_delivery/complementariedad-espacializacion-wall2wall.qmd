@@ -1,0 +1,182 @@
+---
+title: "Cómo se complementan Wall2Wall y la espacialización de variables del equipo"
+subtitle: "Nota de coordinación para el piloto con datos reales"
+author: "Proyecto Wall2Wall"
+date: "2026-09-21"
+lang: es
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    embed-resources: true
+    theme: cosmo
+execute:
+  enabled: false
+---
+
+## Propósito común
+
+Ambos trabajos buscan representar en el territorio variables observadas en campo.
+El equipo está avanzando en la espacialización de un conjunto amplio de variables,
+con métodos adecuados a su significado. **Wall2Wall aporta infraestructura de
+cómputo para relacionar observaciones puntuales con covariables y generar
+predicciones para las celdas del área de interés que tengan entradas válidas.**
+
+La complementariedad consiste en aprovechar las definiciones, datos, capas y
+métodos del equipo, junto con la preparación reproducible, evaluación espacial,
+generación de mapas y trazabilidad implementadas en Wall2Wall. Según el caso,
+un resultado del equipo puede ser una covariable, una referencia para comparar
+métodos o un producto complementario que conserva su propio flujo.
+
+## Qué busca generalizar Wall2Wall
+
+El foco actual son **variables objetivo numéricas continuas**, una por ajuste:
+por ejemplo, altura del arbolado, ancho de senderos u otra magnitud medida con
+unidad y soporte definidos. La altura es un ejemplo para discutir escala,
+muestreo y precisión; no limita el propósito general del desarrollo.
+
+El objetivo es obtener la mejor capacidad de generalización que podamos
+**demostrar con los datos, el diseño de evaluación y los recursos disponibles**.
+Generalizar significa predecir en lugares no utilizados para ajustar o seleccionar
+el modelo, dentro del dominio para el que la evidencia permita sostener esa
+predicción. Un buen ajuste a los puntos conocidos no basta para acreditarlo.
+
+Wall2Wall combina covariables, modelos de regresión y evaluación espacial fuera
+de muestra. Si se comparan familias o parámetros, su selección debe quedar
+dentro del entrenamiento, separada de los datos utilizados para evaluar.
+No se promete que una familia de modelos gane siempre ni que toda variable
+pueda predecirse con utilidad suficiente.
+
+**Propuesta de alcance:** mantener el primer piloto centrado en respuestas
+continuas. Los códigos numéricos de una categoría —por ejemplo, 1, 2 y 3 para
+clases de condición— no la convierten por sí solos en una magnitud continua.
+Las respuestas binarias, nominales, ordinales y los conteos requieren definir
+su interpretación, modelo y métricas antes de incorporarlas. La versión actual
+no implementa un flujo de clasificación u ordinal; ampliarlo sería una decisión
+de desarrollo separada.
+
+## Qué muestra el catálogo compartido
+
+El archivo consolidado contiene **69 entradas con definiciones y métodos
+propuestos**; algunas agrupan varios campos. No contiene las observaciones
+originales, los mapas producidos ni sus resultados de evaluación.
+
+De esas entradas, 32 están marcadas para espacialización mediante modelo predictivo:
+
+| Tipo declarado | Entradas |
+|---|---:|
+| Ordinal | 20 |
+| Selección múltiple | 7 |
+| Nominal | 4 |
+| Numérico | 1 |
+| **Total** | **32** |
+
+Además, hay seis entradas de derivación GIS determinística, tres propuestas
+basadas en indicadores indirectos y una espacialización condicionada. Las
+restantes cumplen funciones de control, interpretación, validación, armonización
+o exclusión.
+
+Esto muestra que el trabajo del equipo es más amplio que la regresión continua.
+También explica por qué conviene distinguir **espacialización**, como objetivo
+general, de cada método concreto: derivación GIS, interpolación, regresión,
+clasificación o modelado ordinal. El catálogo orienta esa separación; los scripts
+y productos permitirán confirmar qué métodos ya se ejecutaron.
+
+## Formas de complementar los procesos
+
+| Componente del trabajo del equipo | Relación posible con Wall2Wall | Qué debemos acordar |
+|---|---|---|
+| Magnitudes continuas medidas en campo | Candidatas a una aplicación del flujo actual de regresión. | Unidad, soporte, muestreo, valores faltantes y criterio de utilidad. |
+| Derivaciones GIS, como distancias o variables del relieve | Covariables reutilizables si son pertinentes y compatibles. | Procedencia, método, CRS, malla, cobertura y fecha. |
+| Mapas interpolados o predicciones ya generadas | Modelos de comparación; algunas capas podrían ser covariables tras revisar su procedencia. | Qué observaciones los originaron y cómo se evaluaron. |
+| Variables nominales, ordinales o binarias | Productos complementarios con métodos propios; posibles ampliaciones futuras. | Significado de clases, modelo, salida y métricas correspondientes. |
+| Controles de sitio, equipo, observador y calidad | Información para depuración, agrupación y análisis de sesgos. | Cómo conservarlos y usarlos sin convertirlos automáticamente en predictores. |
+| Juicios sintéticos o indicadores reservados para validación | Evidencia adicional para interpretar resultados. | Dependencia respecto a las variables modeladas y límites de su independencia. |
+
+La prioridad es reutilizar lo que ya esté bien definido y evaluado, evitando
+duplicar implementaciones. La infraestructura de Wall2Wall puede apoyar la
+comparación y trazabilidad, sin asumir que todos los métodos del catálogo están
+ya disponibles en el paquete.
+
+## Covariables de distintas fuentes
+
+Las covariables describen características del territorio que pueden ayudar a
+explicar la variación espacial de la respuesta. Además de reflectancia e índices
+satelitales y radar, pueden incluir información climática, geológica, hidrológica,
+topográfica, de suelos o de actividad humana.
+
+Su incorporación dependerá de la relación con la variable objetivo y de su
+calidad, cobertura y compatibilidad espacial y temporal. Añadir capas no asegura
+mejores predicciones. Una variable medida sólo en los sitios de campo necesitaría
+estar disponible también donde se pretende predecir, o contar con un procedimiento
+explícito para estimarla y evaluar el efecto de esa estimación.
+
+El núcleo actual recibe covariables numéricas continuas en ráster. Una fuente
+categórica, como clases geológicas, necesita una preparación compatible o una
+ampliación acordada; sus códigos no deben interpretarse automáticamente como
+cantidades.
+
+## Cómo comparar resultados sin perder independencia
+
+Los mapas producidos por el equipo pueden ser referencias útiles para comparar
+enfoques. Para ello necesitamos las **observaciones originales** y conocer qué
+datos intervinieron en cada etapa. Un mapa interpolado no constituye por sí mismo
+una verdad de campo independiente.
+
+Si un mapa se construyó con todos los puntos y luego se usa como predictor al
+evaluar sobre parte de esos mismos puntos, la evaluación puede incorporar
+información que debería estar reservada. Cuando exista esa dependencia, habrá
+que reconstruir el paso correspondiente usando sólo el entrenamiento de cada
+partición, o definir una evaluación realmente independiente. Este principio
+también se aplica a transformaciones y selección de variables.
+[Referencia metodológica: prevención de fuga de información en scikit-learn](https://scikit-learn.org/stable/common_pitfalls.html#data-leakage).
+
+La comparación debe mantener el mismo objetivo, soporte, puntos de evaluación
+y particiones espaciales, y utilizar métricas adecuadas al tipo de respuesta.
+Para respuestas continuas, Wall2Wall contempla MAE, RMSE, sesgo y R², junto con
+una referencia que predice la media del entrenamiento. Las metas en metros
+discutidas para altura no se trasladan a otras variables.
+
+## Qué podemos preparar ahora
+
+Podemos avanzar mientras se completa la respuesta a la petición de datos:
+
+1. **Una matriz de compatibilidad por variable:** objetivo, tipo de respuesta,
+   unidad o categorías, soporte, función y método disponible o pendiente.
+2. **Un inventario de productos existentes:** observaciones de origen, scripts
+   o configuraciones, mapas, covariables y evaluación realizada por el equipo.
+3. **Un protocolo de comparación:** particiones espaciales, métricas, referencia,
+   criterio de utilidad y presupuesto para un primer caso continuo.
+
+El ancho de sendero aparece en el catálogo como respuesta numérica con regresión
+propuesta, por lo que puede estudiarse como candidato. Antes de seleccionarlo,
+debemos definir dónde se mide y dónde tiene sentido predecir: ausencia de sendero,
+dato faltante y ancho cero no son situaciones intercambiables.
+
+Si el proceso paralelo ya dispone de observaciones adecuadas, el piloto puede
+usar una variable distinta de la altura del arbolado. La etapa del producto
+dedicada al **piloto real y evaluación de utilidad**, denominada internamente
+M007, requiere completar datos, permisos y protocolo antes de ejecutar modelos.
+Esta nota prepara esa coordinación y no selecciona todavía una variable ni
+autoriza entrenamientos.
+
+## Información que solicitamos al equipo
+
+Para acordar el siguiente paso, compartir por el canal autorizado:
+
+- Variables ya espacializadas y estado de cada producto: propuesta, ejecutado
+  o evaluado.
+- Método y versión del script, configuración, parámetros y covariables utilizados.
+- Descripción de observaciones originales: cantidad de sitios y visitas,
+  fechas, soporte, unidad o categorías, faltantes y reglas de exclusión.
+- Metadatos de mapas: CRS, resolución, extensión, nodata y período representado.
+- Diseño y resultados de evaluación, indicando qué puntos se reservaron y si
+  participaron indirectamente en la preparación.
+- Permisos, restricciones y responsable de los datos y productos.
+
+La base de esta nota es el catálogo
+`consolidado_variables_espacializacion.xlsx`, hoja `Hoja1`, filas 2–70,
+revisado el 21 de septiembre de 2026, y el alcance implementado de Wall2Wall.
+No se han inspeccionado aquí los mapas o scripts del proceso paralelo ni
+ejecutado ajustes. La revisión no modifica el catálogo original.
